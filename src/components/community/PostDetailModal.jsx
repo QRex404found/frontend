@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { LatestCommentPreview } from './LatestCommentPreview.jsx';
 import { CommentDrawer } from './CommentDrawer.jsx';
-// API 호출 로직은 제거되었지만, API 함수는 신고 기능을 위해 유지합니다.
 import { getPostDetailApi, reportPostApi } from '@/api/community'; 
 import useAuth from '@/hooks/useAuth';
 import { CustomAlertDialog } from '../common/CustomAlertDialog.jsx';
@@ -23,7 +22,7 @@ import { MoreHorizontal, Loader2 } from 'lucide-react';
  * @param {function} onOpenChange - 모달 상태 변경 핸들러
  * @param {object | null} post - 현재 보고 있는 게시글 객체 (핵심 데이터 소스)
  */
-// 🚨 [핵심 수정] boardId 대신 post 객체 전체를 프롭으로 받습니다.
+// [핵심 수정] boardId 대신 post 객체 전체를 프롭으로 받습니다.
 export function PostDetailModal({ isOpen, onOpenChange, post }) {
     // post Prop을 postDetail로 사용 (데이터 소스 통일)
     const postDetail = post; 
@@ -70,7 +69,7 @@ export function PostDetailModal({ isOpen, onOpenChange, post }) {
         setAlertDialogState({ ...alertDialogState, isOpen: false });
     };
 
-    // 🚨 [로딩 트랩 해제] post Prop이 없는데 모달이 열려 있으면 로딩 UI 표시 (오류 방지)
+    // [로딩 트랩 해제] post Prop이 없는데 모달이 열려 있으면 로딩 UI 표시 (오류 방지)
     if (!postDetail && isOpen) { 
         return (
             <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -158,7 +157,7 @@ export function PostDetailModal({ isOpen, onOpenChange, post }) {
                                 </div>
                             )}
 
-                            {/* 🚀 URL 표시 */}
+                            {/* URL 표시 */}
                             {postDetail.url && (
                                 <div className="p-3 border rounded">
                                     <span className="font-semibold text-gray-700">URL:</span>
