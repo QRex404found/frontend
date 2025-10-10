@@ -11,6 +11,7 @@ import { SignUp } from './pages/SignUp.jsx';
 import { Analysis } from './pages/Analysis.jsx';
 import { Community } from './pages/Community.jsx';
 import { MyPost } from './pages/MyPost.jsx';
+import AnalyzingQR from './pages/AnalyzingQR.jsx'; 
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/analysis" element={<Analysis />} />
+          <Route path="/analyzing-qr" element={<AnalyzingQR />} /> 
           <Route path="/community" element={<Community />} />
           <Route path="/mypost" element={<MyPost />} />
           {/* Additional routes can be added here */}

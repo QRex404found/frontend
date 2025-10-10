@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-// Card 관련 요소는 CommonBoard로 옮겨지거나 제거되었습니다.
 import { Loader2 } from 'lucide-react'; 
 import { getAnalysisHistoryApi } from '@/api/analysis'; 
-import { CommonBoard } from '@/components/common/CommonBoard'; // 💡 CommonBoard 임포트
+import { CommonBoard } from '@/components/common/CommonBoard';
 
 // 더미 데이터 (분석 기록 시뮬레이션)
 const DUMMY_HISTORY = Array.from({ length: 35 }, (_, i) => ({
@@ -32,11 +31,9 @@ export function AnalysisHistory({ onSelectResult }) {
     const fetchHistory = async (page) => {
         setIsLoading(true);
         try {
-            // 실제 API 호출 시뮬레이션 (페이지네이션 처리 포함)
             const start = (page - 1) * pageSize;
             const end = start + pageSize;
             
-            // API 응답 구조를 시뮬레이션합니다.
             const totalElements = DUMMY_HISTORY.length;
             const totalPagesCalculated = Math.ceil(totalElements / pageSize);
             const paginatedData = DUMMY_HISTORY.slice(start, end);
@@ -54,22 +51,20 @@ export function AnalysisHistory({ onSelectResult }) {
     };
 
     const handleTitleClick = (item) => {
-        // 제목 클릭 시, 해당 분석 결과를 부모 컴포넌트로 전달
         onSelectResult(item);
     };
 
-    // CommonBoard 컴포넌트를 사용하여 렌더링 구조 통합
     return (
-        <CommonBoard
-            title="QR Analysis History"
-            posts={history}
-            isLoading={isLoading}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={fetchHistory} // fetchHistory 함수를 onPageChange로 전달
-            onItemClick={handleTitleClick}
-            showIndex={false} // 분석 기록은 번호(Index)를 표시하지 않음
-            caption="최근 분석 기록 목록입니다."
-        />
+        <div className="flex-1"> {/* ✅ 상위 컨테이너 유지 */}
+            <CommonBoard
+                posts={history}
+                isLoading={isLoading}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={fetchHistory}
+                onItemClick={handleTitleClick}
+                showIndex={false}
+            />
+        </div>
     );
 }

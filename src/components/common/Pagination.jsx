@@ -19,7 +19,7 @@ export const Pagination = ({ totalPages, currentPage, onPageChange }) => {
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
       >
-        previous
+        이전
       </Button>
       {pages.map(page => (
         <Button
@@ -35,7 +35,7 @@ export const Pagination = ({ totalPages, currentPage, onPageChange }) => {
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
       >
-        next
+        다음
       </Button>
     </div>
   );
