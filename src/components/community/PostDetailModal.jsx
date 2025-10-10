@@ -23,27 +23,32 @@ import { MoreHorizontal, Loader2 } from 'lucide-react';
  * @param {function} onOpenChange - 모달 상태 변경 핸들러
  * @param {object | null} post - 현재 보고 있는 게시글 객체 (핵심 데이터 소스)
  */
+// 🚨 [핵심 수정] boardId 대신 post 객체 전체를 프롭으로 받습니다.
 export function PostDetailModal({ isOpen, onOpenChange, post }) {
     // post Prop을 postDetail로 사용 (데이터 소스 통일)
     const postDetail = post; 
     
+    // API 호출이 없어졌으므로 isLoading 상태는 사실상 불필요하지만 구조 유지를 위해 선언만 둡니다.
     const [isLoading, setIsLoading] = useState(false); 
     const { user } = useAuth();
     const [alertDialogState, setAlertDialogState] = useState({ isOpen: false, title: '', message: '' });
     const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
 
+    // 모달이 닫힐 때 댓글 서랍 상태 초기화
     useEffect(() => {
         if (!isOpen) {
             setIsCommentDrawerOpen(false);
         }
     }, [isOpen]);
 
+    // API 호출 로직이 제거되었으므로, 댓글 업데이트 시 새로고침은 Mocking으로 처리합니다.
     const handleCommentUpdate = () => {
         console.log("댓글 업데이트 후 상세 정보 새로고침 (Mocking)");
         // 실제 환경에서는 여기서 부모 컴포넌트의 데이터 갱신 함수를 호출해야 합니다.
     };
-    
+    
     const handleReportPost = async () => {
+        // postDetail의 ID 사용
         if (!postDetail || !postDetail.id) return;
         try {
             // await reportPostApi(postDetail.id);
@@ -65,6 +70,7 @@ export function PostDetailModal({ isOpen, onOpenChange, post }) {
         setAlertDialogState({ ...alertDialogState, isOpen: false });
     };
 
+    // 🚨 [로딩 트랩 해제] post Prop이 없는데 모달이 열려 있으면 로딩 UI 표시 (오류 방지)
     if (!postDetail && isOpen) { 
         return (
             <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -82,92 +88,62 @@ export function PostDetailModal({ isOpen, onOpenChange, post }) {
             </Dialog>
         );
     }
-    if (!postDetail) return null; 
+    if (!postDetail) return null; // postDetail이 null이고 모달이 닫혀있다면 아무것도 렌더링하지 않음
     
-    // =========================================================================
-    // 👇👇👇 스크롤/URL 테스트를 위한 임시 코드 (ID 3번 게시글에만 적용) 👇👇👇
-    // =========================================================================
-    let finalPostDetail = postDetail; 
-
-    if (postDetail.id === 3) { 
-        // 내용을 매우 길게 만듭니다.
-        const longContent = "이것은 ID 3번 게시글에만 적용되는 매우 긴 테스트 문자열입니다.\n".repeat(150) + "스크롤 테스트를 완료해 주세요!"; 
-        
-        // URL 필드에 긴 테스트 URL을 추가합니다.
-        const longUrl = "https://www.verylongtesturl.com/this/is/a/super/long/path/for/testing/breaking/and/scrolling/01234567890123456789/verylongparameter?q=test_query&p=12345";
-
-        finalPostDetail = {
-            ...postDetail,
-            context: longContent, 
-            url: longUrl, 
-        };
-    }
-    // =========================================================================
-    // 👆👆👆 스크롤/URL 테스트를 위한 임시 코드 👆👆👆
-    // =========================================================================
-
-
     // 게시글 상세 정보 표시 상태
     return (
         <>
             <Dialog open={isOpen} onOpenChange={onOpenChange}>
-                {/* 🚨 변경: DialogContent에 relative 클래스 추가 */}
-                <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col bg-white p-0 overflow-hidden relative">
+                <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col bg-white p-0 overflow-hidden">
+                    
+                    <div className="flex flex-col h-full w-full p-6"> 
+                        
+                        <DialogHeader>
+                            <div className="flex justify-between items-start">
+                                <div className="flex-1 min-w-0 pr-4">
+                                    <DialogTitle className="text-xl font-bold break-words">{postDetail.title}</DialogTitle>
+{/*                                     <DialogDescription className="text-sm text-gray-500 mt-1">
+                                        작성자: {postDetail.author} | {postDetail.date}
+                                    </DialogDescription> */}
+                                </div>
+                                
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            className="h-8 w-8 text-gray-500 hover:bg-gray-100 mr-2 flex-shrink-0"
+                                        >
+                                            <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent 
+                                        align="start" 
+                                        side="left" 
+                                        sideOffset={10} 
+                                        className="w-32" 
+                                    >
+                                        <DropdownMenuItem 
+                                            onClick={handleReportPost}
+                                            className="flex items-center justify-center text-red-600 focus:bg-red-50 focus:text-red-600" 
+                                        >
+                                            report post
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                                
+                            </div>
+                            <Separator className="my-2" /> 
+                        </DialogHeader>
 
-                    {/* 🚨 변경: ... 버튼을 DialogHeader 밖으로 빼고, absolute로 위치 지정 */}
-                    <div className="absolute top-2 right-10 z-10">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 text-gray-500 hover:bg-gray-100"
-                                >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                align="start"
-                                side="left"
-                                sideOffset={10}
-                                className="w-32"
-                            >
-                                <DropdownMenuItem
-                                    onClick={handleReportPost}
-                                    className="flex items-center justify-center text-red-600 focus:bg-red-50 focus:text-red-600"
-                                >
-                                    report post
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-
-                    <div className="flex flex-col h-full w-full p-6">
-                        <DialogHeader>
-                            <div className="flex justify-between items-start">
-                                <div className="flex-1 min-w-0 pr-4">
-                                    <DialogTitle className="text-xl font-bold break-words">{postDetail.title}</DialogTitle>
-                                </div>
-                            </div>
-                            <Separator className="my-2" />
-                        </DialogHeader>
-
-                        {/* 🚨 ScrollArea: 모달의 헤더 아래 영역 전체에 스크롤을 적용하여 댓글까지 접근 가능하게 함 */}
                         <ScrollArea className="flex-grow p-4 space-y-4 -mx-4">
                             
-                            {/* 2. CONTEXT (내용) - 최대 높이를 150px로 줄이고 내부 스크롤 적용 */}
-                            <div 
-                                className="
-                                    whitespace-pre-wrap text-gray-800 border p-3 rounded 
-                                    max-h-[120px] overflow-y-auto 
-                                "
-                            >
-                                {finalPostDetail.context}
-                            </div>
+                            {/* 2. CONTEXT (내용) */}
+                            <div className="whitespace-pre-wrap text-gray-800 border p-3 rounded">{postDetail.context}</div>
 
                             {/* 3. PHOTO (사진) */}
                             {postDetail.photoUrl ? (
-                                <div className="my-4 flex justify-center w-full"> 
+                                <div className="my-4 flex justify-center">
                                     <img
                                         src={postDetail.photoUrl}
                                         alt="첨부 이미지"
@@ -175,25 +151,24 @@ export function PostDetailModal({ isOpen, onOpenChange, post }) {
                                     />
                                 </div>
                             ) : (
-                                 <div className="my-4 w-full flex justify-center"> {/* w-full과 flex justify-center 추가 */}
-                                    {/* 내부 div에서는 mx-auto를 제거해도 됩니다. */}
-                                    <div className="w-40 h-40 bg-gray-100 border-dashed border-2 flex flex-col items-center justify-center text-gray-400"> 
-                                        PHOTO
-                                    </div>
-                                </div>
+                                <div className="my-4 flex justify-center">
+                                    <div className="w-40 h-40 bg-gray-100 border-dashed border-2 flex flex-col items-center justify-center text-gray-400">
+                                        PHOTO
+                                    </div>
+                                </div>
                             )}
 
                             {/* 🚀 URL 표시 */}
-                            {finalPostDetail.url && (
+                            {postDetail.url && (
                                 <div className="p-3 border rounded">
                                     <span className="font-semibold text-gray-700">URL:</span>
                                     <a 
-                                        href={finalPostDetail.url} 
+                                        href={postDetail.url} 
                                         target="_blank" 
                                         rel="noopener noreferrer" 
                                         className="text-blue-600 underline ml-1 break-words hover:text-blue-700 transition-colors"
                                     >
-                                        {finalPostDetail.url}
+                                        {postDetail.url}
                                     </a>
                                 </div>
                             )}
