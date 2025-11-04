@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+// import { Card, CardContent } from '@/components/ui/card'; // Card와 CardContent는 더 이상 사용하지 않으므로 제거
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { updateAnalysisTitleApi } from '@/api/analysis'; // 제목 수정 API
+import { updateAnalysisTitleApi } from '@/api/analysis';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, XCircle, AlertTriangle, Loader2 } from 'lucide-react';
-// import { useToast } from '@/components/ui/use-toast'; // 성공/실패 알림용
-import { CustomAlertDialog } from '@/components/common/CustomAlertDialog'; // 새로 추가
+import { CustomAlertDialog } from '@/components/common/CustomAlertDialog';
 
 /**
  * QR 분석 결과 또는 이력 상세 정보를 표시하고 제목을 저장하는 패널입니다.
- * (Figma PDF 19페이지 참고)
- * * @param {object} result - analysisId, status, url, ipAddress, title 등의 분석 결과 객체
  */
 export default function AnalysisResultPanel({ result }) {
     const [title, setTitle] = useState(result?.title || '');
     const [isLoading, setIsLoading] = useState(false);
-    // const { toast } = useToast();
     const [alertDialogState, setAlertDialogState] = useState({
         isOpen: false,
         title: '',
@@ -59,9 +55,7 @@ export default function AnalysisResultPanel({ result }) {
 
         setIsLoading(true);
         try {
-            // API 호출: 제목 업데이트
             await updateAnalysisTitleApi(result.id, title);
-
             setAlertDialogState({
                 isOpen: true,
                 title: "저장 성공",
@@ -85,8 +79,12 @@ export default function AnalysisResultPanel({ result }) {
 
     return (
         <>
-            <CardContent className="w-full h-full flex flex-col p-6 space-y-6">
-                <h2 className="text-2xl font-bold border-b pb-2 mb-4">QR Analysis Result</h2>
+            {/* <CardContent>를 <div>로 변경하고, 중첩 패딩(p-6)을 제거합니다.
+              flex-col과 space-y-6은 자식 요소들의 간격을 위해 유지합니다.
+              이제 이 컴포넌트의 모든 내용은 부모(Analysis.jsx)의 패딩을 따릅니다.
+            */}
+            <div className="w-full h-full flex flex-col space-y-6">
+                <h2 className="!text-4xl font-bold border-b pb-2 mb-4">QR Analysis Result</h2>
 
                 {/* 상태 표시 섹션 */}
                 <div className={`p-4 rounded-lg ${statusProps.bg} flex items-center space-x-3`}>
@@ -135,7 +133,8 @@ export default function AnalysisResultPanel({ result }) {
                         )}
                     </Button>
                 </form>
-            </CardContent>
+            </div> {/* CardContent 대신 닫는 div */}
+            
             {/* 알림 다이얼로그 컴포넌트 추가 */}
             <CustomAlertDialog
                 isOpen={alertDialogState.isOpen}

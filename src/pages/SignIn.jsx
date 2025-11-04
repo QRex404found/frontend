@@ -1,4 +1,6 @@
 // 로그인 페이지
+// src/pages/SignIn.jsx
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
@@ -8,7 +10,7 @@ import  useAuth  from '../hooks/useAuth';
 import { loginApi } from '@/api/auth'; // 👈 API 함수 import
 
 export function SignIn() {
-  const [id, setId] = useState('');
+  const [id, setId] = useState(''); // 👈 'id' state 사용 (정상)
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -18,11 +20,16 @@ export function SignIn() {
     e.preventDefault();
     setError('');
     try {
-      // 1. 백엔드 로그인 API 호출
-      const data = await loginApi(id, password); 
+      // 🌟 [수정] loginApi가 { userId, password } 객체 1개를 받도록 수정
+      const data = await loginApi({
+          userId: id, // 👈 'id' state를 'userId' 키에 담아 전송
+          password: password
+      }); 
       
-      // 2. 로그인 성공 시 AuthContext 업데이트 (토큰 저장)
-      login(data.token, data.user); 
+      // data는 { success: true, token: "..." } 객체입니다.
+      // 🌟 [수정] AuthContext의 login 함수 호출
+      // (백엔드가 유저 정보를 따로 반환하지 않으므로, ID만 임시로 넘겨줍니다)
+      login(data.token, { id: id }); // 👈 data.user 대신 { id: id } 전달
 
       // 3. 메인 페이지로 이동
       navigate('/');
@@ -42,6 +49,7 @@ export function SignIn() {
         </CardHeader>
         <CardContent className="grid gap-4">
           <form onSubmit={handleSubmit} className="grid gap-4">
+            {/* ... (Input 태그들은 수정할 필요 없이 정상입니다) ... */}
             <div className="grid gap-2">
               <Input
                 id="id"
@@ -67,7 +75,7 @@ export function SignIn() {
               로그인
             </Button>
           </form>
-          {/* 소셜 로그인 버튼 (Figma PDF 4페이지 참고) */}
+          {/* ... (소셜 로그인 버튼 및 회원가입 링크) ... */}
           <div className="flex flex-col gap-2">
             <Button variant="outline" className="flex items-center gap-2">
               {/* Google 아이콘 */}

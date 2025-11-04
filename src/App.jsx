@@ -23,7 +23,7 @@ function App() {
       <main className="flex-grow p-4 md:p-8">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/signin" element={<SignIn />} />
+          <Route path="/login" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/analysis" element={<Analysis />} />
           <Route path="/analyzing-qr" element={<AnalyzingQR />} /> 

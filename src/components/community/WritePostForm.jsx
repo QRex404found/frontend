@@ -31,17 +31,21 @@ const WritePostForm = ({ onPostSuccess }) => {
         }
 
         setIsLoading(true);
-        // FormData는 파일과 텍스트를 함께 보낼 때 유용합니다.
         const formData = new FormData();
-        formData.append('title', title);
-        formData.append('context', context);
-        formData.append('url', url);
+
+        // 🌟 [수정] 키 이름을 백엔드 DTO(BoardCreateRequest)와 일치시킵니다.
+        formData.append('postTitle', title);       // 👈 'title' -> 'postTitle'
+        formData.append('postContents', context);  // 👈 'context' -> 'postContents'
+        formData.append('url', url);               // 👈 'url'은 DTO와 일치
+
         if (photoFile) {
-            formData.append('photo', photoFile);
+            // ❗️ [참고] 'photoFile'이라는 이름으로 파일을 보냅니다.
+            // 백엔드 컨트롤러는 이 'photoFile'을 @RequestPart("photoFile") MultipartFile photoFile 로 받아야 합니다.
+            // (만약 DTO의 imagePath만 사용한다면, 파일 업로드는 별도 로직이 필요합니다)
+            formData.append('photoFile', photoFile);
         }
 
         try {
-            // [수정] API 호출 함수 이름을 import한 이름과 일치시켰습니다.
             await createPostApi(formData); 
             alert('게시글 등록 성공!');
             // 폼 초기화
@@ -49,12 +53,14 @@ const WritePostForm = ({ onPostSuccess }) => {
             setUrl('');
             setContext('');
             setPhotoFile(null);
-            document.getElementById('photo-upload').value = ''; // 파일 입력 필드 초기화
+            document.getElementById('photo-upload').value = ''; 
             
-            if(onPostSuccess) onPostSuccess(); // 부모 컴포넌트에 성공 알림
+            if(onPostSuccess) onPostSuccess();
         } catch (error) {
             console.error("게시글 등록 실패:", error);
-            alert('게시글 등록에 실패했습니다. 다시 시도해주세요.');
+            // 🌟 [수정] 백엔드에서 보낸 오류 메시지를 우선적으로 표시합니다.
+            const errorMessage = error.response?.data || '게시글 등록에 실패했습니다. 다시 시도해주세요.';
+            alert(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -113,8 +119,7 @@ const WritePostForm = ({ onPostSuccess }) => {
                             placeholder="CONTEXT" 
                             value={context} 
                             onChange={(e) => setContext(e.target.value)} 
-                            // 높이를 h-[500px]에서 h-80 (약 320px)로 줄였습니다.
-                            className="resize-none h-80" // 🚀 [최종 수정] 높이를 **h-80**으로 줄였습니다.
+                            className="resize-none h-80"
                         />
                     </div>
 

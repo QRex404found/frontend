@@ -1,88 +1,105 @@
 // QR 분석 관련 API
 
-import { getToken } from '../utils/tokenUtils';
+import apiClient from './index';
 
-const BASE_URL = 'http://localhost:8080/api';
-
-const getAuthHeaders = (contentType = 'application/json') => {
-    const headers = {
-        'Authorization': `Bearer ${getToken()}`,
-    };
-    if (contentType) {
-        headers['Content-Type'] = contentType;
-    }
-    return headers;
-};
-
+// ==========================================================
+// 1. URL 분석 요청 (RAG)
+// (POST /api/analysis/analyze?url=...)
+// ==========================================================
 /**
- * 1. QR 코드 이미지 분석 (POST /api/analysis/scan)
- * - 이미지 파일을 서버로 전송해야 하므로 FormData를 사용합니다.
+ * URL을 백엔드에 보내 QR 피싱 분석을 요청합니다.
+ * @param {string} targetUrl - 분석할 URL (QR 스캔 후 추출된 URL)
+ * @returns {Promise<object>} - AnalysisResultResponse DTO 객체
  */
-export const scanQRImageApi = async (imageFile) => {
-  const formData = new FormData();
-  formData.append('file', imageFile);
+export async function analyzeQrApi(targetUrl) {
+  try {
+    // 1. @RequestParam("url")에 맞게 쿼리 파라미터로 URL 전송
+    const response = await apiClient.post(
+      `/api/analysis/analyze?url=${encodeURIComponent(targetUrl)}`
+    );
+    
+    // 2. 성공 시 AnalysisResultResponse DTO 반환
+    return response.data;
 
-  const response = await fetch(`${BASE_URL}/analysis/scan`, {
-    method: 'POST',
-    // FormData를 사용할 때는 Content-Type 헤더를 명시적으로 설정하지 않습니다.
-    // 브라우저가 자동으로 'multipart/form-data'와 boundary를 설정합니다.
-    headers: {
-        'Authorization': `Bearer ${getToken()}`, // 인증 헤더는 수동으로 추가
-    },
-    body: formData,
-  });
-  
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || 'QR 코드 분석에 실패했습니다.');
+  } catch (error) {
+    console.error("URL 분석 API 오류:", error.response);
+    const errorMessage = error.response?.data || "URL 분석에 실패했습니다.";
+    throw new Error(errorMessage);
   }
-  // 분석 결과 (상태, URL, IP 등) 반환을 기대
-  return data; 
-};
+}
 
+// ==========================================================
+// 2. 분석 기록 목록 조회
+// (GET /api/analysis/history)
+// ==========================================================
 /**
- * 2. 분석 이력 조회 (GET /api/analysis/history)
+ * 현재 사용자의 분석 기록을 페이지별로 조회합니다.
+ * @param {number} page - 요청할 페이지 번호 (0부터 시작)
+ * @param {number} size - 페이지당 항목 수
+ * @returns {Promise<object>} - Page<AnalysisHistoryResponse> DTO 객체
  */
-export const getAnalysisHistoryApi = async (page = 0, size = 10) => {
-  const response = await fetch(`${BASE_URL}/analysis/history?page=${page}&size=${size}`, {
-    method: 'GET',
-    headers: getAuthHeaders(null),
-  });
-  if (!response.ok) {
-    throw new Error('분석 이력 로드 실패');
-  }
-  // PageAnalysisHistoryResponse 스키마를 따르는 데이터 반환을 기대
-  return response.json(); 
-};
+export async function getAnalysisHistoryApi(page = 0, size = 10) {
+  try {
+    // 1. GET 요청 (params가 ?page=0&size=10 쿼리스트링으로 자동 변환)
+    const response = await apiClient.get('/api/analysis/history', {
+      params: { page, size }
+    });
+    // 2. Spring의 Page DTO 객체 반환
+    return response.data;
 
-/**
- * 3. 특정 분석 결과 상세 조회 (GET /api/analysis/history/{analysisId})
- */
-export const getAnalysisResultApi = async (analysisId) => {
-  const response = await fetch(`${BASE_URL}/analysis/history/${analysisId}`, {
-    method: 'GET',
-    headers: getAuthHeaders(null),
-  });
-  if (!response.ok) {
-    throw new Error('특정 분석 결과 로드 실패');
+  } catch (error) {
+    console.error("분석 기록 조회 API 오류:", error.response);
+    const errorMessage = error.response?.data || "기록 조회에 실패했습니다.";
+    throw new Error(errorMessage);
   }
-  // AnalysisResultResponse 스키마를 따르는 데이터 반환을 기대
-  return response.json(); 
-};
+}
 
+// ==========================================================
+// 3. 특정 분석 결과 상세 조회
+// (GET /api/analysis/history/{analysisId})
+// ==========================================================
 /**
- * 4. 분석 기록 제목 수정 (PUT /api/analysis/history/{analysisId})
- * - QR analysis result 페이지에서 제목 저장용
+ * 특정 분석 ID의 상세 결과를 조회합니다.
+ * @param {number} analysisId - 조회할 분석 ID
+ * @returns {Promise<object>} - AnalysisResultResponse DTO 객체
  */
-export const updateAnalysisTitleApi = async (analysisId, newTitle) => {
-  const response = await fetch(`${BASE_URL}/analysis/history/${analysisId}`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ title: newTitle }), // 제목만 전송
-  });
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || '분석 기록 제목 저장 실패');
+export async function getAnalysisResultApi(analysisId) {
+  try {
+    const response = await apiClient.get(`/api/analysis/history/${analysisId}`);
+    return response.data;
+
+  } catch (error) {
+    console.error("분석 상세 조회 API 오류:", error.response);
+    const errorMessage = error.response?.data || "상세 정보 조회에 실패했습니다.";
+    throw new Error(errorMessage);
   }
-  return response.json(); // 업데이트된 기록 정보 반환
-};
+}
+
+// ==========================================================
+// 4. 분석 기록 제목 수정
+// (PUT /api/analysis/history/{analysisId})
+// ==========================================================
+/**
+ * 특정 분석 기록의 제목을 수정합니다.
+ * @param {number} analysisId - 수정할 분석 ID
+ * @param {string} newTitle - 새 제목
+ * @returns {Promise<string>} - 성공 메시지 ("제목이 성공적으로 업데이트되었습니다.")
+ */
+export async function updateAnalysisTitleApi(analysisId, newTitle) {
+  try {
+    // 1. PUT 요청 (Spring: @RequestBody UpdateTitleRequest request)
+    // DTO 형식 { "title": "..." } 에 맞춰 객체 전송
+    const response = await apiClient.put(
+      `/api/analysis/history/${analysisId}`, 
+      { title: newTitle }
+    );
+    
+    // 2. 성공 메시지(String) 반환
+    return response.data;
+
+  } catch (error) {
+    console.error("분석 제목 수정 API 오류:", error.response);
+    const errorMessage = error.response?.data || "제목 수정에 실패했습니다.";
+    throw new Error(errorMessage);
+  }
+}
