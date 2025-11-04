@@ -10,11 +10,6 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
-/**
- * 로그인 필요 시 표시되는 팝업 컴포넌트입니다.
- * @param {boolean} show - 팝업을 표시할지 여부
- * @param {boolean} isMandatory - 팝업을 닫을 수 없는 필수 로그인 팝업인지 여부
- */
 export function AuthPopup({ show, isMandatory }) {
   const navigate = useNavigate();
 
@@ -22,14 +17,16 @@ export function AuthPopup({ show, isMandatory }) {
     navigate('/login');
   };
 
+  const handlePopupClose = (isOpen) => {
+    // Dialog가 닫히려 할 때 (isOpen이 false가 될 때)
+    if (!isOpen) {
+      // 🌟 [수정] 홈('/')이 아닌 직전 화면(-1)으로 이동합니다.
+      navigate(-1);
+    }
+  };
+
   return (
-    <Dialog open={show} onOpenChange={() => {
-      // isMandatory가 true면 팝업을 닫을 수 없습니다.
-      if (!isMandatory) {
-        // onOpenChange 이벤트는 open 상태가 변경될 때마다 발생
-        // show가 false로 바뀌면 팝업이 닫힙니다.
-      }
-    }}>
+    <Dialog open={show} onOpenChange={handlePopupClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>로그인이 필요합니다</DialogTitle>
@@ -38,9 +35,11 @@ export function AuthPopup({ show, isMandatory }) {
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-end gap-2">
-          {/* isMandatory가 false일 때만 취소 버튼을 표시할 수 있습니다. */}
           {!isMandatory && (
-            <Button variant="outline">취소</Button>
+            // 🌟 [수정] 취소 버튼도 직전 화면(-1)으로 이동합니다.
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              취소
+            </Button>
           )}
           <Button onClick={handleLoginClick}>로그인</Button>
         </div>

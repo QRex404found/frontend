@@ -40,3 +40,21 @@
 .read-the-docs {
   color: #888;
 }
+
+.fixed-modal {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 10050 !important;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 8px;
+  overflow: visible; /* hidden → visible */
+}
+
+
+
+

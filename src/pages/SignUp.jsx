@@ -4,201 +4,224 @@ import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { signupApi, checkIdApi } from '@/api/auth';
-import SignupResultDialog from '@/components/common/SignupResultDialog'; // Dialog 컴포넌트 추가
+import SignupResultDialog from '@/components/common/SignupResultDialog';
 
 export function SignUp() {
-    const [form, setForm] = useState({
-        name: '',
-        id: '',
-        password: '',
-        confirmPassword: '',
-    });
-    const [isIdChecked, setIsIdChecked] = useState(false);
-    const [idCheckMessage, setIdCheckMessage] = useState('');
-    // Dialog 상태: isOpen (표시 여부), type ('success', 'failure', 'warning'), title/message (경고 메시지용)
-    const [dialogState, setDialogState] = useState({ 
-        isOpen: false, 
-        type: 'success', 
-        title: '', 
-        message: '' 
-    });
-    const navigate = useNavigate();
+  const [form, setForm] = useState({
+    name: '',
+    id: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [isIdChecked, setIsIdChecked] = useState(false);
+  const [idCheckMessage, setIdCheckMessage] = useState('');
+  const [dialogState, setDialogState] = useState({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    message: '',
+  });
+  const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        const { id, value } = e.target;
-        setForm((prev) => ({ ...prev, [id]: value }));
-        if (id === 'id') {
-            setIsIdChecked(false); // ID 변경 시 중복 확인 초기화
-            setIdCheckMessage('');
-        }
-    };
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setForm((prev) => ({ ...prev, [id]: value }));
+    if (id === 'id') {
+      setIsIdChecked(false);
+      setIdCheckMessage('');
+    }
+  };
 
-    const handleIdCheck = async () => {
-        if (!form.id) {
-            setIdCheckMessage('ID를 입력해주세요.');
-            return;
-        }
-        try {
-            // checkIdApi는 ID 중복 여부를 반환한다고 가정
-            const response = await checkIdApi(form.id); 
-            if (response.isAvailable) {
-                setIsIdChecked(true);
-                setIdCheckMessage('사용 가능한 ID입니다.');
-            } else {
-                setIsIdChecked(false);
-                setIdCheckMessage('이미 사용 중인 ID입니다.');
-            }
-        } catch (error) {
-            setIsIdChecked(false);
-            setIdCheckMessage('ID 확인 중 오류가 발생했습니다.');
-        }
-    };
+  const handleIdCheck = async () => {
+    if (!form.id) {
+      setIdCheckMessage('ID를 입력해주세요.');
+      return;
+    }
+    try {
+      const isAvailable = await checkIdApi(form.id);
 
-    /**
-     * SignupResultDialog에서 버튼 클릭 시 호출되는 액션 핸들러
-     * @param {string} actionType - 'success', 'failure', 'warning' 중 하나
-     */
-    const handleDialogAction = (actionType) => {
-        setDialogState({ ...dialogState, isOpen: false }); // 다이얼로그 닫기
-        
-        if (actionType === 'success') {
-            // 성공 시 'Home' 버튼 클릭 -> 로그인 페이지로 이동
-            navigate('/signin'); 
-        } else if (actionType === 'failure') {
-            // 실패 시 'Try Again' 버튼 클릭 -> 폼 초기화
-            setForm({ name: '', id: '', password: '', confirmPassword: '' });
-            setIsIdChecked(false);
-            setIdCheckMessage('');
-        }
-        // 'warning' (유효성 검사 실패)는 닫기만 합니다.
-    };
+      if (isAvailable) {
+        setIsIdChecked(true);
+        setIdCheckMessage('사용 가능한 ID입니다.');
+      } else {
+        setIsIdChecked(false);
+        setIdCheckMessage('이미 사용 중인 ID입니다.');
+      }
+    } catch (error) {
+      setIsIdChecked(false);
+      setIdCheckMessage('ID 확인 중 오류가 발생했습니다.');
+    }
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        // 1. 클라이언트 측 유효성 검사 (Dialog 사용)
-        if (form.password !== form.confirmPassword) {
-            setDialogState({ 
-                isOpen: true, 
-                type: 'warning',
-                title: '비밀번호 불일치', 
-                message: '비밀번호와 비밀번호 확인이 일치하지 않습니다.' 
-            });
-            return;
-        }
-        if (!isIdChecked) {
-            setDialogState({ 
-                isOpen: true, 
-                type: 'warning',
-                title: '필수 확인 누락', 
-                message: 'ID 중복 확인을 완료해야 회원가입을 진행할 수 있습니다.' 
-            });
-            return;
-        }
+  const handleDialogAction = (actionType) => {
+    setDialogState({ ...dialogState, isOpen: false });
 
-        try {
-            // 서버 API를 호출하여 회원가입 시도
-            await signupApi({
-                name: form.name, 
-                id: form.id, 
-                password: form.password
-            });
+    if (actionType === 'success') {
+      navigate('/signin');
+    } else if (actionType === 'failure') {
+      setForm({ name: '', id: '', password: '', confirmPassword: '' });
+      setIsIdChecked(false);
+      setIdCheckMessage('');
+    }
+  };
 
-            // 2. 서버 통신 성공 시 Dialog 띄우기 (Figma PDF 6페이지)
-            setDialogState({ isOpen: true, type: 'success' });
-            
-        } catch (error) {
-            // 3. 서버 통신 실패 시 Dialog 띄우기 (Figma PDF 7페이지)
-            setDialogState({ isOpen: true, type: 'failure' });
-        }
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    return (
-        <div className="flex items-center justify-center p-4 min-h-[calc(100vh-64px)]">
-            <Card className="w-full max-w-md shadow-lg">
-                <CardHeader>
-                    {/* Figma 디자인에 맞게 텍스트 및 크기 조정 */}
-                    <CardTitle className="text-3xl font-bold">Sign up</CardTitle> 
-                    <p className="text-sm text-gray-500">
-                        Sign up to QREX and be part of a community!
-                    </p>
-                </CardHeader>
-                <CardContent className="grid gap-4">
-                    <form onSubmit={handleSubmit} className="grid gap-4">
-                        
-                        {/* Name */}
-                        <div className="grid gap-2">
-                            <label htmlFor="name" className="font-semibold">Name</label>
-                            <Input id="name" type="text" value={form.name} onChange={handleChange} required placeholder="hong-gil-dong" />
-                        </div>
+    if (form.password !== form.confirmPassword) {
+      setDialogState({
+        isOpen: true,
+        type: 'warning',
+        title: '비밀번호 불일치',
+        message: '비밀번호와 비밀번호 확인이 일치하지 않습니다.',
+      });
+      return;
+    }
+    if (!isIdChecked) {
+      setDialogState({
+        isOpen: true,
+        type: 'warning',
+        title: '필수 확인 누락',
+        message: 'ID 중복 확인을 완료해야 회원가입을 진행할 수 있습니다.',
+      });
+      return;
+    }
 
-                        {/* ID (with Check Button) */}
-                        <div className="grid gap-2">
-                            <label htmlFor="id" className="font-semibold">ID</label>
-                            <div className="flex gap-2">
-                                <Input id="id" type="text" value={form.id} onChange={handleChange} required placeholder="@peduarte" />
-                                <Button 
-                                    type="button" 
-                                    onClick={handleIdCheck} 
-                                    variant="outline" 
-                                    className="text-sm font-bold shadow-sm"
-                                >
-                                    Check
-                                </Button>
-                            </div>
-                            {/* 중복 확인 메시지 표시 */}
-                            <p className={`text-sm ${isIdChecked ? 'text-green-500' : 'text-red-500'} h-4`}>
-                                {idCheckMessage}
-                            </p>
-                        </div>
+    try {
+      // ✅ 백엔드 DTO(userPw)에 맞게 수정
+      const response = await signupApi({
+        userName: form.name,
+        userId: form.id,
+        userPw: form.password,
+        phone: '',
+      });
 
-                        {/* Password */}
-                        <div className="grid gap-2">
-                            <label htmlFor="password" className="font-semibold">Password</label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={form.password}
-                                onChange={handleChange}
-                                required
-                                placeholder="******"
-                            />
-                        </div>
+      console.log('회원가입 응답:', response); // ✅ 반드시 콘솔에서 확인 가능
 
-                        {/* Confirm Password */}
-                        <div className="grid gap-2">
-                            <label htmlFor="confirmPassword" className="font-semibold">Confirm Password</label>
-                            <Input
-                                id="confirmPassword"
-                                type="password"
-                                value={form.confirmPassword}
-                                onChange={handleChange}
-                                required
-                                placeholder="******"
-                            />
-                        </div>
+      setDialogState({
+        isOpen: true,
+        type: 'success',
+        title: '회원가입 성공',
+        message: '회원가입이 완료되었습니다!',
+      });
+    } catch (error) {
+      console.error('회원가입 실패:', error); // ✅ 실패 로그 추가
+      setDialogState({
+        isOpen: true,
+        type: 'failure',
+        title: '회원가입 실패',
+        message: error.message || '회원가입 중 문제가 발생했습니다.',
+      });
+    }
+  };
 
-                        <Button 
-                            type="submit" 
-                            className="w-full mt-4 h-10 bg-green-500 hover:bg-green-600 text-lg font-bold shadow-md"
-                        >
-                            Sign up
-                        </Button>
-                    </form>
-                </CardContent>
-            </Card>
+  return (
+    <div className="flex items-center justify-center p-4 min-h-[calc(100vh-64px)]">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-3xl font-bold">Sign up</CardTitle>
+          <p className="text-sm text-gray-500">
+            Sign up to QREX and be part of a community!
+          </p>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            {/* Name */}
+            <div className="grid gap-2">
+              <label htmlFor="name" className="font-semibold">
+                Name
+              </label>
+              <Input
+                id="name"
+                type="text"
+                value={form.name}
+                onChange={handleChange}
+                required
+                placeholder="hong-gil-dong"
+              />
+            </div>
 
-            {/* ⭐️ 회원가입 결과 Dialog (Figma 팝업 구현) ⭐️ */}
-            <SignupResultDialog
-                isOpen={dialogState.isOpen}
-                type={dialogState.type}
-                title={dialogState.title}
-                message={dialogState.message}
-                // 다이얼로그 닫기 (배경 클릭 등)
-                onClose={() => setDialogState({ ...dialogState, isOpen: false })}
-                // 버튼 클릭 시 호출되는 액션
-                onAction={handleDialogAction}
-            />
-        </div>
-    );
+            {/* ID (with Check Button) */}
+            <div className="grid gap-2">
+              <label htmlFor="id" className="font-semibold">
+                ID
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  id="id"
+                  type="text"
+                  value={form.id}
+                  onChange={handleChange}
+                  required
+                  placeholder="@peduarte"
+                />
+                <Button
+                  type="button"
+                  onClick={handleIdCheck}
+                  variant="outline"
+                  className="text-sm font-bold shadow-sm"
+                >
+                  Check
+                </Button>
+              </div>
+              <p
+                className={`text-sm ${
+                  isIdChecked ? 'text-green-500' : 'text-red-500'
+                } h-4`}
+              >
+                {idCheckMessage}
+              </p>
+            </div>
+
+            {/* Password */}
+            <div className="grid gap-2">
+              <label htmlFor="password" className="font-semibold">
+                Password
+              </label>
+              <Input
+                id="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                required
+                placeholder="******"
+              />
+            </div>
+
+            {/* Confirm Password */}
+            <div className="grid gap-2">
+              <label htmlFor="confirmPassword" className="font-semibold">
+                Confirm Password
+              </label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={form.confirmPassword}
+                onChange={handleChange}
+                required
+                placeholder="******"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full mt-4 h-10 bg-green-500 hover:bg-green-600 text-lg font-bold shadow-md"
+            >
+              Sign up
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* 회원가입 결과 Dialog */}
+      <SignupResultDialog
+        isOpen={dialogState.isOpen}
+        type={dialogState.type}
+        title={dialogState.title}
+        message={dialogState.message}
+        onClose={() => setDialogState({ ...dialogState, isOpen: false })}
+        onAction={handleDialogAction}
+      />
+    </div>
+  );
 }
