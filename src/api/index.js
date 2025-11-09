@@ -1,11 +1,12 @@
 import axios from 'axios';
 
 // 🚀 [수정됨] API 기본 URL을 로컬호스트와 백엔드 포트(8080)로 설정
-const API_BASE_URL = 'http://172.30.1.40:8080/api';
+const API_BASE_URL = 'https://api.qrex.kro.kr/api';
+//const API_BASE_URL = 'https://172.30.1.40:8080/api';
 
 // ✅ Axios 인스턴스 생성
 const apiClient = axios.create({
-  baseURL: 'http://172.30.1.40:8080/api', // ← 호스트 IP
+  baseURL: API_BASE_URL, // ← 호스트 IP
   headers: {
     'Content-Type': 'application/json',
   },
