@@ -1,33 +1,42 @@
 import axios from 'axios';
-// 🌟 [수정] 'tokenUtils.js'의 'getToken' 함수 import를 삭제합니다.
-// import { getToken } from '../utils/tokenUtils';
 
-// 🌟 [수정] 'localhost:8080'이 아닌 실제 IP로 설정
-const API_BASE_URL = 'http://172.30.133.113:8080';
+// 🚀 [수정됨] API 기본 URL을 로컬호스트와 백엔드 포트(8080)로 설정
+const API_BASE_URL = 'http://172.30.1.40:8080/api';
 
-// Axios 인스턴스 생성
+// ✅ Axios 인스턴스 생성
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: 'http://172.30.1.40:8080/api', // ← 호스트 IP
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// (핵심) 요청 인터셉터
-apiClient.interceptors.request.use(
-  (config) => {
-    // 🌟 [수정] 'getToken()' 대신 'localStorage.getItem('jwtToken')'을 직접 호출합니다.
-    // (AuthContext.js가 저장한 키와 동일한 키를 사용)
-    const token = localStorage.getItem('jwtToken');
 
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
+// ✅ 요청 인터셉터 (Request Interceptor)
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('jwtToken');
+
+    // 토큰이 있으면 자동으로 Authorization 헤더 추가
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// ✅ 응답 인터셉터 (Response Interceptor)
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // 401 또는 403 에러 발생 시 경고
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      console.warn('⚠️ 인증 오류: 토큰이 없거나 만료됨');
+    }
+    return Promise.reject(error);
+  }
 );
 
 export default apiClient;

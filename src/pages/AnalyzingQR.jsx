@@ -28,8 +28,8 @@ export default function AnalyzingQR() {
     if (!fileToAnalyze) {
         // 파일이 없어서 리디렉션되기 전까지 잠시 로딩 스피너를 보여줍니다.
         return (
-            <div className="flex justify-center items-center h-screen">
-                <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+            <div className="flex items-center justify-center h-screen">
+                <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
             </div>
         );
     }
@@ -39,7 +39,7 @@ export default function AnalyzingQR() {
         <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
             
             {/* ⭐ 추가 1: "Analyzing QR" 제목 텍스트 (굵고 크게) */}
-            <h1 className="text-4xl font-bold mb-8">Analyzing QR</h1> 
+            <h1 className="mb-8 text-4xl font-medium">Analyzing QR</h1> 
 
             <LoadingBar 
                 file={fileToAnalyze} 
@@ -47,7 +47,7 @@ export default function AnalyzingQR() {
             />
             
             {/* ⭐ 추가 2: "Please Wait..." 안내 텍스트 (굵고 크게) */}
-            <p className="mt-8 text-3xl font-bold text-gray-800">Please Wait...</p>
+            <p className="mt-8 text-3xl font-medium text-gray-800">Please Wait...</p>
         </div>
     );
 }

@@ -1,3 +1,5 @@
+// src/components/community/CommentDrawer.jsx
+
 import React, { useState, useEffect } from 'react';
 import { lockScroll, unlockScroll } from '@/utils/scrollLock';
 import {
@@ -7,7 +9,7 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
 import {
@@ -22,16 +24,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { toast } from "sonner"; // ✅ toast 적용
 
-/**
- * 댓글 목록 및 작성 Drawer
- * @param {boolean} isOpen - Drawer 열림/닫힘 상태
- * @param {function} onOpenChange - Drawer 상태 변경 핸들러
- * @param {number} boardId - 댓글을 작성할 게시글 ID
- * @param {function} onCommentUpdate - 댓글 작성/삭제 시 부모(PostDetailModal)에게 알림
- * @param {string} className - 너비 제한을 위해 PostDetailModal로부터 클래스를 받음
- * @param {Array} initialComments - 부모로부터 받은 초기 댓글 목록
- */
 export const CommentDrawer = ({
   isOpen,
   onOpenChange,
@@ -51,55 +45,48 @@ export const CommentDrawer = ({
   }, [isOpen, initialComments]);
 
   useEffect(() => {
-    if (isOpen) {
-      lockScroll();
-    } else {
-      unlockScroll();
-    }
-    return () => {
-      unlockScroll();
-    };
+    if (isOpen) lockScroll();
+    else unlockScroll();
+    return () => unlockScroll();
   }, [isOpen]);
 
+  // ✅ 댓글 등록
   const handleSubmitComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
     try {
       await addCommentApi(boardId, newComment);
-      setNewComment('');
+      setNewComment("");
 
-      if (onCommentUpdate) {
-        onCommentUpdate();
-      }
+      toast.success("댓글이 등록되었습니다.");
+
+      if (onCommentUpdate) onCommentUpdate();
     } catch (error) {
-      console.error('댓글 등록 실패:', error);
-      alert('댓글 등록에 실패했습니다.');
+      toast.error("댓글 등록에 실패했습니다.");
     }
   };
 
+  // ✅ 댓글 신고
   const handleReportComment = async (commentId) => {
     try {
       await reportCommentApi(commentId);
-      alert('댓글이 신고되었습니다.');
-    } catch (error) {
-      console.error('댓글 신고 실패:', error);
-      alert('댓글 신고에 실패했습니다.');
+      toast.success("댓글이 신고되었습니다.");
+    } catch {
+      toast.error("댓글 신고에 실패했습니다.");
     }
   };
 
+  // ✅ 댓글 삭제 (자동 새로고침 포함)
   const handleDeleteComment = async (commentId) => {
-    if (window.confirm('댓글을 삭제하시겠습니까?')) {
-      try {
-        await deleteCommentApi(commentId);
-        alert('댓글이 삭제되었습니다.');
-        if (onCommentUpdate) {
-          onCommentUpdate();
-        }
-      } catch (error) {
-        console.error('댓글 삭제 실패:', error);
-        alert('댓글 삭제에 실패했습니다.');
-      }
+    try {
+      await deleteCommentApi(commentId);
+
+      if (onCommentUpdate) onCommentUpdate();
+
+      toast.success("댓글이 삭제되었습니다.");
+    } catch {
+      toast.error("댓글 삭제에 실패했습니다.");
     }
   };
 
@@ -110,87 +97,96 @@ export const CommentDrawer = ({
       direction="bottom"
       disablePreventScroll
     >
-      <DrawerContent
-        className={`h-[70vh] flex flex-col rounded-t-xl ${className}`}
-      >
+      <DrawerContent className={`h-[70vh] flex flex-col rounded-t-xl ${className}`}>
         <DrawerHeader>
-          <DrawerTitle>댓글</DrawerTitle>
+          <DrawerTitle>COMMENT</DrawerTitle>
         </DrawerHeader>
 
-        {/* 댓글 목록 스크롤 영역 */}
+        {/* 댓글 목록 */}
         <ScrollArea className="flex-grow p-4">
           <div className="space-y-6">
             {comments.length === 0 ? (
-              <div className="text-center text-gray-500 py-10">
-                아직 댓글이 없습니다.
+              <div className="py-10 text-center text-gray-500">
+                No comments yet
               </div>
             ) : (
-              comments.map((comment) => (
-                <div key={comment.commentId} className="flex items-start gap-3">
-                  {/* 1. 프로필 동그라미 */}
-                  <div className="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full mt-1"></div>
+              comments.map((comment) => {
+                // ✅ 본인 댓글 판별 (게시글과 동일 방식)
+                const authorId =
+                  comment?.userId ??
+                  comment?.user?.id ??
+                  comment?.writerId ??
+                  comment?.writer?.id;
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start">
-                      {/* 2. 아이디와 내용 */}
-                      <div className="flex-1 min-w-0 pr-4">
-                        <p className="font-semibold text-sm">
-                          {comment.userId}
-                        </p>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">
-                          {comment.contents}
-                        </p>
+                const currentUserId = user?.id ?? user?.userId;
+
+                const isMyComment =
+                  authorId != null &&
+                  currentUserId != null &&
+                  String(authorId) === String(currentUserId);
+
+                return (
+                  <div key={comment.commentId} className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 mt-1 bg-gray-300 rounded-full" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0 pr-4">
+                          <p className="text-sm font-semibold text-[#81BF59]">
+                            {authorId}
+                          </p>
+                          <p className="text-sm text-gray-700 break-all whitespace-pre-wrap">
+                            {comment.contents}
+                          </p>
+                        </div>
+
+                        {/* 메뉴 */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="flex-shrink-0 p-1 mt-1 text-gray-500 hover:text-gray-700">
+                              <MoreHorizontal className="w-4 h-4" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-40">
+
+                            {isMyComment ? (
+                              <DropdownMenuItem
+                                onClick={() => handleDeleteComment(comment.commentId)}
+                                className="text-red-600 focus:bg-red-50 focus:text-red-600"
+                              >
+                                delete comment
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem
+                                onClick={() => handleReportComment(comment.commentId)}
+                                className="text-[#CA8A04] focus:bg-yellow-50 focus:text-[#CA8A04]"
+                              >
+                                report comment
+                              </DropdownMenuItem>
+                            )}
+
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-
-                      {/* 3. 오른쪽 상단 점 세 개 옵션 (DropdownMenu) */}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="flex-shrink-0 p-1 text-gray-500 hover:text-gray-700 mt-1">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
-                          {user && comment.userId === user.userId ? (
-                            // 내 댓글인 경우: 삭제 버튼
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleDeleteComment(comment.commentId)
-                              }
-                              className="text-gray-900 focus:bg-gray-100 focus:text-gray-900"
-                            >
-                              delete comment
-                            </DropdownMenuItem>
-                          ) : (
-                            // 다른 사람 댓글인 경우: 신고 버튼
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleReportComment(comment.commentId)
-                              }
-                              className="text-red-600 focus:bg-red-50 focus:text-red-600"
-                            >
-                              report comment
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </ScrollArea>
 
-        {/* 댓글 작성 폼 */}
-        <form onSubmit={handleSubmitComment} className="p-4 border-t flex gap-2">
-          <Input
-            type="text"
-            placeholder="댓글을 작성하세요..."
+        {/* 댓글 입력 */}
+        <form onSubmit={handleSubmitComment} className="flex items-end gap-2 p-4 border-t">
+          <Textarea
+            placeholder="Add a comment..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            className="flex-grow"
+            className="flex-grow min-h-0 break-all resize-none max-h-24"
+            rows={1}
           />
-          <Button type="submit">Submit</Button>
+          <Button type="submit" className="bg-[#81BF59] text-white hover:bg-[#7CB54C]">
+            Submit
+          </Button>
         </form>
       </DrawerContent>
     </Drawer>

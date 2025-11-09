@@ -57,7 +57,7 @@ export function SignUp() {
     setDialogState({ ...dialogState, isOpen: false });
 
     if (actionType === 'success') {
-      navigate('/signin');
+      navigate('/login');
     } else if (actionType === 'failure') {
       setForm({ name: '', id: '', password: '', confirmPassword: '' });
       setIsIdChecked(false);
@@ -93,7 +93,6 @@ export function SignUp() {
         userName: form.name,
         userId: form.id,
         userPw: form.password,
-        phone: '',
       });
 
       console.log('회원가입 응답:', response); // ✅ 반드시 콘솔에서 확인 가능

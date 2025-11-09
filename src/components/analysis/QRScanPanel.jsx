@@ -1,151 +1,188 @@
-import React, { useState, useRef } from 'react'; // useEffect, useCallback 제거
+import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Camera, Image, FileText } from 'lucide-react';
+import jsQR from 'jsqr';
 
-// --- (Mock API Function) ---
-// (이전과 동일)
-const scanQRImageApi = (file) => {
-    console.log("Mock API: 분석 시작...", file.name);
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            console.log("Mock API: 분석 성공");
-            const mockResult = {
-                id: `qr-${Date.now()}`,
-                timestamp: new Date().toISOString(),
-                type: 'URL', 
-                content: 'https://www.google.com',
-                riskLevel: 'safe', 
-                details: '이 QR 코드는 Google 홈페이지로 연결됩니다. 안전한 링크입니다. (모의 결과)'
-            };
-            resolve(mockResult);
-        }, 1500);
+/**
+ * 개선된 QR 코드 스캔 함수
+ * - 흑백 대비 강화
+ * - inversionAttempts: "attemptBoth"
+ * - createImageBitmap 오류 처리
+ */
+
+
+const scanFileForQrUrl = async (file) => {
+  let imageBitmap;
+  try {
+    imageBitmap = await createImageBitmap(file);
+  } catch (err) {
+    console.error("createImageBitmap 실패:", err);
+    throw new Error("이미지 파일을 처리할 수 없습니다.");
+  }
+
+  // 캔버스 설정 (성능 향상 옵션 포함)
+  const canvas = document.createElement("canvas");
+  canvas.width = imageBitmap.width;
+  canvas.height = imageBitmap.height;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(imageBitmap, 0, 0, imageBitmap.width, imageBitmap.height);
+
+  let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  // 평균 밝기 자동 계산
+  let total = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    total += (data[i] + data[i + 1] + data[i + 2]) / 3;
+  }
+  const avgBrightness = total / (data.length / 4);
+
+  // 자동 임계값 설정
+  const threshold = avgBrightness * 0.9;
+
+  // 흑백 변환
+  for (let i = 0; i < data.length; i += 4) {
+    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    const bw = avg > threshold ? 255 : 0;
+    data[i] = data[i + 1] = data[i + 2] = bw;
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  // 첫 번째 시도
+  let code = jsQR(imageData.data, imageData.width, imageData.height, {
+    inversionAttempts: "dontInvert",
+  });
+
+  // 실패 시 반전 재시도
+  if (!code) {
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = 255 - data[i];
+      data[i + 1] = 255 - data[i + 1];
+      data[i + 2] = 255 - data[i + 2];
+    }
+    ctx.putImageData(imageData, 0, 0);
+    imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    code = jsQR(imageData.data, imageData.width, imageData.height, {
+      inversionAttempts: "dontInvert",
     });
-};
-// --- (Mock API Function End) ---
+  }
 
-// --- (dataURLtoFile 헬퍼 함수 삭제됨) ---
+  if (code && code.data) {
+    console.log("✅ QR 코드 인식 성공:", code.data);
+    return code.data;
+  } else {
+    throw new Error("이미지에서 QR 코드를 찾을 수 없습니다.");
+  }
+};
 
 
 /**
  * QRScanPanel 컴포넌트
- * (CameraCapture 로직이 제거되고, input 'capture' 속성을 사용하도록 수정됨)
  */
 export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
-    const fileInputRef = useRef(null);
-    // isCameraOpen state 제거됨
+  const fileInputRef = useRef(null);
 
-    // 파일 분석 로직 (변경 없음)
-    const startAnalysis = async (file) => {
-        if (!file) return;
-        onAnalysisStart();
-        try {
-            const result = await scanQRImageApi(file);
-            onAnalysisResult(result);
-        } catch (error) {
-            console.error("QR 분석 실패:", error);
-            onAnalysisResult(null, error);
-        }
-    };
+  // 분석 시작
+  const startAnalysis = async (file) => {
+    if (!file) return;
+    try {
+      console.log("React: QR 이미지 스캔 시작...");
+      const extractedUrl = await scanFileForQrUrl(file);
+      console.log("React: URL 추출 성공:", extractedUrl);
 
-    // 파일 선택(사진 보관함, 파일 선택, 카메라) 공통 핸들러
-    const handleFileSelect = (event) => {
-        const file = event.target.files[0];
-        startAnalysis(file);
-        if (event.target) {
-            event.target.value = null;
-        }
-    };
+      if (onAnalysisStart) {
+        onAnalysisStart(file, extractedUrl);
+      }
+    } catch (error) {
+      console.error("QR 스캔 실패:", error);
+      if (onAnalysisResult) {
+        onAnalysisResult(null, error.message);
+      }
+    }
+  };
 
-    // (수정) "사진 보관함" 클릭 시
-    const handlePhotoLibraryClick = () => {
-        if (!fileInputRef.current) return;
-        // capture 속성 제거 (파일 탐색기 실행)
-        fileInputRef.current.removeAttribute('capture');
-        fileInputRef.current.accept = "image/*";
-        fileInputRef.current.click();
-    };
+  // 파일 선택 핸들러
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    startAnalysis(file);
+    if (event.target) event.target.value = null;
+  };
 
-    // (수정) "사진 찍기" 클릭 시
-    const handleCameraClick = () => {
-        if (!fileInputRef.current) return;
-        // capture="environment" (후면 카메라 앱 실행)
-        fileInputRef.current.setAttribute('capture', 'environment');
-        fileInputRef.current.accept = "image/*";
-        fileInputRef.current.click();
-    };
+  // 사진 보관함에서 선택
+  const handlePhotoLibraryClick = () => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.removeAttribute('capture');
+    fileInputRef.current.accept = "image/*";
+    fileInputRef.current.click();
+  };
 
-    // (수정) "파일 선택" 클릭 시
-    const handleFileClick = () => {
-        if (!fileInputRef.current) return;
-        // capture 속성 제거 (파일 탐색기 실행)
-        fileInputRef.current.removeAttribute('capture');
-        fileInputRef.current.accept = "*/*";
-        fileInputRef.current.click();
-    };
+  // 카메라로 촬영
+  const handleCameraClick = () => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.setAttribute('capture', 'environment');
+    fileInputRef.current.accept = "image/*";
+    fileInputRef.current.click();
+  };
 
-    // handleCapture, handleCameraClose 함수 제거됨
+  // 파일 선택
+  const handleFileClick = () => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.removeAttribute('capture');
+    fileInputRef.current.accept = "*/*";
+    fileInputRef.current.click();
+  };
 
-    return (
-        <div className="flex flex-col items-center justify-center min-h-[400px] ">
-            <div className="flex flex-col items-center justify-center p-6 space-y-6">
+  // --- 렌더링 ---
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[400px]">
+      <div className="flex flex-col items-center justify-center p-6 space-y-6">
+        <p className="text-2xl font-semibold text-gray-700">QR 코드를 스캔하세요</p>
 
-                <p className="text-2xl font-semibold text-gray-700">QR 코드를 스캔하세요</p>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileSelect}
+          className="hidden"
+        />
 
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    className="hidden"
-                    // accept와 capture 속성은 클릭 시 동적으로 설정됨
-                />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600 transition-transform transform hover:scale-105"
+              size="icon"
+            >
+              <Camera className="!w-10 !h-10" />
+            </Button>
+          </DropdownMenuTrigger>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            className="w-24 h-24 rounded-full shadow-xl text-white bg-green-500 hover:bg-green-600 transition-transform transform hover:scale-105"
-                            size="icon"
-                        >
-                            <Camera className="!w-10 !h-10" />
-                        </Button>
-                    </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-48 p-2 rounded-lg shadow-xl">
+            <DropdownMenuItem
+              onClick={handlePhotoLibraryClick}
+              className="cursor-pointer p-3 flex items-center space-x-2 text-base"
+            >
+              <Image className="w-4 h-4" />
+              <span>사진 보관함</span>
+            </DropdownMenuItem>
 
-                    <DropdownMenuContent className="w-48 p-2 rounded-lg shadow-xl">
-                        {/* 사진 보관함 - onClick 수정 */}
-                        <DropdownMenuItem
-                            onClick={handlePhotoLibraryClick}
-                            className="cursor-pointer p-3 flex items-center space-x-2 text-base"
-                        >
-                            <Image className="w-4 h-4" />
-                            <span>사진 보관함</span>
-                        </DropdownMenuItem>
-                        
-                        {/* 사진 찍기 - onClick 수정 */}
-                        <DropdownMenuItem
-                            onClick={handleCameraClick}
-                            className="cursor-pointer p-3 flex items-center space-x-2 text-base"
-                        >
-                            <Camera className="w-4 h-4" />
-                            <span>사진 찍기</span>
-                        </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handleCameraClick}
+              className="cursor-pointer p-3 flex items-center space-x-2 text-base"
+            >
+              <Camera className="w-4 h-4" />
+              <span>사진 찍기</span>
+            </DropdownMenuItem>
 
-                        {/* 파일 선택 - onClick 수정 */}
-                        <DropdownMenuItem
-                            onClick={handleFileClick}
-                            className="cursor-pointer p-3 flex items-center space-x-2 text-base"
-                        >
-                            <FileText className="w-4 h-4" />
-                            <span>파일 선택</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-
-            </div>
-
-            {/* CameraCapture 컴포넌트 렌더링 로직 제거됨 */}
-        </div>
-    );
+            <DropdownMenuItem
+              onClick={handleFileClick}
+              className="cursor-pointer p-3 flex items-center space-x-2 text-base"
+            >
+              <FileText className="w-4 h-4" />
+              <span>파일 선택</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  );
 }
-
-// --- (CameraCapture 컴포넌트 전체 삭제됨) ---
-

@@ -1,99 +1,101 @@
-// 로그인 페이지
 // src/pages/SignIn.jsx
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import  useAuth  from '../hooks/useAuth';
-import { loginApi } from '@/api/auth'; // 👈 API 함수 import
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import useAuth from "../hooks/useAuth";
+import { loginApi } from "@/api/auth";
+import { toast } from "sonner";
 
 export function SignIn() {
-  const [id, setId] = useState(''); // 👈 'id' state 사용 (정상)
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [id, setId] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { login } = useAuth(); // 👈 전역 로그인 함수
+  const location = useLocation();
+  
+  // ✅ 1. user 객체도 함께 가져옵니다.
+  const { login, isLoggedIn, user } = useAuth(); 
+  const shown = useRef(false);
+
+  useEffect(() => {
+    const info = location.state?.toast;
+    if (info && !shown.current) {
+      shown.current = true;
+      info.type === "success" ? toast.success(info.message) : toast.error(info.message);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
+  // ✅ 2. 페이지 이동(navigation)을 위한 useEffect 수정
+  useEffect(() => {
+    // ⭐️ (핵심) 로그인이 되었고, user.userId 값도 실제로 들어왔는지 "둘 다" 확인합니다.
+    if (isLoggedIn && user?.userId) {
+      navigate("/");
+    }
+  }, [isLoggedIn, user, navigate]); // ✅ 3. user를 의존성 배열에 추가합니다.
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    try {
-      // 🌟 [수정] loginApi가 { userId, password } 객체 1개를 받도록 수정
-      const data = await loginApi({
-          userId: id, // 👈 'id' state를 'userId' 키에 담아 전송
-          password: password
-      }); 
-      
-      // data는 { success: true, token: "..." } 객체입니다.
-      // 🌟 [수정] AuthContext의 login 함수 호출
-      // (백엔드가 유저 정보를 따로 반환하지 않으므로, ID만 임시로 넘겨줍니다)
-      login(data.token, { id: id }); // 👈 data.user 대신 { id: id } 전달
+    setError("");
 
-      // 3. 메인 페이지로 이동
-      navigate('/');
+    try {
+      const data = await loginApi({ userId: id, password });
+      login(data.token); 
+      // navigate("/"); // 여기서 이동하지 않습니다.
     } catch (err) {
-      setError(err.message || '로그인에 실패했습니다. ID와 비밀번호를 확인해주세요.');
+      setError(err.message || "로그인에 실패했습니다.");
     }
   };
 
   return (
+    // ... (이하 폼 UI는 동일)
     <div className="flex items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">계정에 로그인</CardTitle>
-          <p className="text-sm text-gray-500">
-            계정에 로그인하려면 아래에 ID와 비밀번호를 입력하세요.
-          </p>
         </CardHeader>
+
         <CardContent className="grid gap-4">
+
           <form onSubmit={handleSubmit} className="grid gap-4">
-            {/* ... (Input 태그들은 수정할 필요 없이 정상입니다) ... */}
-            <div className="grid gap-2">
-              <Input
-                id="id"
-                type="text"
-                placeholder="ID"
-                required
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Input
-                id="password"
-                type="password"
-                placeholder="Password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+            <Input value={id} onChange={(e) => setId(e.target.value)} placeholder="ID" required />
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
             {error && <p className="text-sm text-red-500">{error}</p>}
-            <Button type="submit" className="w-full">
-              로그인
-            </Button>
+            <Button type="submit" className="w-full">로그인</Button>
           </form>
-          {/* ... (소셜 로그인 버튼 및 회원가입 링크) ... */}
-          <div className="flex flex-col gap-2">
-            <Button variant="outline" className="flex items-center gap-2">
-              {/* Google 아이콘 */}
-              <img src="/google-icon.svg" alt="Google" className="w-4 h-4" />
-              Google로 로그인
+
+          <div className="flex flex-col gap-2 pt-2">
+            <Button asChild variant="outline" className="flex items-center gap-2">
+              <a 
+                  href="http://localhost:8080/oauth2/authorization/google"
+                  className="flex items-center justify-center w-full gap-2"
+                >
+                <img src="/google-icon.svg" className="w-4 h-4" />
+                Google로 로그인
+              </a>
             </Button>
-            <Button className="bg-[#fee500] hover:bg-[#e6cd00] text-black flex items-center gap-2">
-              {/* Kakao 아이콘 */}
-              <img src="/kakao-icon.svg" alt="Kakao" className="w-4 h-4" />
-              Kakao로 로그인
+            <Button asChild className="bg-[#fee500] hover:bg-[#e6cd00] text-black flex items-center gap-2">
+              <a 
+                  href="http://localhost:8080/oauth2/authorization/kakao"
+                  className="flex items-center justify-center w-full gap-2"
+                >
+                <img src="/kakao-icon.svg" className="w-4 h-4" />
+                Kakao로 로그인
+              </a>
             </Button>
           </div>
-          <div className="mt-4 text-center text-sm">
-            계정이 없으신가요?{' '}
-            <button onClick={() => navigate('/signup')} className="underline">
+
+          <div className="text-sm text-center">
+            계정이 없으신가요?{" "}
+            <button onClick={() => navigate("/signup")} className="underline">
               회원가입
             </button>
           </div>
+
         </CardContent>
       </Card>
     </div>

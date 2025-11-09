@@ -1,72 +1,76 @@
 import React, { useState, useEffect } from 'react';
-// import { Card, CardContent } from '@/components/ui/card'; // Card와 CardContent는 더 이상 사용하지 않으므로 제거
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { updateAnalysisTitleApi } from '@/api/analysis';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, XCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import { CustomAlertDialog } from '@/components/common/CustomAlertDialog';
 
-/**
- * QR 분석 결과 또는 이력 상세 정보를 표시하고 제목을 저장하는 패널입니다.
- */
-export default function AnalysisResultPanel({ result }) {
-    const [title, setTitle] = useState(result?.title || '');
+export default function AnalysisResultPanel({ result, onTitleUpdated }) {
+
+    const [title, setTitle] = useState(result?.analysisTitle || '');
     const [isLoading, setIsLoading] = useState(false);
+    const [isDetailView, setIsDetailView] = useState(false);
     const [alertDialogState, setAlertDialogState] = useState({
         isOpen: false,
+        type: 'warning',
         title: '',
-        message: ''
+        description: ''
     });
 
-    // result 객체가 변경될 때마다 제목을 초기화 (이력 선택 시)
     useEffect(() => {
-        setTitle(result?.title || '');
+        setTitle(result?.analysisTitle || '');
+        setIsDetailView(false);
     }, [result]);
 
-    // 결과 상태에 따라 표시할 색상, 아이콘, 텍스트를 결정
-    const getStatusProps = (status) => {
-        switch (status) {
-            case '안전':
+    // ✅ riskLevel이 없거나 이상한 경우 → WARNING 으로 처리
+    const getStatusProps = (riskLevel) => {
+        switch (riskLevel) {
+            case 'SAFE':
                 return { color: 'text-green-600', bg: 'bg-green-50', icon: CheckCircle, label: '안전' };
-            case '주의':
+            case 'WARNING':
                 return { color: 'text-yellow-600', bg: 'bg-yellow-50', icon: AlertTriangle, label: '주의' };
-            case '위험':
+            case 'DANGER':
                 return { color: 'text-red-600', bg: 'bg-red-50', icon: XCircle, label: '위험' };
-            default:
-                return { color: 'text-gray-500', bg: 'bg-gray-50', icon: Loader2, label: '알 수 없음' };
+            default: // ✅ 여기가 변경된 부분
+                return { color: 'text-yellow-600', bg: 'bg-yellow-50', icon: AlertTriangle, label: '주의' };
         }
     };
 
-    const statusProps = getStatusProps(result?.status);
+    const statusProps = getStatusProps(result?.riskLevel);
     const Icon = statusProps.icon;
 
-    // 제목 저장 (Submit 버튼 클릭) 핸들러
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!title || !result?.id) {
+
+        if (!title.trim() || !result?.analysisId) {
             setAlertDialogState({
                 isOpen: true,
+                type: 'warning',
                 title: "오류",
-                message: "제목과 분석 ID가 유효해야 합니다."
+                description: "제목은 공백일 수 없습니다."
             });
             return;
         }
 
         setIsLoading(true);
         try {
-            await updateAnalysisTitleApi(result.id, title);
+            await updateAnalysisTitleApi(result.analysisId, title.trim());
+
+            if (onTitleUpdated) onTitleUpdated(title.trim());
+
             setAlertDialogState({
                 isOpen: true,
+                type: 'success',
                 title: "저장 성공",
-                message: "분석 기록 제목이 성공적으로 저장되었습니다."
+                description: "분석 기록 제목이 성공적으로 저장되었습니다."
             });
+
         } catch (error) {
-            console.error('제목 저장 실패:', error);
             setAlertDialogState({
                 isOpen: true,
+                type: 'error',
                 title: "저장 실패",
-                message: error.message || "제목 저장 중 오류가 발생했습니다."
+                description: error.message || "제목 저장 중 오류가 발생했습니다."
             });
         } finally {
             setIsLoading(false);
@@ -79,68 +83,88 @@ export default function AnalysisResultPanel({ result }) {
 
     return (
         <>
-            {/* <CardContent>를 <div>로 변경하고, 중첩 패딩(p-6)을 제거합니다.
-              flex-col과 space-y-6은 자식 요소들의 간격을 위해 유지합니다.
-              이제 이 컴포넌트의 모든 내용은 부모(Analysis.jsx)의 패딩을 따릅니다.
-            */}
             <div className="w-full h-full flex flex-col space-y-6">
-                <h2 className="!text-4xl font-bold border-b pb-2 mb-4">QR Analysis Result</h2>
+                <h2 className="!text-4xl font-medium border-b pb-2 mb-4">QR Analysis Result</h2>
 
-                {/* 상태 표시 섹션 */}
-                <div className={`p-4 rounded-lg ${statusProps.bg} flex items-center space-x-3`}>
-                    <Icon className={`h-6 w-6 ${statusProps.color}`} />
-                    <span className={`text-lg font-semibold ${statusProps.color}`}>
-                        상태: {statusProps.label}
-                    </span>
-                </div>
+                {!isDetailView && (
+                    <div className="space-y-6">
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className={`p-4 rounded-lg ${statusProps.bg} flex items-center space-x-3`}>
+                            <Icon className={`h-6 w-6 ${statusProps.color}`} />
+                            <span className={`text-lg font-semibold ${statusProps.color}`}>
+                                상태: {statusProps.label}
+                            </span>
+                        </div>
 
-                    {/* URL 표시 */}
-                    <div className="grid gap-2">
-                        <label htmlFor="url" className="text-sm font-semibold text-gray-700">URL</label>
-                        <Input id="url" value={result.url} readOnly className="bg-gray-100 cursor-default" />
+                        <div className="grid gap-2">
+                            <label className="text-sm font-semibold text-gray-700">URL</label>
+                            <Input value={result.url} readOnly className="bg-gray-100 cursor-default" />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <label className="text-sm font-semibold text-gray-700">IP Address</label>
+                            <Input value={result.ipAddress} readOnly className="bg-gray-100 cursor-default" />
+                        </div>
                     </div>
+                )}
 
-                    {/* 제목 입력 (사용자 설정) */}
+                {isDetailView && (
                     <div className="grid gap-2">
-                        <label htmlFor="title" className="text-sm font-semibold text-gray-700">제목 (사용자 설정)</label>
-                        <Input
-                            id="title"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="기록을 저장할 제목을 입력하세요"
-                            required
-                        />
+                        <label className="text-sm font-semibold text-gray-700">상세 분석 결과</label>
+                        <div className="p-4 bg-gray-100 rounded-md min-h-[260px] text-gray-800 whitespace-pre-wrap overflow-y-auto">
+                            {result.reason || "상세 분석 내용이 없습니다."}
+                        </div>
                     </div>
+                )}
 
-                    {/* IP Address 표시 */}
-                    <div className="grid gap-2">
-                        <label htmlFor="ipAddress" className="text-sm font-semibold text-gray-700">IP Address</label>
-                        <Input id="ipAddress" value={result.ipAddress} readOnly className="bg-gray-100 cursor-default" />
-                    </div>
+                {!isDetailView && (
+                    <form onSubmit={handleSubmit} className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700">제목 (사용자 설정)</label>
+                        <div className="flex items-end gap-2">
+                            <Input
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="기록을 저장할 제목을 입력하세요"
+                                required
+                                className="flex-grow"
+                            />
+                            <Button
+                                type="submit"
+                                className="w-auto h-10 bg-lime-500 hover:bg-lime-600 text-white font-bold shadow-md"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                ) : (
+                                    "Submit"
+                                )}
+                            </Button>
+                        </div>
+                    </form>
+                )}
 
-                    {/* Submit 버튼 */}
-                    <Button
-                        type="submit"
-                        className="w-full h-10 bg-green-500 hover:bg-green-600 font-bold shadow-md"
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                        ) : (
-                            "Submit"
-                        )}
-                    </Button>
-                </form>
-            </div> {/* CardContent 대신 닫는 div */}
-            
-            {/* 알림 다이얼로그 컴포넌트 추가 */}
+                <Button
+                    type="button"
+                    className={`
+                        w-full h-10 font-bold shadow-md
+                        ${isDetailView 
+                            ? "bg-[#999999] hover:bg-[#808080] text-white"
+                            : "bg-lime-500 hover:bg-lime-600 text-white"
+                        }
+                    `}
+                    onClick={() => setIsDetailView(!isDetailView)}
+                >
+                    {isDetailView ? "Back" : "Detail"}
+                </Button>
+
+            </div>
+
             <CustomAlertDialog
                 isOpen={alertDialogState.isOpen}
                 onClose={() => setAlertDialogState({ ...alertDialogState, isOpen: false })}
+                type={alertDialogState.type}
                 title={alertDialogState.title}
-                message={alertDialogState.message}
+                description={alertDialogState.description}
             />
         </>
     );

@@ -6,12 +6,13 @@ import { setToken, removeToken } from '../utils/tokenUtils';
 // ==========================================================
 export async function loginApi(credentials) {
   try {
-    const response = await apiClient.post('/api/auth/login', {
+    const response = await apiClient.post('/auth/login', {
       userId: credentials.userId,
-      password: credentials.password,
+      password: credentials.password, 
     });
 
     const token = response.data.token;
+    localStorage.setItem('jwtToken', token);
     setToken(token);
 
     return { success: true, token: token };
@@ -27,7 +28,7 @@ export async function loginApi(credentials) {
 // ==========================================================
 export async function checkIdApi(userId) {
   try {
-    const response = await apiClient.post('/api/auth/check-id', { userId });
+    const response = await apiClient.post('/auth/check-id', { userId });
     return response.data.isAvailable;
   } catch (error) {
     console.error('ID 중복 확인 API 오류:', error.response);
@@ -40,12 +41,12 @@ export async function checkIdApi(userId) {
 // ==========================================================
 export const signupApi = async (signupData) => {
   try {
-    const response = await apiClient.post('/api/auth/signup', {
+    const response = await apiClient.post('/auth/signup', {
       userId: signupData.userId,
       userName: signupData.userName,
-      userPw: signupData.userPw,
-      phone: signupData.phone || null,
+      userPw: signupData.userPw,  // ✅ 회원가입은 DTO와 일치 → 그대로 둠
     });
+
     console.log('회원가입 성공:', response.data);
     return response.data;
   } catch (error) {
@@ -59,25 +60,25 @@ export const signupApi = async (signupData) => {
 // ==========================================================
 export async function updateProfileApi(profileData) {
   try {
-    const response = await apiClient.put('/api/auth/profile', {
+    const response = await apiClient.put('/auth/profile', {
       newName: profileData.newName,
       newPassword: profileData.newPassword,
-      verifyPassword: profileData.verifyPassword,
+      verifyPassword: profileData.verifyPassword, // ← 중요
     });
     return { success: true, message: response.data };
   } catch (error) {
     console.error('프로필 수정 API 오류:', error.response);
-    const errorMessage = error.response?.data || '프로필 수정에 실패했습니다.';
-    throw new Error(errorMessage);
+    throw new Error(error.response?.data || '프로필 수정에 실패했습니다.');
   }
 }
+
 
 // ==========================================================
 // 5. 회원 탈퇴 API
 // ==========================================================
 export async function deleteAccountApi() {
   try {
-    const response = await apiClient.delete('/api/auth/profile');
+    const response = await apiClient.delete('/auth/profile');
     removeToken();
     return { success: true, message: response.data };
   } catch (error) {

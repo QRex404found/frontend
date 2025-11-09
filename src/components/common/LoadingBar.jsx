@@ -1,110 +1,190 @@
-// src/components/common/LoadingBar.jsx (React Router Dom 버전)
+// src/components/common/LoadingBar.jsx
 
 import * as React from "react";
-// ⭐ Next.js 대신 React Router Dom의 useNavigate를 가져옵니다.
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import { Progress } from "@/components/ui/progress";
+// ⭐️ 1. axios 대신 apiClient를 import 합니다.
+import apiClient from '@/api/index'; 
 
-import { Progress } from "@/components/ui/progress"; 
-// axios 라이브러리는 Mocking 버전에서는 필요 없습니다.
-
-// 로딩 단계를 정의합니다.
+// 로딩 단계 정의
 const LOADING_STAGES = {
-  UPLOAD: 'UPLOAD',     // 파일 업로드 (진행률 표시)
-  PROCESS: 'PROCESS',   // 서버 처리 중 (무한 대기 로딩)
-  COMPLETE: 'COMPLETE', // 완료
-  ERROR: 'ERROR',       // 오류
+  FAKING: 'FAKING',
+  PROCESSING: 'PROCESSING',
+  COMPLETE: 'COMPLETE',
+  ERROR: 'ERROR',
 };
 
-// Promise를 사용하여 일정 시간(ms) 동안 기다리게 하는 헬퍼 함수
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+export function LoadingBar({ file, extractedUrl }) {
+  const navigate = useNavigate();
 
-/**
- * 파일 업로드 및 서버 분석 과정을 표시하고 완료 후 결과 페이지로 이동시키는 로딩 컴포넌트입니다.
- * (React Router Dom 환경의 Mocking 버전)
- * @param {object} props - { file: File 객체, extractedUrl: 추출된 URL }
- */
-export function LoadingBar({ file, extractedUrl }) { 
-  // ⭐ useNavigate를 사용합니다.
-  const navigate = useNavigate(); 
-  const [stage, setStage] = React.useState(LOADING_STAGES.UPLOAD); // 현재 단계
-  const [uploadProgress, setUploadProgress] = React.useState(0);   // 업로드 진행률 (0-100)
-  const [statusMessage, setStatusMessage] = React.useState('파일 업로드를 준비 중입니다...');
+  const [progress, setProgress] = React.useState(0);
+  const [stage, setStage] = React.useState(LOADING_STAGES.FAKING);
+  const [statusMessage, setStatusMessage] = React.useState('분석을 준비 중입니다...');
 
-  const processFile = async () => {
-    if (!file) {
-        setStatusMessage('오류: 업로드할 파일이 없습니다.');
-        setStage(LOADING_STAGES.ERROR);
-        return;
-    }
-    
-    // 이 시점에서는 실제 API 호출 대신 Mocking 로직을 실행합니다.
-    try {
-      // 1. 🚀 업로드 단계 Mocking (3초 동안 0%에서 100%까지 시뮬레이션)
-      setStatusMessage('파일 업로드를 시뮬레이션 중...');
-      setStage(LOADING_STAGES.UPLOAD);
-      
-      // 100까지 10%씩 증가시키며 0.3초(300ms)씩 대기합니다.
-      for (let i = 0; i <= 100; i += 10) {
-        setUploadProgress(i);
-        await sleep(300); 
-      }
-      
-      // 2. ⏳ 서버 처리 단계로 전환 (2초 동안 무한 대기 로딩)
-      setStage(LOADING_STAGES.PROCESS);
-      setStatusMessage('서버 분석을 시뮬레이션 중... (2초 대기)');
-      
-      // 2초 동안 무한 대기 로딩바를 보여줍니다.
-      await sleep(2000); 
-      
-      // 3. ✅ 완료 단계: 분석 결과 페이지로 이동
-      setStage(LOADING_STAGES.COMPLETE);
-      setStatusMessage('분석 완료 (Mock)! 결과 화면으로 이동합니다.');
-      
-      // ⭐ 핵심: useNavigate를 사용하여 분석 메인 페이지('/analysis')로 돌아가 결과 패널을 표시합니다.
-      // (혹은 결과 전용 페이지('/analysis-result')가 있다면 그곳으로 이동합니다.)
-      // 저희는 Analysis.jsx에서 이미 라우팅 관리를 하고 있으므로 '/analysis'로 돌아갑니다.
-      navigate('/analysis', {
-        // 결과 화면이 Analysis.jsx에 표시될 수 있도록 상태를 전달할 수도 있습니다.
-        // 예시: state: { analysisCompleted: true, mockResult: { status: '안전', url: extractedUrl } }
-      }); 
+  const intervalRef = React.useRef(null);
+  const apiCalledRef = React.useRef(false); // 중복 호출 방지
 
-    } catch (error) {
-      console.error('로딩 중 오류 발생:', error);
-      setStatusMessage(`오류 발생: ${error.message || '알 수 없는 오류'}`);
-      setStage(LOADING_STAGES.ERROR);
+  const stopFakeProgress = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
   };
 
+  // 실제 API 호출 함수
+  const callApi = async () => {
+    try {
+      // ⭐️ 2. apiClient를 사용하도록 수정합니다.
+      // (헤더는 apiClient의 interceptor가 자동으로 처리해 줍니다)
+      const response = await apiClient.post(
+        '/analysis/analyze', // (apiClient에 baseURL이 이미 설정됨)
+        null,
+        {
+          params: { url: extractedUrl },
+          // (헤더의 'Authorization'은 apiClient가 자동으로 넣어줌)
+        }
+      );
+      
+      // ⭐️ (기존 코드)
+      /*
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        // ... (이 로직은 apiClient의 interceptor로 이동됨) ...
+        return;
+      }
+      const response = await axios.post(
+        'http://localhost:8080/api/analysis/analyze', // ⬅️ 이 부분이 문제였습니다.
+        null,
+        {
+          params: { url: extractedUrl },
+          headers: { 'Authorization': `Bearer ${token}` }
+        }
+      );
+      */
+      // ⭐️ (수정 완료)
+
+      stopFakeProgress();
+      setProgress(100);
+      setStage(LOADING_STAGES.COMPLETE);
+      setStatusMessage('분석 완료! 결과 화면으로 이동합니다.');
+
+      setTimeout(() => {
+        navigate('/analysis', {
+          replace: true,
+          state: { analysisResult: response.data }
+        });
+      }, 1000);
+
+    } catch (error) {
+      stopFakeProgress();
+      console.error('API 호출 중 오류 발생:', error);
+
+      let redirectPath = '/analysis';
+      let redirectMessage = { analysisError: '' };
+      let timeout = 3000;
+
+      if (error.response) {
+        if (error.response.status === 403 || error.response.status === 401) {
+          setStatusMessage('오류: 인증 세션이 만료되었습니다. 다시 로그인해 주세요.');
+          setStage(LOADING_STAGES.ERROR);
+          redirectPath = '/login';
+          redirectMessage = { analysisError: '세션이 만료되었거나 접근 권한이 없습니다.' };
+          timeout = 2000;
+        } else {
+          const msg = `서버 오류 (Status ${error.response.status})`;
+          setStatusMessage(`오류 발생: ${msg}`);
+          redirectMessage = { analysisError: msg };
+          setStage(LOADING_STAGES.ERROR);
+        }
+      } else if (error.request) {
+        // ⭐️ 3. (수정) 이제 Network Error (ERR_CONNECTION_REFUSED)는 이쪽으로 잡힙니다.
+        const msg = "서버에 연결할 수 없습니다. (IP: " + (error.config?.baseURL || 'Error') + ")";
+        setStatusMessage(`오류 발생: ${msg}`);
+        redirectMessage = { analysisError: msg };
+        setStage(LOADING_STAGES.ERROR);
+      } else {
+        const msg = error.message || "알 수 없는 오류가 발생했습니다.";
+        setStatusMessage(`오류 발생: ${msg}`);
+        redirectMessage = { analysisError: msg };
+        setStage(LOADING_STAGES.ERROR);
+      }
+
+      setTimeout(() => {
+        navigate(redirectPath, {
+          replace: true,
+          state: redirectMessage
+        });
+      }, timeout);
+    }
+  };
+
+  // 진행 애니메이션 + API 호출
+  const processFile = () => {
+    if (!extractedUrl) {
+      setStatusMessage('오류: 분석할 URL이 없습니다.');
+      setStage(LOADING_STAGES.ERROR);
+      navigate('/analysis', {
+        replace: true,
+        state: { analysisError: '분석할 URL 정보가 없습니다.' }
+      });
+      return;
+    }
+
+    setStage(LOADING_STAGES.FAKING);
+    setStatusMessage('분석 진행 중...');
+
+    // 가짜 진행률 (0~90%)
+    intervalRef.current = setInterval(() => {
+      setProgress(prev => {
+        const next = prev + 5;
+        if (next >= 90) {
+          stopFakeProgress();
+          setStage(LOADING_STAGES.PROCESSING);
+          setStatusMessage('거의 완료되었습니다. 잠시만 기다려주세요...');
+          if (!apiCalledRef.current) { // 중복 방지
+            apiCalledRef.current = true;
+            callApi();
+          }
+          return 90;
+        }
+        return next;
+      });
+    }, 200);
+  };
+
   React.useEffect(() => {
+    if (apiCalledRef.current) return; // 중복 방지
     processFile();
-    // 컴포넌트 마운트 시 한 번만 실행되도록 의존성 배열을 비웁니다.
-  }, []); 
+    return () => stopFakeProgress();
+  }, [extractedUrl]);
 
-  // 단계별 로딩바 및 메시지 표시
   return (
-    <div className="w-full max-w-xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h3 className="text-xl font-bold mb-4 text-center">QR 코드 분석 과정</h3>
+    // ... (이하 렌더링 부분은 동일) ...
+    <div className="w-full max-w-xl p-6 mx-auto bg-white rounded-lg shadow-lg">
+      <h3 className="mb-4 text-xl font-bold text-center">QR 코드 분석 과정</h3>
 
-      {(stage === LOADING_STAGES.UPLOAD || stage === LOADING_STAGES.PROCESS) && (
-        <div className="mb-4">
-          {/* 업로드 단계: value가 있어 진행률 표시 */}
-          {stage === LOADING_STAGES.UPLOAD && (
-            <Progress value={uploadProgress} className="h-3" />
-          )}
+      <div className="mb-4">
+        {(stage === LOADING_STAGES.FAKING || stage === LOADING_STAGES.PROCESSING) && (
+          <Progress value={progress} className="h-3 transition-all duration-200 ease-linear" />
+        )}
+        {stage === LOADING_STAGES.COMPLETE && (
+          <Progress value={100} className="h-3 transition-all duration-200 ease-linear" />
+        )}
+        {stage === LOADING_STAGES.ERROR && (
+          <Progress value={progress} className="h-3 transition-all duration-200 ease-linear bg-red-200" />
+        )}
+      </div>
 
-          {/* 서버 처리 단계: value가 없어 무한 대기 로딩 표시 */}
-          {stage === LOADING_STAGES.PROCESS && (
-            <Progress className="h-3" />
-          )}
-        </div>
-      )}
-
-      {/* 상태 메시지 */}
-      <p className={`mt-3 text-sm text-center font-medium 
-          ${stage === LOADING_STAGES.COMPLETE ? 'text-green-600 font-bold' : 
-            stage === LOADING_STAGES.ERROR ? 'text-red-600 font-bold' : 'text-gray-700'}`}>
-          {stage === LOADING_STAGES.UPLOAD && `${uploadProgress}% `}
-          {statusMessage}
+      <p
+        className={`mt-3 text-sm text-center font-medium 
+        ${stage === LOADING_STAGES.COMPLETE
+          ? 'text-lime-500 font-bold'
+          : stage === LOADING_STAGES.ERROR
+            ? 'text-red-600 font-bold'
+            : 'text-gray-700'}`}
+      >
+        {(stage === LOADING_STAGES.FAKING || stage === LOADING_STAGES.PROCESSING) && `${progress}% `}
+        {statusMessage}
       </p>
     </div>
   );

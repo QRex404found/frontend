@@ -19,10 +19,10 @@ export const LatestCommentPreview = ({ comments }) => {
       >
         {latestComment ? (
           // 댓글이 있는 경우
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <div className="flex items-start space-x-3 truncate">
               {/* 프로필 동그라미 */}
-              <div className="flex-shrink-0 w-8 h-8 bg-gray-300 rounded-full mt-1"></div>
+              <div className="flex-shrink-0 w-8 h-8 mt-1 bg-gray-300 rounded-full"></div>
 
               <div className="flex flex-col min-w-0">
                 {/* 사용자 ID */}
@@ -35,13 +35,13 @@ export const LatestCommentPreview = ({ comments }) => {
                 </p>
               </div>
             </div>
-            <ChevronRightIcon className="h-5 w-5 text-gray-400 shrink-0 ml-2" />
+            <ChevronRightIcon className="w-5 h-5 ml-2 text-gray-400 shrink-0" />
           </div>
         ) : (
           // 댓글이 없는 경우
-          <div className="flex justify-between items-center text-gray-500">
-            <span className="text-sm">첫 댓글을 남겨주세요!</span>
-            <ChevronRightIcon className="h-5 w-5 text-gray-400" />
+          <div className="flex items-center justify-between text-gray-500">
+            <span className="text-sm">Add a comment...</span>
+            <ChevronRightIcon className="w-5 h-5 text-gray-400" />
           </div>
         )}
       </Card>

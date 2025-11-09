@@ -1,66 +1,75 @@
-// 게시글 작성 폼
+// src/components/community/WritePostForm.jsx
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { createPostApi } from '@/api/community'; // 게시글 등록 API
-import { CameraIcon } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { createPostApi } from '@/api/community';
+import { CameraIcon, X } from 'lucide-react';
+import { toast } from "sonner"; // ✅ 추가
 
-/**
- * 게시글 작성 폼
- * @param {function} onPostSuccess - 게시글 등록 성공 시 호출할 함수 (목록 갱신 등)
- */
 const WritePostForm = ({ onPostSuccess }) => {
     const [title, setTitle] = useState('');
     const [url, setUrl] = useState('');
     const [context, setContext] = useState('');
     const [photoFile, setPhotoFile] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState(null);
 
     const handleFileChange = (e) => {
-        setPhotoFile(e.target.files[0]);
+        const file = e.target.files[0];
+        if (file) {
+            setPhotoFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => setPreviewUrl(reader.result);
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleCancelPreview = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setPhotoFile(null);
+        setPreviewUrl(null);
+        document.getElementById('photo-upload').value = '';
+    };
+
+    const resetForm = () => {
+        setTitle('');
+        setUrl('');
+        setContext('');
+        setPhotoFile(null);
+        setPreviewUrl(null);
+        document.getElementById('photo-upload').value = '';
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!title.trim() || !context.trim()) {
-            alert("제목과 내용은 필수 입력 사항입니다.");
+            toast.warning("제목과 내용은 반드시 입력해야 합니다.");
             return;
         }
 
         setIsLoading(true);
         const formData = new FormData();
-
-        // 🌟 [수정] 키 이름을 백엔드 DTO(BoardCreateRequest)와 일치시킵니다.
-        formData.append('postTitle', title);       // 👈 'title' -> 'postTitle'
-        formData.append('postContents', context);  // 👈 'context' -> 'postContents'
-        formData.append('url', url);               // 👈 'url'은 DTO와 일치
-
-        if (photoFile) {
-            // ❗️ [참고] 'photoFile'이라는 이름으로 파일을 보냅니다.
-            // 백엔드 컨트롤러는 이 'photoFile'을 @RequestPart("photoFile") MultipartFile photoFile 로 받아야 합니다.
-            // (만약 DTO의 imagePath만 사용한다면, 파일 업로드는 별도 로직이 필요합니다)
-            formData.append('photoFile', photoFile);
-        }
+        formData.append('postTitle', title);
+        formData.append('postContents', context);
+        formData.append('url', url);
+        if (photoFile) formData.append('photoFile', photoFile);
 
         try {
-            await createPostApi(formData); 
-            alert('게시글 등록 성공!');
-            // 폼 초기화
-            setTitle('');
-            setUrl('');
-            setContext('');
-            setPhotoFile(null);
-            document.getElementById('photo-upload').value = ''; 
-            
-            if(onPostSuccess) onPostSuccess();
+            await createPostApi(formData);
+            toast.success("게시글이 등록되었습니다! ");
+            resetForm();
+            onPostSuccess?.();
         } catch (error) {
-            console.error("게시글 등록 실패:", error);
-            // 🌟 [수정] 백엔드에서 보낸 오류 메시지를 우선적으로 표시합니다.
-            const errorMessage = error.response?.data || '게시글 등록에 실패했습니다. 다시 시도해주세요.';
-            alert(errorMessage);
+            const errorMessage =
+                error.response?.data?.message ||
+                error.response?.data ||
+                error.message ||
+                '게시글 등록에 실패했습니다. 다시 시도해주세요.';
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -70,16 +79,30 @@ const WritePostForm = ({ onPostSuccess }) => {
         <Card className="w-full">
             <CardContent className="pt-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    
-                    {/* 1. PHOTO */}
+
+                    {/* PHOTO */}
                     <div className="space-y-2">
                         <div className="flex flex-col items-center space-y-2">
-                            <label 
-                                htmlFor="photo-upload" 
-                                className="w-48 h-48 flex flex-col items-center justify-center border-2 border-dashed rounded-md cursor-pointer hover:bg-gray-50"
+                            <label
+                                htmlFor="photo-upload"
+                                className="relative flex flex-col items-center justify-center w-48 h-48 border-2 border-dashed rounded-md cursor-pointer hover:bg-gray-50"
                             >
-                                <CameraIcon className="w-6 h-6 text-gray-500" />
-                                <span className="text-sm text-gray-500 mt-1">PHOTO</span>
+                                {previewUrl ? (
+                                    <>
+                                        <img src={previewUrl} alt="미리보기" className="object-cover w-full h-full rounded-md" />
+                                        <button
+                                            onClick={handleCancelPreview}
+                                            className="absolute top-1 right-1 p-0.5 bg-gray-900 bg-opacity-50 text-white rounded-full hover:bg-opacity-75"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <CameraIcon className="w-6 h-6 text-gray-500" />
+                                        <span className="mt-1 text-sm text-gray-500">PHOTO</span>
+                                    </>
+                                )}
                             </label>
                             <input
                                 id="photo-upload"
@@ -88,47 +111,42 @@ const WritePostForm = ({ onPostSuccess }) => {
                                 onChange={handleFileChange}
                                 className="hidden"
                             />
-                            {photoFile && <span className="text-sm truncate max-w-[200px]">{photoFile.name}</span>}
+                            {previewUrl && photoFile && (
+                                <span className="text-sm truncate max-w-[200px]">{photoFile.name}</span>
+                            )}
                         </div>
                     </div>
 
-                    {/* 2. TITLE */}
-                    <div className="space-y-1">
-                        <Input 
-                            id="title" 
-                            placeholder="TITLE" 
-                            value={title} 
-                            onChange={(e) => setTitle(e.target.value)} 
-                        />
-                    </div>
-                    
-                    {/* 3. URL */}
-                    <div className="space-y-1">
-                        <Input 
-                            id="url" 
-                            placeholder="URL" 
-                            value={url} 
-                            onChange={(e) => setUrl(e.target.value)} 
-                        />
-                    </div>
+                    {/* TITLE */}
+                    <Input
+                        id="title"
+                        placeholder="TITLE"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
 
-                    {/* 4. CONTEXT */}
-                    <div className="space-y-1">
-                        <Textarea 
-                            id="context" 
-                            placeholder="CONTEXT" 
-                            value={context} 
-                            onChange={(e) => setContext(e.target.value)} 
-                            className="resize-none h-80"
-                        />
-                    </div>
+                    {/* URL */}
+                    <Input
+                        id="url"
+                        placeholder="URL"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                    />
 
-                    {/* Write 버튼 */}
-                    <Button 
-                        type="submit" 
-                        className="w-full mt-6" 
+                    {/* CONTEXT */}
+                    <Textarea
+                        id="context"
+                        placeholder="CONTEXT"
+                        value={context}
+                        onChange={(e) => setContext(e.target.value)}
+                        className="px-2 break-all resize-none h-33"
+                    />
+
+                    <Button
+                        type="submit"
+                        className="w-full mt-6"
                         disabled={isLoading}
-                        style={{ backgroundColor: '#8EE000' }} 
+                        style={{ backgroundColor: '#7CCF00' }}
                     >
                         {isLoading ? '등록 중...' : 'Write'}
                     </Button>

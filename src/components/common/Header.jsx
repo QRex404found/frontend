@@ -1,144 +1,151 @@
-// 헤더 (로그인 상태 관리 및 네비게이션)
+// src/components/common/Header.jsx
+
 import * as React from 'react';
-import {
-  NavigationMenu,
-  NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuLink,
-} from '@/components/ui/navigation-menu';
-import { cn } from '@/lib/utils.js';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from '@/components/ui/navigation-menu';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logoSrc from '@/assets/qrex_logo.png';
 import useAuth from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-
-/* (A 방식)
- * 'localStorage'를 직접 삭제하는 대신,
- * 'tokenUtils.js'의 'removeToken'을 import 합니다.
- */
 import { removeToken } from '@/utils/tokenUtils';
-
-{/* 로고 컴포넌트 */}
-const Logo = () => (
-  <Link to="/" className="mr-6">
-    <img src={logoSrc} alt="QREX Logo" className="h-14 w-auto" />
-  </Link>
-);
-
-{/* 로그인 버튼 컴포넌트 */}
-const LoginButton = () => (
-  <div className="flex items-center">
-    <Link
-      to="/login"
-      className="text-xl font-semibold transition-colors hover:text-primary"
-    >
-      Login
-    </Link>
-  </div>
-);
-
-{/* 로그아웃 버튼 컴포넌트 */}
-const LogoutButton = ({ onLogout }) => (
-  <div className="flex items-center">
-    <Button
-      onClick={onLogout}
-      variant="ghost"
-      className="text-xl font-semibold transition-colors hover:text-primary"
-    >
-      Logout
-    </Button>
-  </div>
-);
+import { LogOut, CircleUser } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import eggAvatar from '@/assets/QR_EGG.png';
+import EditProfileTab from "@/components/profile/EditProfileTab";
+import DeleteAccountTab from "@/components/profile/DeleteAccountTab";
 
 export function Header() {
   const navigate = useNavigate();
-  const { isLoggedIn, logout } = useAuth();
+  const location = useLocation();
+  const { isLoggedIn, logout, user } = useAuth();
 
-  const handleAnalysisClick = (e) => {
-    e.preventDefault();
-    navigate('/analysis', { replace: true });
-  };
+  // ⭐️⭐️⭐️ [핵심 수정] ⭐️⭐️⭐️
+  // user.username이 null이나 undefined일 때 .toUpperCase()를 호출해
+  // 충돌이 나던 문제를 수정합니다.
+  //
+  // [기존 코드]
+  // const fallbackLetter = user?.username?.charAt(0).toUpperCase() ?? "U";
+  //
+  // [수정된 코드]
+  // 1. user?.username?.charAt(0) (첫 글자)를 먼저 찾습니다.
+  // 2. ?? 'U' (없으면 'U'를 사용합니다.)
+  // 3. ( ... ).toUpperCase() (결과가 'U'이든 첫 글자이든, 그 후에 대문자로 바꿉니다.)
+  const fallbackLetter = (user?.username?.charAt(0) ?? 'U').toUpperCase();
+  // ⭐️⭐️⭐️ [수정 완료] ⭐️⭐️⭐️
 
-  {/* (A 방식 수정) 로그아웃 핸들러 */}
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
   const handleLogout = () => {
-    // 1. (A 방식) 'removeToken' 유틸리티를 사용해 영구 토큰을 삭제합니다.
     removeToken();
-
-    // 2. 'useAuth' 훅의 logout 함수를 호출해 React 상태를 변경합니다.
-    if (logout) {
-      logout();
-    }
-    
-    // 3. 페이지 이동은 제거합니다. (useAuth의 logout이 처리하거나,
-    //    isLoggedIn=false가 되면 페이지가 알아서 반응합니다.)
+    logout?.();
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm h-24">
-      <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* 왼쪽 섹션 (로고, 네비게이션) */}
-        <div className="flex items-center gap-x-10">
-          <Logo />
+    <header className="relative sticky top-0 z-50 h-20 bg-white shadow-sm">
+      <div className="flex items-center h-full gap-4 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
-          <NavigationMenu>
-            <NavigationMenuList className="space-x-10">
-              {/* Analysis */}
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <a
-                    href="/analysis"
-                    onClick={handleAnalysisClick}
-                    className={cn(
-                      'text-xl font-semibold transition-colors hover:text-primary ',
-                      'bg-transparent hover:bg-transparent focus:bg-transparent data-[active=true]:bg-transparent',
-                    )}
-                  >
-                    Analysis
-                  </a>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
+        {/* 로고 */}
+        <Link to="/" className="flex items-center flex-shrink-0">
+          <img src={logoSrc} alt="QREX Logo" className="object-contain w-auto h-10 select-none md:h-14" />
+        </Link>
 
-              {/* community */}
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link
-                    to="/community"
-                    className={cn(
-                      'text-xl font-semibold transition-colors hover:text-primary ',
-                      'bg-transparent hover:bg-transparent focus:bg-transparent data-[active=true]:bg-transparent',
-                    )}
-                  >
-                    community
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
+        {/* 네비게이션 → 화면 절대 중앙 고정 */}
+        <NavigationMenu className="absolute flex-none -translate-x-1/2 left-1/2">
+          <NavigationMenuList className="flex items-center justify-center gap-8 md:gap-12">
 
-              {/* My post */}
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link
-                    to="/mypost"
-                    className={cn(
-                      'text-xl font-semibold transition-colors hover:text-primary ',
-                      'bg-transparent hover:bg-transparent focus:bg-transparent data-[active=true]:bg-transparent',
-                    )}
-                  >
-                    My post
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link
+                  to="/analysis"
+                  replace
+                  className="text-sm font-medium md:text-lg hover:text-primary"
+                >
+                  Analysis
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link to="/community" className="text-sm font-medium md:text-lg hover:text-primary">
+                  Community
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link to="/mypost" className="text-sm font-medium md:text-lg hover:text-primary">
+                  My post
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+
+          </NavigationMenuList>
+        </NavigationMenu>
+
+        {/* 우측 영역 */}
+        <div className="flex items-center gap-3 ml-auto md:gap-4">
+          {isLoggedIn && (
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <CircleUser
+                className="w-5 h-5 text-gray-500 transition md:w-6 md:h-6 hover:text-black"
+                strokeWidth={1.6}
+              />
+              </PopoverTrigger>
+
+              <PopoverContent
+                side="bottom"
+                align="end"
+                sideOffset={35}
+                alignOffset={-200}
+                className="w-[420px] max-w-[100vw] p-4 shadow-lg border rounded-xl bg-white"
+              >
+                <Tabs defaultValue="edit" className="w-full">
+
+                  <TabsList className="inline-flex items-center justify-center bg-gray-200 rounded-md p-1.5 gap-1 max-w-max">
+                    <TabsTrigger value="edit" className="px-3 py-2 rounded text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                      Edit Profile
+                    </TabsTrigger>
+                    <TabsTrigger value="delete" className="px-3 py-2 rounded text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                      Delete Account
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="edit" className="pt-4 text-sm space-y-3 max-h-[330px] overflow-y-auto">
+                    <EditProfileTab onClose={() => setOpen(false)} />
+                  </TabsContent>
+
+                  <TabsContent value="delete" className="pt-4 text-sm space-y-3 max-h-[330px] overflow-y-auto">
+                    <DeleteAccountTab onClose={() => setOpen(false)} />
+                  </TabsContent>
+
+                </Tabs>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {isLoggedIn ? (
+            <Button onClick={handleLogout} variant="ghost" className="text-base md:text-lg hover:text-primary">
+              <LogOut className="w-5 h-5 md:w-6 md:h-6" />
+            </Button>
+          ) : (
+            <Link to="/login" className="text-base md:text-lg hover:text-primary">
+              <CircleUser
+                className="w-5 h-5 text-gray-500 transition md:w-6 md:h-6 hover:text-black"
+                strokeWidth={1.6}
+              />
+
+            </Link>
+          )}
         </div>
-
-        {/* 오른쪽 섹션 (로그인/로그아웃 버튼) */}
-        {isLoggedIn ? (
-          <LogoutButton onLogout={handleLogout} />
-        ) : (
-          <LoginButton />
-        )}
       </div>
     </header>
   );
 }
-

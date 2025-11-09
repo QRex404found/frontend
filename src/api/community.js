@@ -45,16 +45,23 @@ export const getPostDetailApi = async (boardId) => {
 };
 
 // 4. 새 게시글 작성 (POST /api/community/posts)
-export const createPostApi = async (formData) => { // (postData -> formData로 이름 변경)
+export const createPostApi = async (formData) => {
   try {
+    // 1. localStorage에서 토큰을 가져옵니다.
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+      throw new Error("No auth token found. Please log in.");
+    }
+
     const response = await apiClient.post(
-      '/community/posts', 
-      formData, // 1. React FormData 객체
+      '/community/posts',
+      formData,
       {
         headers: {
-          // 2. (중요) apiClient의 기본 JSON 설정을 덮어쓰고
-          //    FormData용 헤더를 명시합니다.
+          // 2. 기존 FormData용 헤더
           'Content-Type': 'multipart/form-data',
+          // 3. (핵심) 인증 헤더를 수동으로 다시 추가합니다.
+          'Authorization': `Bearer ${token}`,
         },
       }
     );

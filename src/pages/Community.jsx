@@ -1,3 +1,5 @@
+// src/pages/Community.jsx (이 코드로 파일 전체를 덮어쓰세요)
+
 import React, { useState, useEffect } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { AuthPopup } from '@/components/common/AuthPopup';
@@ -5,6 +7,16 @@ import { PostDetailModal } from '@/components/community/PostDetailModal';
 import { getCommunityPostsApi } from '@/api/community';
 import { Loader2 } from 'lucide-react';
 import { CommonBoard } from '@/components/common/CommonBoard';
+// ⬇️ [수정 1] Pagination import 삭제 (CommonBoard로 이동)
+/*
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+*/
 
 const PAGE_SIZE = 8;
 
@@ -18,11 +30,6 @@ export function Community() {
   const [selectedBoardId, setSelectedBoardId] = useState(null);
 
   useEffect(() => {
-    /* (핵심)
-     * fetchPosts 함수 로직을 useEffect 안으로 가져옵니다.
-     * 이렇게 하면 ReferenceError가 해결되고,
-     * useEffect가 올바르게 currentPage와 isLoggedIn만 의존하게 됩니다.
-     */
     const fetchPosts = async (page) => {
       setLoading(true);
       setError(null);
@@ -30,11 +37,14 @@ export function Community() {
         // Spring Page는 0부터 시작하므로 page - 1
         const data = await getCommunityPostsApi(page - 1, PAGE_SIZE);
 
-        const transformedPosts = data.content.map((post) => ({
-          id: post.boardId,
-          title: post.title,
-          date: post.createdAt,
-        }));
+        const transformedPosts = data.content
+          .slice()
+          .reverse()
+          .map((post) => ({
+            id: post.boardId,
+            title: post.title,
+            date: post.createdAt,
+          }));
 
         setPosts(transformedPosts);
         setTotalPages(data.totalPages || 1);
@@ -46,17 +56,16 @@ export function Community() {
       }
     };
 
-    /* 훅 내부에서 조건문을 쓰는 것은 괜찮습니다. */
     if (isLoggedIn) {
       fetchPosts(currentPage);
     }
-  }, [currentPage, isLoggedIn]); // 의존성 배열은 그대로 둡니다.
+  }, [currentPage, isLoggedIn]);
 
   /* 1. 인증 체크 로직 */
   if (!isChecked) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
       </div>
     );
   }
@@ -74,10 +83,23 @@ export function Community() {
     setSelectedBoardId(null);
   };
 
+  // ⬇️ [수정 2] 페이지 이동 핸들러 삭제 (CommonBoard로 이동)
+  /*
+  const handlePreviousPage = () => {
+    // 1페이지보다 작아지지 않도록 방지
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    // 마지막 페이지보다 커지지 않도록 방지
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+  */
+
   /* 3. 에러 발생 시 UI */
   if (error) {
     return (
-      <div className="text-red-500 text-center p-8">
+      <div className="p-8 text-center text-red-500">
         게시글을 불러오는 중 오류가 발생했습니다: {error}
       </div>
     );
@@ -87,18 +109,25 @@ export function Community() {
   return (
     <div className="p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold mb-6">Community</h1>
+        <h1 className="mb-6 text-4xl font-medium">Community</h1>
 
-        {/* 게시판 목록 (CommonBoard) */}
+        {/* ⬇️ [수정 3] props 다시 전달 */}
         <CommonBoard
           posts={posts}
           isLoading={loading}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
           onItemClick={handlePostClick}
           showIndex={true}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage} // ⬅️ 핸들러 대신 setCurrentPage 전달
         />
+
+        {/* ⬇️ [수정 4] 외부 Pagination JSX 삭제 */}
+        {/*
+        <div className="flex justify-center mt-6">
+          <Pagination> ... </Pagination>
+        </div>
+        */}
       </div>
 
       {/* 게시글 상세 모달 */}
