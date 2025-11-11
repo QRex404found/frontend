@@ -1,8 +1,7 @@
-// src/components/common/CommonBoard.jsx (이 코드로 파일 전체를 덮어쓰세요)
-
 import React from 'react';
 import { Table, TableBody, TableCaption, TableHeader, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import {
+    // 💡 Pagination 관련 import는 유지합니다. CommonBoard를 사용하는 다른 곳에서 필요할 수 있습니다.
     Pagination,
     PaginationContent,
     PaginationItem,
@@ -68,7 +67,8 @@ export const CommonBoard = ({
 }) => {
     const pageSize = 8;
 
-    // 페이지 이동 핸들러
+    // 💡 페이지 이동 핸들러 제거 (AnalysisHistory에서 직접 처리)
+    /*
     const handlePreviousPage = () => {
         if (!onPageChange) return;
         onPageChange((prev) => Math.max(prev - 1, 1));
@@ -78,11 +78,10 @@ export const CommonBoard = ({
         if (!onPageChange) return;
         onPageChange((prev) => Math.min(prev + 1, totalPages));
     };
+    */
 
-    // ⬇️ [수정 1] flex-col 및 min-h-[500px] 제거
     return (
         <div>
-            {/* ⬇️ [수정 2] min-h-[500px] 제거 */}
             <CardContent className="p-0">
                 {isLoading ? (
                     <div className={`flex justify-center items-center h-full min-h-[300px] ${rowHeightClass}`}>
@@ -157,43 +156,8 @@ export const CommonBoard = ({
                 )}
             </CardContent>
 
-            {/* ⬇️ [수정 3] {totalPages > 1 && ...} 조건 제거 */}
-            <div className="flex justify-center pt-4">
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handlePreviousPage();
-                                }}
-                                disabled={currentPage === 1}
-                                aria-disabled={currentPage === 1}
-                                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                            />
-                        </PaginationItem>
-                        <PaginationItem>
-                            <span className="px-4 py-2 text-sm">
-                                {/* ⬇️ totalPages가 0일 때 1로 보이도록 수정 */}
-                                Page {currentPage} / {totalPages < 1 ? 1 : totalPages}
-                            </span>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationNext
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handleNextPage();
-                                }}
-                                disabled={currentPage === totalPages || totalPages < 1}
-                                aria-disabled={currentPage === totalPages || totalPages < 1}
-                                className={(currentPage === totalPages || totalPages < 1) ? "pointer-events-none opacity-50" : ""}
-                            />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            </div>
+            {/* 🛑 수정 4: 페이지네이션 렌더링 코드 전체를 삭제합니다. (AnalysisHistory에서 렌더링) */}
+            {/* 이전 코드가 여기에 있었음 */}
         </div>
     );
 };

@@ -3,240 +3,281 @@
 import React, { useState, useEffect } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { AuthPopup } from '@/components/common/AuthPopup';
+import WritePostForm from '@/components/community/WritePostForm';
+import { getMyPostsApi, deletePostApi } from '@/api/community';
+import { PostDetailModal } from '@/components/community/PostDetailModal';
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { CommonBoard } from '@/components/common/CommonBoard';
+
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
   PaginationNext,
   PaginationPrevious,
-} from '@/components/ui/pagination';
-import WritePostForm from '@/components/community/WritePostForm';
-import { getMyPostsApi, deletePostApi } from '@/api/community';
-import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { PostDetailModal } from '@/components/community/PostDetailModal';
-import { Loader2 } from 'lucide-react';
-import { toast } from "sonner";
+} from "@/components/ui/pagination";
 
-// ✅ 추가: resizable
 import {
   ResizablePanelGroup,
   ResizablePanel,
   ResizableHandle,
 } from "@/components/ui/resizable";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 8;
 
 export function MyPost() {
   const { isLoggedIn } = useAuth();
-
   const [myPosts, setMyPosts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedPosts, setSelectedPosts] = useState([]);
-  const [showDetailPopup, setShowDetailPopup] = useState(false);
-  const [selectedBoardId, setSelectedBoardId] = useState(null);
-  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  // ✅ 모바일 슬라이드 탭
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [showDetail, setShowDetail] = useState(false);
+  const [selectedBoardId, setSelectedBoardId] = useState(null);
+
   const [mobileTab, setMobileTab] = useState("write");
 
   if (!isLoggedIn) return <AuthPopup show={true} isMandatory={true} />;
 
   useEffect(() => {
-    fetchMyPosts(currentPage);
-  }, [currentPage, isLoggedIn]);
+    fetchPosts(currentPage);
+  }, [currentPage]);
 
-  const fetchMyPosts = async (page) => {
+  const fetchPosts = async (page) => {
     setIsLoading(true);
     try {
       const data = await getMyPostsApi(page - 1, ITEMS_PER_PAGE, 'createdAt,desc');
       const mapped = data.content.map((p) => ({
         id: p.boardId,
         title: p.title,
-        date: new Date(p.createdAt).toLocaleDateString('ko-KR'),
+        date: p.createdAt,
       }));
       setMyPosts(mapped);
-      setTotalPages(data.totalPages);
-    } catch {
-      setMyPosts([]);
-      setTotalPages(0);
+      setTotalPages(Math.max(data.totalPages || 1, 1));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const toggleDelete = () => {
-    if (isDeleteMode && selectedPosts.length > 0) {
-      executeDelete();
+  const toggleDeleteMode = () => {
+    if (isDeleting && selectedPosts.length > 0) {
+      deleteSelected();
     } else {
-      setIsDeleteMode(!isDeleteMode);
+      setIsDeleting(!isDeleting);
       setSelectedPosts([]);
     }
   };
 
-  const executeDelete = async () => {
+  const deleteSelected = async () => {
     try {
       await Promise.all(selectedPosts.map((id) => deletePostApi(id)));
-      toast.success("선택한 게시글을 삭제했습니다.");
-      fetchMyPosts(currentPage);
+      toast.success("게시글이 삭제되었습니다.");
+      fetchPosts(currentPage);
     } catch {
       toast.error("삭제 실패");
     } finally {
-      setIsDeleteMode(false);
+      setIsDeleting(false);
       setSelectedPosts([]);
     }
   };
 
-  const handlePostClick = (post) => {
-    setSelectedBoardId(post.id);
-    setShowDetailPopup(true);
+  const toggleSelect = (id) => {
+    setSelectedPosts((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
   };
 
-  return (
-    <div className="px-4 pb-2 md:pb-4 md:px-8 -mt-[20px]">
+  const openDetail = (item) => {
+    setSelectedBoardId(item.id);
+    setShowDetail(true);
+  };
 
-      {showDetailPopup && (
+  const showEmpty = !isLoading && myPosts.length === 0;
+
+  const PaginationBar = ({ className = "" }) => (
+    <div className={`flex justify-center pt-4 ${className}`}>
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setCurrentPage((p) => Math.max(1, p - 1));
+              }}
+              aria-disabled={currentPage === 1}
+              className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+            />
+          </PaginationItem>
+          <PaginationItem>
+            <span className="px-4 py-2 text-sm">
+              Page {currentPage} / {totalPages}
+            </span>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setCurrentPage((p) => Math.min(totalPages, p + 1));
+              }}
+              aria-disabled={currentPage === totalPages}
+              className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    </div>
+  );
+
+  return (
+    <div className="px-4 md:px-8 pb-6 max-w-[1300px] mx-auto">
+
+      {showDetail && (
         <PostDetailModal
-          isOpen={showDetailPopup}
-          onOpenChange={() => setShowDetailPopup(false)}
+          isOpen={showDetail}
+          onOpenChange={() => setShowDetail(false)}
           boardId={selectedBoardId}
           showComments={true}
         />
       )}
 
-      {/* ✅ PC에서만 제목 표시 */}
-      <h1 className="hidden lg:block text-3xl font-medium mb-6 font-inter">My Post</h1>
-
-      {/* ✅ PC 화면: Resizable 좌우 배치 */}
-      <div className="hidden lg:flex w-full min-h-[500px]">
-        <ResizablePanelGroup direction="horizontal" className="w-full">
+      {/* ✅ PC */}
+      <div className="hidden lg:flex justify-center gap-8 h-[calc(100vh-160px)]">
+        <ResizablePanelGroup direction="horizontal">
 
           <ResizablePanel defaultSize={50} minSize={30}>
-            <div className="pr-6">
-              <WritePostForm onPostSuccess={() => fetchMyPosts(1)} />
+            <div className="max-w-[550px] mx-auto">
+              <WritePostForm onPostSuccess={() => fetchPosts(1)} />
             </div>
           </ResizablePanel>
 
-          <ResizableHandle className="px-[px] cursor-col-resize">
-            <div className="w-[1px] h-[85%] bg-gray-300 hover:bg-gray-400 transition-colors rounded -mt-[40px]" />
-          </ResizableHandle>
+          <ResizableHandle />
 
           <ResizablePanel minSize={30}>
-            <div className="pl-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-medium">My Post</h2>
-                <Button size="sm" onClick={toggleDelete}
-                  className={`${isDeleteMode ? 'bg-[#7CCF00] text-white' : 'text-gray-700 border border-gray-300 bg-white hover:bg-gray-100'}`}>
-                  {isDeleteMode ? 'Submit' : 'Delete'}
+            {/* ✅ 여기 overflow 제거됨 */}
+            <div className="max-w-[550px] mx-auto">
+
+              <h2 className="text-2xl font-medium mb-4">My Post</h2>
+
+              <div className="flex justify-end mb-4">
+                <Button
+                  onClick={toggleDeleteMode}
+                  variant={isDeleting ? "default" : "outline"}
+                  className={`
+                    w-[80px] text-center text-sm font-medium
+                    ${isDeleting
+                      ? "bg-[#7CCF00] text-white border-[#7CCF00] hover:bg-[#6AC600]"
+                      : "text-gray-700 border-gray-300 hover:bg-gray-100"
+                    }
+                  `}
+                >
+                  {isDeleting ? "Submit" : "Delete"}
                 </Button>
               </div>
 
-              <Table>
-                <TableBody>
-                  {isLoading ? (
-                    <TableRow><TableCell colSpan={3} className="py-6 text-center"><Loader2 className="animate-spin mx-auto text-green-500" /></TableCell></TableRow>
-                  ) : (
-                    myPosts.map((post, index) => (
-                      <TableRow key={post.id} className="cursor-pointer hover:bg-gray-50"
-                        onClick={() => !isDeleteMode && handlePostClick(post)}>
-                        <TableCell className="w-[40px] text-center">
-                          {isDeleteMode ? (
-                            <Checkbox checked={selectedPosts.includes(post.id)}
-                              onCheckedChange={() =>
-                                setSelectedPosts(prev => prev.includes(post.id) ? prev.filter(i => i !== post.id) : [...prev, post.id])
-                              }
-                            />
-                          ) : index + 1 + (currentPage - 1) * ITEMS_PER_PAGE}
-                        </TableCell>
-                        <TableCell className="flex-1 font-medium">{post.title}</TableCell>
-                        <TableCell className="text-right text-gray-500">{post.date}</TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+              {!showEmpty ? (
+                <CommonBoard
+                  posts={myPosts}
+                  isLoading={isLoading}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  onItemClick={openDetail}
+                  isDeleting={isDeleting}
+                  selectedPosts={selectedPosts}
+                  onCheckboxChange={toggleSelect}
+                  rowHeightClass="h-12"
+                />
+              ) : (
+                <div className="py-12 text-center text-gray-500">
+                  등록된 게시물이 없습니다.
+                </div>
+              )}
 
-              <div className="flex justify-center mt-6">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem><PaginationPrevious onClick={() => setCurrentPage(p => Math.max(1, p - 1))} /></PaginationItem>
-                    <PaginationItem><span className="px-4 py-2">Page {currentPage} / {totalPages}</span></PaginationItem>
-                    <PaginationItem><PaginationNext onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} /></PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
+              <PaginationBar />
             </div>
           </ResizablePanel>
 
         </ResizablePanelGroup>
       </div>
 
-      {/* ✅ 모바일 : Segmented + 슬라이드 */}
-      <div className="lg:hidden w-full mt-4">
-
+      {/* ✅ 모바일 */}
+      <div className="lg:hidden mt-4 w-full">
         <div className="mb-4 flex justify-center">
           <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
-            <button onClick={() => setMobileTab('write')}
-              className={`px-4 py-1.5 rounded-full ${mobileTab === 'write' ? 'bg-white shadow-sm border border-gray-200' : 'text-gray-600'}`}>
+            <button
+              onClick={() => setMobileTab("write")}
+              className={`px-4 py-1.5 rounded-full ${mobileTab === "write" ? "bg-white shadow-sm border" : "text-gray-600"}`}
+            >
               글 작성
             </button>
-
-            <button onClick={() => setMobileTab('list')}
-              className={`px-4 py-1.5 rounded-full ${mobileTab === 'list' ? 'bg-white shadow-sm border border-gray-200' : 'text-gray-600'}`}>
+            <button
+              onClick={() => setMobileTab("list")}
+              className={`px-4 py-1.5 rounded-full ${mobileTab === "list" ? "bg-white shadow-sm border" : "text-gray-600"}`}
+            >
               내가 쓴 글
             </button>
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-lg border">
-          <div className="flex w-[200%] transition-transform duration-300 ease-out"
-               style={{ transform: mobileTab === 'write' ? 'translateX(0)' : 'translateX(-50%)' }}>
-
+        <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+          <div
+            className="flex w-[200%] transition-transform duration-300"
+            style={{ transform: mobileTab === "write" ? "translateX(0)" : "translateX(-50%)" }}
+          >
             <div className="w-1/2 p-4">
-              <WritePostForm onPostSuccess={() => fetchMyPosts(1)} />
+              <WritePostForm onPostSuccess={() => fetchPosts(1)} />
             </div>
 
             <div className="w-1/2 p-4">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-medium">My Post</h2>
-                <Button size="sm" onClick={toggleDelete}
-                  className={`${isDeleteMode ? 'bg-[#81BF59] text-white' : 'text-gray-700 border border-gray-300 bg-white hover:bg-gray-100'}`}>
-                  {isDeleteMode ? 'Submit' : 'Delete'}
+              <h2 className="text-xl font-medium mb-4">My Post</h2>
+
+              <div className="flex justify-end mb-4">
+                <Button
+                  onClick={toggleDeleteMode}
+                  variant={isDeleting ? "default" : "outline"}
+                  className={`
+                    w-[80px] text-center text-sm font-medium
+                    ${isDeleting
+                      ? "bg-[#7CCF00] text-white border-[#7CCF00] hover:bg-[#6AC600]"
+                      : "text-gray-700 border-gray-300 hover:bg-gray-100"
+                    }
+                  `}
+                >
+                  {isDeleting ? "Submit" : "Delete"}
                 </Button>
               </div>
 
-              <Table>
-                <TableBody>
-                  {isLoading ? (
-                    <TableRow><TableCell colSpan={3} className="py-6 text-center"><Loader2 className="animate-spin mx-auto text-green-500" /></TableCell></TableRow>
-                  ) : (
-                    myPosts.map((post, index) => (
-                      <TableRow key={post.id} className="cursor-pointer hover:bg-gray-50"
-                        onClick={() => !isDeleteMode && handlePostClick(post)}>
-                        <TableCell className="w-[40px] text-center">
-                          {isDeleteMode ? (
-                            <Checkbox checked={selectedPosts.includes(post.id)}
-                              onCheckedChange={() =>
-                                setSelectedPosts(prev => prev.includes(post.id) ? prev.filter(i => i !== post.id) : [...prev, post.id])
-                              }
-                            />
-                          ) : index + 1 + (currentPage - 1) * ITEMS_PER_PAGE}
-                        </TableCell>
-                        <TableCell className="flex-1">{post.title}</TableCell>
-                        <TableCell className="text-right text-gray-500">{post.date}</TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+              {!showEmpty ? (
+                <CommonBoard
+                  posts={myPosts}
+                  isLoading={isLoading}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  onItemClick={openDetail}
+                  isDeleting={isDeleting}
+                  selectedPosts={selectedPosts}
+                  onCheckboxChange={toggleSelect}
+                  rowHeightClass="h-14"
+                />
+              ) : (
+                <div className="py-10 text-center text-gray-500">
+                  등록된 게시물이 없습니다.
+                </div>
+              )}
 
+              <PaginationBar className="pb-2" />
             </div>
           </div>
         </div>
       </div>
+
     </div>
   );
 }

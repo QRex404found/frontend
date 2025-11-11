@@ -7,16 +7,6 @@ import { PostDetailModal } from '@/components/community/PostDetailModal';
 import { getCommunityPostsApi } from '@/api/community';
 import { Loader2 } from 'lucide-react';
 import { CommonBoard } from '@/components/common/CommonBoard';
-// ⬇️ [수정 1] Pagination import 삭제 (CommonBoard로 이동)
-/*
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-*/
 
 const PAGE_SIZE = 8;
 

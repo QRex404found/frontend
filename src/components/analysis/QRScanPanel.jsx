@@ -137,7 +137,7 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px]">
       <div className="flex flex-col items-center justify-center p-6 space-y-6">
-        <p className="text-2xl font-semibold text-gray-700">QR 코드를 스캔하세요</p>
+        <p className="text-2xl font-semibold text-gray-700">QR Scan</p>
 
         <input
           type="file"

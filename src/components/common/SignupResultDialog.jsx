@@ -10,14 +10,15 @@ const SignupResultDialog = ({ isOpen, type, onAction, onClose }) => {
     icon: CheckCircle,
     title: 'Sign Up Successful!',
     message: 'Welcome to QREX! Your account has been created successfully.',
-    feature: 'New Feature Added: When you use the QR phishing detection feature, your activity will be recorded and can be shared with the community. Try QREX\'s services!',
+    // ⬇️ [수정 1] 성공 시 'feature' 속성 자체를 제거합니다.
+    // feature: 'New Feature Added: ...', 
     buttonText: 'Go to Login',
     buttonClass: 'bg-green-500 hover:bg-green-600',
   } : {
     icon: XCircle,
     title: 'Sign Up Failed',
     message: 'Something went wrong. Please check your information and try again.',
-    feature: 'Why Join QREX? By joining QREX, you can detect QR phishing safely and share your insights with the community.',
+    feature: 'Why Join QREX? By joining QREX, you can detect QR phishing safely and share your insights with the community.', // ⬅️ 실패 시에는 유지
     buttonText: 'Try Again',
     buttonClass: 'bg-green-500 hover:bg-green-600',
   };
@@ -42,13 +43,17 @@ const SignupResultDialog = ({ isOpen, type, onAction, onClose }) => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="p-4 mt-4 space-y-2 border rounded-md bg-gray-50">
-            <div className="flex items-start space-x-2">
-                <CheckCircle className="w-4 h-4 mt-1 text-green-500" /> 
-                <p className="text-sm font-semibold">{isSuccess ? 'New Feature Added' : 'Why Join QREX?'}</p>
-            </div>
-            <p className="text-xs text-gray-700">{config.feature}</p>
-        </div>
+        {/* ⬇️ [수정 2] config.feature 값이 존재할 때만 (즉, 실패 시에만) 이 블록이 렌더링됩니다. ⬇️ */}
+        {config.feature && (
+          <div className="p-4 mt-4 space-y-2 border rounded-md bg-gray-50">
+              <div className="flex items-start space-x-2">
+                  <CheckCircle className="w-4 h-4 mt-1 text-green-500" /> 
+                  <p className="text-sm font-semibold">{isSuccess ? 'New Feature Added' : 'Why Join QREX?'}</p>
+              </div>
+              <p className="text-xs text-gray-700">{config.feature}</p>
+          </div>
+        )}
+        {/* ⬆️ [수정 2] 여기까지 ⬆️ */}
 
         <Button 
           onClick={handleAction} 

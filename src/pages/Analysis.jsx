@@ -1,3 +1,5 @@
+// src/pages/Analysis.jsx
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
@@ -33,7 +35,7 @@ export function Analysis() {
     description: ''
   });
 
-  const [mobileTab, setMobileTab] = useState('scan'); // scan | history
+  const [mobileTab, setMobileTab] = useState('scan');
   const titleUpdateRef = useRef(null);
 
   const handleAnalysisResult = useCallback((result, error) => {
@@ -129,26 +131,34 @@ export function Analysis() {
   );
 
   return (
-    <div className="p-4 md:p-8 -mt-[20px]">
-      <h1 className="hidden lg:block text-3xl font-medium mb-6 font-inter">QR 코드 분석</h1>
-
-      {/* ✅ 큰 화면: 좌/우 패널 (랩퍼에 hidden/lg:flex 적용) */}
+    // [수정 1] MyPost와 동일하게 수평/하단 패딩만 적용
+    <div className="px-4 md:px-8 pb-8">
+      {/* ✅ 큰 화면: 좌/우 패널 */}
       <div className="hidden lg:flex w-full min-h-[500px]">
         <ResizablePanelGroup direction="horizontal" className="w-full">
+
           <ResizablePanel defaultSize={50} minSize={30}>
-            <div className="px-10">
-              <Card className="min-h-[520px] shadow-lg p-6 flex items-center justify-center">
-                {LeftPanelContent}
-              </Card>
+            <div className="h-full flex flex-col justify-between">
+              
+              {/* ⬇️ [수정 2] 여기에 pt-0, md:pt-0 추가 (좌/우 상단 정렬) */}
+              <div className="p-4 md:p-8 px-10 flex-1 pt-0 md:pt-0"> 
+                <Card className="h-full w-full shadow-lg p-6 flex items-center justify-center">
+                  {LeftPanelContent}
+                </Card>
+              </div>
+              <div className="py-10" />
             </div>
           </ResizablePanel>
 
           <ResizableHandle className="px-[1px] cursor-col-resize">
-            <div className="w-[1px] h-[85%] bg-gray-300 hover:bg-gray-400 transition-colors rounded -mt-[40px]" />
+            <div className="w-[1px] h-[85%] bg-gray-300 hover:bg-gray-400 transition-colors rounded" />
           </ResizableHandle>
 
           <ResizablePanel minSize={30}>
-            <div className="pl-4">
+             {/* ⬇️ 여기(오른쪽 패널)는 pt-0 (pl-4만 있으므로)
+                그래서 [수정 2]에서 왼쪽 패널도 pt-0으로 맞춘 것입니다.
+             */}
+            <div className="pl-4 h-full flex flex-col">
               <AnalysisHistory
                 onSelectResult={handleHistorySelect}
                 refreshKey={historyRefreshKey}
@@ -159,10 +169,9 @@ export function Analysis() {
         </ResizablePanelGroup>
       </div>
 
-      {/* ✅ 작은 화면: 세그먼트 + 슬라이드 UI */}
-      <div className="lg:hidden w-full">
-
-        {/* Segmented */}
+      {/* ✅ 작은 화면 */}
+      {/* [수정 3] MyPost와 동일하게 mt-4 추가 */}
+      <div className="lg:hidden mt-4 w-full">
         <div className="mb-3 flex items-center justify-center">
           <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
             <button
@@ -188,13 +197,12 @@ export function Analysis() {
           </div>
         </div>
 
-        {/* Slide */}
         <div className="overflow-hidden rounded-lg border">
           <div
             className="flex w-[200%] transition-transform duration-300 ease-out"
             style={{ transform: mobileTab === 'scan' ? 'translateX(0)' : 'translateX(-50%)' }}
           >
-            <div className="w-1/2">
+            <div className="w-1w-1/2">
               <Card className="min-h-[520px] shadow-lg p-4 sm:p-6">
                 {LeftPanelContent}
               </Card>
@@ -207,11 +215,11 @@ export function Analysis() {
                   refreshKey={historyRefreshKey}
                   titleUpdateRef={titleUpdateRef}
                 />
-              </div>
-            </div>
+              </div> 
+            </div> 
           </div>
         </div>
-      </div>
+      </div> 
 
       <CustomAlertDialog
         isOpen={alertDialogState.isOpen}

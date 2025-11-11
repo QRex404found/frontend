@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { createPostApi } from '@/api/community';
 import { CameraIcon, X } from 'lucide-react';
-import { toast } from "sonner"; // ✅ 추가
+import { toast } from "sonner";
 
 const WritePostForm = ({ onPostSuccess }) => {
     const [title, setTitle] = useState('');
@@ -60,16 +60,11 @@ const WritePostForm = ({ onPostSuccess }) => {
 
         try {
             await createPostApi(formData);
-            toast.success("게시글이 등록되었습니다! ");
+            toast.success("게시글이 등록되었습니다!");
             resetForm();
             onPostSuccess?.();
-        } catch (error) {
-            const errorMessage =
-                error.response?.data?.message ||
-                error.response?.data ||
-                error.message ||
-                '게시글 등록에 실패했습니다. 다시 시도해주세요.';
-            toast.error(errorMessage);
+        } catch {
+            toast.error("게시글 등록 실패");
         } finally {
             setIsLoading(false);
         }
@@ -78,75 +73,76 @@ const WritePostForm = ({ onPostSuccess }) => {
     return (
         <Card className="w-full">
             <CardContent className="pt-6">
-                <form onSubmit={handleSubmit} className="space-y-4">
+                {/* ✅ 간격은 space-y-3 유지 */}
+                <form onSubmit={handleSubmit} className="space-y-3">
 
-                    {/* PHOTO */}
-                    <div className="space-y-2">
-                        <div className="flex flex-col items-center space-y-2">
-                            <label
-                                htmlFor="photo-upload"
-                                className="relative flex flex-col items-center justify-center w-48 h-48 border-2 border-dashed rounded-md cursor-pointer hover:bg-gray-50"
-                            >
-                                {previewUrl ? (
-                                    <>
-                                        <img src={previewUrl} alt="미리보기" className="object-cover w-full h-full rounded-md" />
-                                        <button
-                                            onClick={handleCancelPreview}
-                                            className="absolute top-1 right-1 p-0.5 bg-gray-900 bg-opacity-50 text-white rounded-full hover:bg-opacity-75"
-                                        >
-                                            <X size={14} />
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <CameraIcon className="w-6 h-6 text-gray-500" />
-                                        <span className="mt-1 text-sm text-gray-500">PHOTO</span>
-                                    </>
-                                )}
-                            </label>
-                            <input
-                                id="photo-upload"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileChange}
-                                className="hidden"
-                            />
-                            {previewUrl && photoFile && (
-                                <span className="text-sm truncate max-w-[200px]">{photoFile.name}</span>
+                    {/* ✅ PHOTO (중간 크기: w-44 h-40) */}
+                    <div className="flex flex-col items-center">
+                        <label
+                            htmlFor="photo-upload"
+                            className="relative flex flex-col items-center justify-center w-44 h-40 border-2 border-dashed rounded-md cursor-pointer hover:bg-gray-50 transition"
+                        >
+                            {previewUrl ? (
+                                <>
+                                    <img src={previewUrl} alt="미리보기" className="object-cover w-full h-full rounded-md" />
+                                    <button
+                                        onClick={handleCancelPreview}
+                                        className="absolute top-1 right-1 p-0.5 bg-gray-900 bg-opacity-50 text-white rounded-full hover:bg-opacity-75"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <CameraIcon className="w-6 h-6 text-gray-500" />
+                                    <span className="mt-1 text-sm text-gray-500">PHOTO</span>
+                                </>
                             )}
-                        </div>
+                        </label>
+
+                        <input
+                            id="photo-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="hidden"
+                        />
+
+                        {previewUrl && photoFile && (
+                            <span className="text-xs truncate max-w-[200px] mt-1">{photoFile.name}</span>
+                        )}
                     </div>
 
                     {/* TITLE */}
                     <Input
-                        id="title"
                         placeholder="TITLE"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
+                        className="text-sm"
                     />
 
                     {/* URL */}
                     <Input
-                        id="url"
-                        placeholder="URL"
+                        placeholder="URL (선택)"
                         value={url}
                         onChange={(e) => setUrl(e.target.value)}
+                        className="text-sm"
                     />
 
-                    {/* CONTEXT */}
+                    {/* CONTEXT (적절히 줄인 높이 유지) */}
                     <Textarea
-                        id="context"
                         placeholder="CONTEXT"
                         value={context}
                         onChange={(e) => setContext(e.target.value)}
-                        className="px-2 break-all resize-none h-33"
+                        className="resize-none h-28 text-sm"
                     />
 
+                    {/* ✅ 버튼 위 간격 유지 */}
                     <Button
                         type="submit"
-                        className="w-full mt-6"
-                        disabled={isLoading}
+                        className="w-full mt-2 text-sm font-medium"
                         style={{ backgroundColor: '#7CCF00' }}
+                        disabled={isLoading}
                     >
                         {isLoading ? '등록 중...' : 'Write'}
                     </Button>
