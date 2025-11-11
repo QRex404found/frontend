@@ -1,5 +1,3 @@
-// src/pages/MyPost.jsx
-
 import React, { useState, useEffect } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { AuthPopup } from '@/components/common/AuthPopup';
@@ -9,14 +7,6 @@ import { PostDetailModal } from '@/components/community/PostDetailModal';
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CommonBoard } from '@/components/common/CommonBoard';
-
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 
 import {
   ResizablePanelGroup,
@@ -98,44 +88,8 @@ export function MyPost() {
 
   const showEmpty = !isLoading && myPosts.length === 0;
 
-  const PaginationBar = ({ className = "" }) => (
-    <div className={`flex justify-center pt-4 ${className}`}>
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setCurrentPage((p) => Math.max(1, p - 1));
-              }}
-              aria-disabled={currentPage === 1}
-              className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-            />
-          </PaginationItem>
-          <PaginationItem>
-            <span className="px-4 py-2 text-sm">
-              Page {currentPage} / {totalPages}
-            </span>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setCurrentPage((p) => Math.min(totalPages, p + 1));
-              }}
-              aria-disabled={currentPage === totalPages}
-              className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-    </div>
-  );
-
   return (
-    <div className="px-4 md:px-8 pb-6 max-w-[1300px] mx-auto">
+    <div className="px-4 md:px-8 pb-8 max-w-[1300px] mx-auto">
 
       {showDetail && (
         <PostDetailModal
@@ -147,7 +101,7 @@ export function MyPost() {
       )}
 
       {/* ✅ PC */}
-      <div className="hidden lg:flex justify-center gap-8 h-[calc(100vh-160px)]">
+      <div className="hidden lg:flex justify-center gap-8 min-h-[620px]">
         <ResizablePanelGroup direction="horizontal">
 
           <ResizablePanel defaultSize={50} minSize={30}>
@@ -159,17 +113,16 @@ export function MyPost() {
           <ResizableHandle />
 
           <ResizablePanel minSize={30}>
-            {/* ✅ 여기 overflow 제거됨 */}
             <div className="max-w-[550px] mx-auto">
 
               <h2 className="text-2xl font-medium mb-4">My Post</h2>
 
-              <div className="flex justify-end mb-4">
+              <div className="flex justify-end mb-3">
                 <Button
                   onClick={toggleDeleteMode}
                   variant={isDeleting ? "default" : "outline"}
                   className={`
-                    w-[80px] text-center text-sm font-medium
+                    w-[80px] text-sm font-medium
                     ${isDeleting
                       ? "bg-[#7CCF00] text-white border-[#7CCF00] hover:bg-[#6AC600]"
                       : "text-gray-700 border-gray-300 hover:bg-gray-100"
@@ -194,12 +147,11 @@ export function MyPost() {
                   rowHeightClass="h-12"
                 />
               ) : (
-                <div className="py-12 text-center text-gray-500">
+                <div className="py-10 text-center text-gray-500">
                   등록된 게시물이 없습니다.
                 </div>
               )}
 
-              <PaginationBar />
             </div>
           </ResizablePanel>
 
@@ -208,7 +160,7 @@ export function MyPost() {
 
       {/* ✅ 모바일 */}
       <div className="lg:hidden mt-4 w-full">
-        <div className="mb-4 flex justify-center">
+        <div className="mb-3 flex justify-center">
           <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
             <button
               onClick={() => setMobileTab("write")}
@@ -235,14 +187,14 @@ export function MyPost() {
             </div>
 
             <div className="w-1/2 p-4">
-              <h2 className="text-xl font-medium mb-4">My Post</h2>
+              <h2 className="text-xl font-medium mb-3">My Post</h2>
 
-              <div className="flex justify-end mb-4">
+              <div className="flex justify-end mb-3">
                 <Button
                   onClick={toggleDeleteMode}
                   variant={isDeleting ? "default" : "outline"}
                   className={`
-                    w-[80px] text-center text-sm font-medium
+                    w-[80px] text-sm font-medium
                     ${isDeleting
                       ? "bg-[#7CCF00] text-white border-[#7CCF00] hover:bg-[#6AC600]"
                       : "text-gray-700 border-gray-300 hover:bg-gray-100"
@@ -271,9 +223,8 @@ export function MyPost() {
                   등록된 게시물이 없습니다.
                 </div>
               )}
-
-              <PaginationBar className="pb-2" />
             </div>
+
           </div>
         </div>
       </div>

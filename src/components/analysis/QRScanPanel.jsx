@@ -5,13 +5,8 @@ import { Camera, Image, FileText } from 'lucide-react';
 import jsQR from 'jsqr';
 
 /**
- * 개선된 QR 코드 스캔 함수
- * - 흑백 대비 강화
- * - inversionAttempts: "attemptBoth"
- * - createImageBitmap 오류 처리
+ * QR 이미지에서 URL 추출
  */
-
-
 const scanFileForQrUrl = async (file) => {
   let imageBitmap;
   try {
@@ -21,27 +16,22 @@ const scanFileForQrUrl = async (file) => {
     throw new Error("이미지 파일을 처리할 수 없습니다.");
   }
 
-  // 캔버스 설정 (성능 향상 옵션 포함)
   const canvas = document.createElement("canvas");
   canvas.width = imageBitmap.width;
   canvas.height = imageBitmap.height;
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  ctx.drawImage(imageBitmap, 0, 0, imageBitmap.width, imageBitmap.height);
+  ctx.drawImage(imageBitmap, 0, 0);
 
   let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const data = imageData.data;
 
-  // 평균 밝기 자동 계산
   let total = 0;
   for (let i = 0; i < data.length; i += 4) {
     total += (data[i] + data[i + 1] + data[i + 2]) / 3;
   }
   const avgBrightness = total / (data.length / 4);
-
-  // 자동 임계값 설정
   const threshold = avgBrightness * 0.9;
 
-  // 흑백 변환
   for (let i = 0; i < data.length; i += 4) {
     const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
     const bw = avg > threshold ? 255 : 0;
@@ -49,12 +39,10 @@ const scanFileForQrUrl = async (file) => {
   }
   ctx.putImageData(imageData, 0, 0);
 
-  // 첫 번째 시도
   let code = jsQR(imageData.data, imageData.width, imageData.height, {
     inversionAttempts: "dontInvert",
   });
 
-  // 실패 시 반전 재시도
   if (!code) {
     for (let i = 0; i < data.length; i += 4) {
       data[i] = 255 - data[i];
@@ -68,72 +56,52 @@ const scanFileForQrUrl = async (file) => {
     });
   }
 
-  if (code && code.data) {
-    console.log("✅ QR 코드 인식 성공:", code.data);
-    return code.data;
-  } else {
-    throw new Error("이미지에서 QR 코드를 찾을 수 없습니다.");
-  }
+  if (code && code.data) return code.data;
+  throw new Error("이미지에서 QR 코드를 찾을 수 없습니다.");
 };
 
 
 /**
- * QRScanPanel 컴포넌트
+ * QRScanPanel
  */
 export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
   const fileInputRef = useRef(null);
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
 
-  // 분석 시작
   const startAnalysis = async (file) => {
     if (!file) return;
     try {
-      console.log("React: QR 이미지 스캔 시작...");
       const extractedUrl = await scanFileForQrUrl(file);
-      console.log("React: URL 추출 성공:", extractedUrl);
-
-      if (onAnalysisStart) {
-        onAnalysisStart(file, extractedUrl);
-      }
+      if (onAnalysisStart) onAnalysisStart(file, extractedUrl);
     } catch (error) {
-      console.error("QR 스캔 실패:", error);
-      if (onAnalysisResult) {
-        onAnalysisResult(null, error.message);
-      }
+      if (onAnalysisResult) onAnalysisResult(null, error.message);
     }
   };
 
-  // 파일 선택 핸들러
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
     startAnalysis(file);
-    if (event.target) event.target.value = null;
+    e.target.value = null;
   };
 
-  // 사진 보관함에서 선택
   const handlePhotoLibraryClick = () => {
-    if (!fileInputRef.current) return;
-    fileInputRef.current.removeAttribute('capture');
+    fileInputRef.current?.removeAttribute('capture');
     fileInputRef.current.accept = "image/*";
     fileInputRef.current.click();
   };
 
-  // 카메라로 촬영
   const handleCameraClick = () => {
-    if (!fileInputRef.current) return;
-    fileInputRef.current.setAttribute('capture', 'environment');
+    fileInputRef.current?.setAttribute('capture', 'environment');
     fileInputRef.current.accept = "image/*";
     fileInputRef.current.click();
   };
 
-  // 파일 선택
   const handleFileClick = () => {
-    if (!fileInputRef.current) return;
-    fileInputRef.current.removeAttribute('capture');
+    fileInputRef.current?.removeAttribute('capture');
     fileInputRef.current.accept = "*/*";
     fileInputRef.current.click();
   };
 
-  // --- 렌더링 ---
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px]">
       <div className="flex flex-col items-center justify-center p-6 space-y-6">
@@ -157,6 +125,8 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-48 p-2 rounded-lg shadow-xl">
+
+            {/* 공통: 사진 보관함 */}
             <DropdownMenuItem
               onClick={handlePhotoLibraryClick}
               className="cursor-pointer p-3 flex items-center space-x-2 text-base"
@@ -165,14 +135,18 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
               <span>사진 보관함</span>
             </DropdownMenuItem>
 
-            <DropdownMenuItem
-              onClick={handleCameraClick}
-              className="cursor-pointer p-3 flex items-center space-x-2 text-base"
-            >
-              <Camera className="w-4 h-4" />
-              <span>사진 찍기</span>
-            </DropdownMenuItem>
+            {/* ✅ 모바일에서만 표시 */}
+            {isMobile && (
+              <DropdownMenuItem
+                onClick={handleCameraClick}
+                className="cursor-pointer p-3 flex items-center space-x-2 text-base"
+              >
+                <Camera className="w-4 h-4" />
+                <span>사진 찍기</span>
+              </DropdownMenuItem>
+            )}
 
+            {/* 공통: 파일 선택 */}
             <DropdownMenuItem
               onClick={handleFileClick}
               className="cursor-pointer p-3 flex items-center space-x-2 text-base"
@@ -180,6 +154,7 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
               <FileText className="w-4 h-4" />
               <span>파일 선택</span>
             </DropdownMenuItem>
+
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
