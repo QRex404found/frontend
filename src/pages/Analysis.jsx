@@ -110,7 +110,7 @@ export function Analysis() {
   }
 
   if (!isLoggedIn) {
-    return <AuthPopup show={true} isMandatory={true} />;
+    return <AuthPopup show={true} isMandatory={true} onClose={() => navigate('/')} />;
   }
 
   const currentResult = selectedHistory || analysisResult;

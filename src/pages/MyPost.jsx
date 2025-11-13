@@ -1,3 +1,5 @@
+// src/pages/MyPost.jsx
+
 import React, { useState, useEffect } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { AuthPopup } from '@/components/common/AuthPopup';
@@ -7,6 +9,7 @@ import { PostDetailModal } from '@/components/community/PostDetailModal';
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CommonBoard } from '@/components/common/CommonBoard';
+import { useNavigate } from 'react-router-dom';
 
 import {
   ResizablePanelGroup,
@@ -17,7 +20,10 @@ import {
 const ITEMS_PER_PAGE = 8;
 
 export function MyPost() {
-  const { isLoggedIn } = useAuth();
+
+  const navigate = useNavigate();
+  const { isLoggedIn, isChecked } = useAuth();
+
   const [myPosts, setMyPosts] = useState([]);
   const [selectedPosts, setSelectedPosts] = useState([]);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -31,8 +37,26 @@ export function MyPost() {
 
   const [mobileTab, setMobileTab] = useState("write");
 
-  if (!isLoggedIn) return <AuthPopup show={true} isMandatory={true} />;
+  /* ----------------------- 인증 체크 ----------------------- */
+  if (!isChecked) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
 
+  if (!isLoggedIn) {
+    return (
+      <AuthPopup
+        show={true}
+        isMandatory={true}
+        onClose={() => navigate('/')}
+      />
+    );
+  }
+
+  /* ----------------------- 게시글 목록 로드 ----------------------- */
   useEffect(() => {
     fetchPosts(currentPage);
   }, [currentPage]);
@@ -53,6 +77,7 @@ export function MyPost() {
     }
   };
 
+  /* ----------------------- 삭제 모드 ----------------------- */
   const toggleDeleteMode = () => {
     if (isDeleting && selectedPosts.length > 0) {
       deleteSelected();
@@ -81,6 +106,7 @@ export function MyPost() {
     );
   };
 
+  /* ----------------------- 상세보기 ----------------------- */
   const openDetail = (item) => {
     setSelectedBoardId(item.id);
     setShowDetail(true);
@@ -88,9 +114,11 @@ export function MyPost() {
 
   const showEmpty = !isLoading && myPosts.length === 0;
 
+  /* ----------------------- 화면 렌더링 ----------------------- */
   return (
     <div className="px-4 md:px-8 pb-8 max-w-[1300px] mx-auto">
 
+      {/* 상세 모달 */}
       {showDetail && (
         <PostDetailModal
           isOpen={showDetail}
@@ -100,7 +128,7 @@ export function MyPost() {
         />
       )}
 
-      {/* ✅ PC */}
+      {/* ---------------- PC 화면 ---------------- */}
       <div className="hidden lg:flex justify-center gap-8 min-h-[620px]">
         <ResizablePanelGroup direction="horizontal">
 
@@ -158,7 +186,7 @@ export function MyPost() {
         </ResizablePanelGroup>
       </div>
 
-      {/* ✅ 모바일 */}
+      {/* ---------------- 모바일 화면 ---------------- */}
       <div className="lg:hidden mt-4 w-full">
         <div className="mb-3 flex justify-center">
           <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
@@ -182,6 +210,7 @@ export function MyPost() {
             className="flex w-[200%] transition-transform duration-300"
             style={{ transform: mobileTab === "write" ? "translateX(0)" : "translateX(-50%)" }}
           >
+
             <div className="w-1/2 p-4">
               <WritePostForm onPostSuccess={() => fetchPosts(1)} />
             </div>
@@ -223,6 +252,7 @@ export function MyPost() {
                   등록된 게시물이 없습니다.
                 </div>
               )}
+
             </div>
 
           </div>

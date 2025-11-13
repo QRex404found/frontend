@@ -1,4 +1,4 @@
-// src/pages/Community.jsx (이 코드로 파일 전체를 덮어쓰세요)
+// src/pages/Community.jsx
 
 import React, { useState, useEffect } from 'react';
 import useAuth from '@/hooks/useAuth';
@@ -7,11 +7,14 @@ import { PostDetailModal } from '@/components/community/PostDetailModal';
 import { getCommunityPostsApi } from '@/api/community';
 import { Loader2 } from 'lucide-react';
 import { CommonBoard } from '@/components/common/CommonBoard';
+import { useNavigate } from 'react-router-dom';   // ⭐ 추가됨
 
 const PAGE_SIZE = 8;
 
 export function Community() {
+  const navigate = useNavigate();  // ⭐ 추가됨
   const { isLoggedIn, isChecked } = useAuth();
+
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -23,8 +26,8 @@ export function Community() {
     const fetchPosts = async (page) => {
       setLoading(true);
       setError(null);
+
       try {
-        // Spring Page는 0부터 시작하므로 page - 1
         const data = await getCommunityPostsApi(page - 1, PAGE_SIZE);
 
         const transformedPosts = data.content
@@ -60,11 +63,18 @@ export function Community() {
     );
   }
 
+  // ⭐ 새 AuthPopup 구조 적용
   if (!isLoggedIn) {
-    return <AuthPopup show={true} isMandatory={true} />;
+    return (
+      <AuthPopup
+        show={true}
+        isMandatory={true}
+        onClose={() => navigate('/')}   // ⭐ Analysis와 동일한 안정 구조
+      />
+    );
   }
 
-  /* 2. 핸들러 함수들 */
+  /* 2. 핸들러 */
   const handlePostClick = (item) => {
     setSelectedBoardId(item.id);
   };
@@ -73,20 +83,7 @@ export function Community() {
     setSelectedBoardId(null);
   };
 
-  // ⬇️ [수정 2] 페이지 이동 핸들러 삭제 (CommonBoard로 이동)
-  /*
-  const handlePreviousPage = () => {
-    // 1페이지보다 작아지지 않도록 방지
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleNextPage = () => {
-    // 마지막 페이지보다 커지지 않도록 방지
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  };
-  */
-
-  /* 3. 에러 발생 시 UI */
+  /* 3. 에러 화면 */
   if (error) {
     return (
       <div className="p-8 text-center text-red-500">
@@ -95,13 +92,12 @@ export function Community() {
     );
   }
 
-  /* 4. 최종 렌더링 */
+  /* 4. 실제 렌더링 */
   return (
     <div className="p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
         <h1 className="mb-6 text-4xl font-medium">Community</h1>
 
-        {/* ⬇️ [수정 3] props 다시 전달 */}
         <CommonBoard
           posts={posts}
           isLoading={loading}
@@ -109,15 +105,8 @@ export function Community() {
           showIndex={true}
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={setCurrentPage} // ⬅️ 핸들러 대신 setCurrentPage 전달
+          onPageChange={setCurrentPage}
         />
-
-        {/* ⬇️ [수정 4] 외부 Pagination JSX 삭제 */}
-        {/*
-        <div className="flex justify-center mt-6">
-          <Pagination> ... </Pagination>
-        </div>
-        */}
       </div>
 
       {/* 게시글 상세 모달 */}

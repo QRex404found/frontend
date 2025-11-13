@@ -84,6 +84,14 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
     e.target.value = null;
   };
 
+  const openMobileFilePicker = () => {
+    // 모바일 기본 제공 메뉴 열기
+    if (!fileInputRef.current) return;
+    fileInputRef.current.removeAttribute('capture');
+    fileInputRef.current.accept = "image/*";
+    fileInputRef.current.click();
+  };
+
   const handlePhotoLibraryClick = () => {
     fileInputRef.current?.removeAttribute('capture');
     fileInputRef.current.accept = "image/*";
@@ -114,49 +122,52 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
           className="hidden"
         />
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600 transition-transform transform hover:scale-105"
-              size="icon"
-            >
-              <Camera className="!w-10 !h-10" />
-            </Button>
-          </DropdownMenuTrigger>
+        {/* ---------------------------------------------------
+            모바일: Dropdown 제거 → 아이콘 클릭 시 바로 파일 선택
+        ------------------------------------------------------ */}
+        {isMobile ? (
+          <Button
+            className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600 transition-transform transform hover:scale-105"
+            size="icon"
+            onClick={openMobileFilePicker}
+          >
+            <Camera className="!w-10 !h-10" />
+          </Button>
+        ) : (
+        /* ---------------------------------------------------
+            데스크탑: 기존 Dropdown 유지
+        ------------------------------------------------------ */
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600 transition-transform transform hover:scale-105"
+                size="icon"
+              >
+                <Camera className="!w-10 !h-10" />
+              </Button>
+            </DropdownMenuTrigger>
 
-          <DropdownMenuContent className="w-48 p-2 rounded-lg shadow-xl">
-
-            {/* 공통: 사진 보관함 */}
-            <DropdownMenuItem
-              onClick={handlePhotoLibraryClick}
-              className="cursor-pointer p-3 flex items-center space-x-2 text-base"
-            >
-              <Image className="w-4 h-4" />
-              <span>사진 보관함</span>
-            </DropdownMenuItem>
-
-            {/* ✅ 모바일에서만 표시 */}
-            {isMobile && (
+            <DropdownMenuContent className="w-48 p-2 rounded-lg shadow-xl">
+              {/* 사진 보관함 */}
               <DropdownMenuItem
-                onClick={handleCameraClick}
+                onClick={handlePhotoLibraryClick}
                 className="cursor-pointer p-3 flex items-center space-x-2 text-base"
               >
-                <Camera className="w-4 h-4" />
-                <span>사진 찍기</span>
+                <Image className="w-4 h-4" />
+                <span>사진 보관함</span>
               </DropdownMenuItem>
-            )}
 
-            {/* 공통: 파일 선택 */}
-            <DropdownMenuItem
-              onClick={handleFileClick}
-              className="cursor-pointer p-3 flex items-center space-x-2 text-base"
-            >
-              <FileText className="w-4 h-4" />
-              <span>파일 선택</span>
-            </DropdownMenuItem>
-
-          </DropdownMenuContent>
-        </DropdownMenu>
+              {/* 파일 선택 */}
+              <DropdownMenuItem
+                onClick={handleFileClick}
+                className="cursor-pointer p-3 flex items-center space-x-2 text-base"
+              >
+                <FileText className="w-4 h-4" />
+                <span>파일 선택</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </div>
   );

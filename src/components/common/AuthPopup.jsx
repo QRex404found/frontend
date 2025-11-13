@@ -1,4 +1,5 @@
 // src/components/common/AuthPopup.jsx
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -10,18 +11,19 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
-export function AuthPopup({ show, isMandatory }) {
+export function AuthPopup({ show, isMandatory, onClose }) {
   const navigate = useNavigate();
 
+  // 로그인 버튼 — 팝업을 닫지 않고 직접 로그인 페이지로 이동
   const handleLoginClick = () => {
-    navigate('/login');
+    navigate('/login'); 
   };
 
+  // X 버튼(팝업 바깥 클릭 포함)
   const handlePopupClose = (isOpen) => {
-    // Dialog가 닫히려 할 때 (isOpen이 false가 될 때)
     if (!isOpen) {
-      // 🌟 [수정] 홈('/')이 아닌 직전 화면(-1)으로 이동합니다.
-      navigate(-1);
+      // 전달된 onClose가 있으면 실행
+      if (onClose) onClose();
     }
   };
 
@@ -34,15 +36,18 @@ export function AuthPopup({ show, isMandatory }) {
             이 기능을 사용하려면 먼저 로그인해주세요.
           </DialogDescription>
         </DialogHeader>
+
         <div className="flex justify-end gap-2">
+
           {!isMandatory && (
-            // 🌟 [수정] 취소 버튼도 직전 화면(-1)으로 이동합니다.
-            <Button variant="outline" onClick={() => navigate(-1)}>
+            <Button variant="outline" onClick={() => onClose?.()}>
               취소
             </Button>
           )}
+
           <Button onClick={handleLoginClick}>로그인</Button>
         </div>
+
       </DialogContent>
     </Dialog>
   );
