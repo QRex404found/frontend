@@ -1,6 +1,5 @@
-// src/contexts/AuthContext.jsx
+// src/contexts/AuthContext.jsx (이 코드로 파일 전체를 덮어쓰세요)
 
-// ✅ 1. useCallback을 import 합니다.
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 
 // 1. JWT 토큰을 해독(decode)하는 헬퍼 함수
@@ -24,25 +23,28 @@ const parseJwt = (token) => {
 const getInitialUser = () => {
   const token = localStorage.getItem('jwtToken');
   if (!token) {
-    return { userId: null, username: null };
+    // ⬇️ [수정 1] userId -> id
+    return { id: null, username: null };
   }
 
   const decoded = parseJwt(token);
 
-  // (백엔드 수정이 적용되었다는 가정 하에 username까지 확인)
   if (!decoded || !decoded.sub || decoded.exp * 1000 < Date.now()) {
     localStorage.removeItem('jwtToken');
-    return { userId: null, username: null };
+    // ⬇️ [수정 2] userId -> id
+    return { id: null, username: null };
   }
 
-  return { userId: decoded.sub, username: decoded.username || null };
+  // ⬇️ [수정 3] userId -> id (토큰의 'sub'가 ID임)
+  return { id: decoded.sub, username: decoded.username || null };
 };
 
 // 3. Context 생성 (기본값)
 export const AuthContext = createContext({
   isLoggedIn: false,
-  user: { userId: null, username: null }, 
-  login: (token) => {},
+  // ⬇️ [수정 4] userId -> id
+  user: { id: null, username: null }, 
+  login: (token, userInfo) => {}, // ⬅️ userInfo 인자 추가
   logout: () => {},
   setUser: (userInfo) => {},
   isChecked: false,
@@ -51,7 +53,8 @@ export const AuthContext = createContext({
 export const AuthProvider = ({ children }) => {
   const initialUser = getInitialUser();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(!!initialUser.userId);
+  // ⬇️ [수정 5] initialUser.userId -> initialUser.id
+  const [isLoggedIn, setIsLoggedIn] = useState(!!initialUser.id);
   const [user, setUser] = useState(initialUser);
   const [isChecked, setIsChecked] = useState(false);
 
@@ -59,26 +62,30 @@ export const AuthProvider = ({ children }) => {
     setIsChecked(true);
   }, []);
 
-  // ✅ 2. (핵심) login 함수를 useCallback으로 감싸줍니다.
-  // 이 함수는 이제 AuthProvider가 리렌더링되어도 재생성되지 않습니다.
-  const login = useCallback((token) => {
+  // ⬇️ [수정 6] login 함수가 (token, userInfo) 두 인자를 모두 처리하도록 수정
+  const login = useCallback((token, userInfo) => {
     localStorage.setItem('jwtToken', token);
     setIsLoggedIn(true);
 
-    const decoded = parseJwt(token);
-    if (decoded && decoded.sub) {
-      setUser({ userId: decoded.sub, username: decoded.username || null });
+    if (userInfo) {
+      // (Case 1) 일반 로그인: SignIn.jsx가 보내준 { id: '...' } 객체를 그대로 사용
+      setUser(userInfo);
+    } else {
+      // (Case 2) 소셜 로그인: 토큰을 해독하여 { id: '...' } 객체를 생성
+      const decoded = parseJwt(token);
+      if (decoded && decoded.sub) {
+        setUser({ id: decoded.sub, username: decoded.username || null });
+      }
     }
-  }, []); // ⬅️ 의존성 배열이 비어있으므로, 절대 다시 생성되지 않습니다.
+  }, []); // ⬅️ 의존성 배열은 비워둠
 
-  // ✅ 3. (핵심) logout 함수도 useCallback으로 감싸줍니다.
   const logout = useCallback(() => {
     localStorage.removeItem('jwtToken');
     setIsLoggedIn(false);
-    setUser({ userId: null, username: null }); 
+    // ⬇️ [수정 7] userId -> id
+    setUser({ id: null, username: null }); 
   }, []);
 
-  // ✅ 4. (핵심) 프로필 수정 함수도 useCallback으로 감싸줍니다.
   const updateProfile = useCallback((newUserInfo) => {
     setUser(newUserInfo);
   }, []);
@@ -87,15 +94,13 @@ export const AuthProvider = ({ children }) => {
     isLoggedIn,
     user,
     isChecked,
-    login, // ⬅️ useCallback으로 감싸진 안정적인 함수
-    logout, // ⬅️ useCallback으로 감싸진 안정적인 함수
-    setUser: updateProfile, // ⬅️ useCallback으로 감싸진 안정적인 함수
+    login,
+    logout,
+    setUser: updateProfile,
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
