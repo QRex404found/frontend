@@ -89,7 +89,7 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
 
   /* ---------------- 모바일/데스크탑 공통: input click 핸들러 ---------------- */
 
-  //  사진 촬영 → 카메라 강제 실행
+  // 사진 촬영 → 카메라 강제 실행
   const handleTakePhoto = () => {
     if (!fileInputRef.current) return;
     fileInputRef.current.accept = "image/*";
@@ -97,7 +97,7 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
     fileInputRef.current.click();
   };
 
-  //  갤러리에서 선택
+  // 갤러리에서 선택
   const handleSelectFromGallery = () => {
     if (!fileInputRef.current) return;
     fileInputRef.current.accept = "image/*";
@@ -105,7 +105,7 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
     fileInputRef.current.click();
   };
 
-  //  파일 앱에서 선택
+  // 파일 앱에서 선택
   const handleSelectFile = () => {
     if (!fileInputRef.current) return;
     fileInputRef.current.accept = "*/*";
