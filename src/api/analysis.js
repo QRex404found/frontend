@@ -1,4 +1,4 @@
-// QR 분석 관련 API
+// QR 분석 관련 API1
 
 import apiClient from './index';
 
