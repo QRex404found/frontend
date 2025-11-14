@@ -1,0 +1,17 @@
+
+{
+    "rewrites": [
+        {
+            "source": "/api/:path*",
+            "destination": "https://[백엔드_서버_실제_주소]/api/:path*"
+        },
+        {
+            "source": "/oauth2/:path*",
+            "destination": "https://[백엔드_서버_실제_주소]/oauth2/:path*"
+        },
+        {
+            "source": "/login/oauth2/:path*",
+            "destination": "https://[백엔드_서버_실제_주소]/login/oauth2/:path*"
+        }
+    ]
+}
