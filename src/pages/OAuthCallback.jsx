@@ -1,18 +1,18 @@
-// src/pages/OAuthCallback.jsx
+// src/pages/OAuthCallback.jsx (이 코드로 덮어쓰세요)
 
-import React, { useEffect } from 'react'; 
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
 export function OAuthCallback() {
-    // ✅ 1. user 객체도 함께 가져옵니다.
-    const { login, isLoggedIn, user } = useAuth(); 
+    const { login, isLoggedIn, user } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Effect 1: 토큰 처리용 (변경 없음)
+    // Effect 1: 토큰 처리용
     useEffect(() => {
+        console.log('OAuthCallback: Effect 1 실행 (토큰 처리)');
         const searchParams = new URLSearchParams(location.search);
         const token = searchParams.get('token');
 
@@ -24,13 +24,21 @@ export function OAuthCallback() {
         }
     }, [location.search, login, navigate]);
 
-    // Effect 2: 로그인 상태 감지 및 리디렉션용 (수정됨)
+    // Effect 2: 로그인 상태 감지 및 리디렉션용
     useEffect(() => {
-        // ⭐️ (핵심) 로그인이 되었고, user.userId 값도 실제로 들어왔는지 "둘 다" 확인합니다.
-        if (isLoggedIn && user?.userId) {
+        // [디버깅 2] 상태 변경을 추적합니다.
+        console.log(
+            `OAuthCallback: Effect 2 실행. isLoggedIn: ${isLoggedIn}, user.id: ${user?.id}`
+        );
+
+        // [수정] user.id가 0일 수도 있음을 고려
+        if (isLoggedIn && user?.id != null) {
+            console.log('OAuthCallback: 리디렉션 조건 충족. 홈으로 이동.');
             navigate('/', { replace: true });
+        } else {
+            console.log('OAuthCallback: 리디렉션 조건 미충족.');
         }
-    }, [isLoggedIn, user, navigate]); // ✅ 2. user를 의존성 배열에 추가합니다.
+    }, [isLoggedIn, user, navigate]);
 
     // 처리 중 로딩 스피너 표시
     return (
