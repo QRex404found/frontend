@@ -71,7 +71,7 @@ export function SignIn() {
           <div className="flex flex-col gap-2 pt-2">
             <Button asChild variant="outline" className="flex items-center gap-2">
               <a 
-                  href="https://www.qrex.kro.kr/login/oauth2/authorization/google"
+                  href="https://www.qrex.kro.kr/oauth2/authorization/google"
                   className="flex items-center justify-center w-full gap-2"
                 >
                 <img src="/google-icon.svg" className="w-4 h-4" />
@@ -80,7 +80,7 @@ export function SignIn() {
             </Button>
             <Button asChild className="bg-[#fee500] hover:bg-[#e6cd00] text-black flex items-center gap-2">
               <a 
-                  href="https://www.qrex.kro.kr/login/oauth2/authorization/kakao"
+                  href="https://www.qrex.kro.kr/oauth2/authorization/kakao"
                   className="flex items-center justify-center w-full gap-2"
                 >
                 <img src="/kakao-icon.svg" className="w-4 h-4" />
