@@ -87,32 +87,29 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
     e.target.value = null;
   };
 
-  /* ---------------- 모바일: OS 자동 UI 띄우기 ---------------- */
-  const openMobilePicker = () => {
-    if (!fileInputRef.current) return;
+  /* ---------------- 모바일/데스크탑 공통: input click 핸들러 ---------------- */
 
-    /**
-     * 핵심 포인트:
-     * - accept="image/*" : 사진 + 카메라 + 파일 앱
-     * - capture 속성 제거: OS 기본 메뉴(카메라/사진/파일) 전체 제공
-     */
+  //  사진 촬영 → 카메라 강제 실행
+  const handleTakePhoto = () => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.accept = "image/*";
+    fileInputRef.current.setAttribute("capture", "environment");
+    fileInputRef.current.click();
+  };
+
+  //  갤러리에서 선택
+  const handleSelectFromGallery = () => {
+    if (!fileInputRef.current) return;
     fileInputRef.current.accept = "image/*";
     fileInputRef.current.removeAttribute("capture");
-
-    // OS 기본 UI 실행
     fileInputRef.current.click();
   };
 
-  /* ---------------- 데스크탑: 기존 Dropdown 유지 ---------------- */
-  const handlePhotoLibraryClick = () => {
-    fileInputRef.current.accept = "image/*";
-    fileInputRef.current.removeAttribute('capture');
-    fileInputRef.current.click();
-  };
-
-  const handleFileClick = () => {
+  //  파일 앱에서 선택
+  const handleSelectFile = () => {
+    if (!fileInputRef.current) return;
     fileInputRef.current.accept = "*/*";
-    fileInputRef.current.removeAttribute('capture');
+    fileInputRef.current.removeAttribute("capture");
     fileInputRef.current.click();
   };
 
@@ -128,46 +125,48 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
           onChange={handleFileSelect}
         />
 
-        {isMobile ? (
-          /* ---------------- 모바일: 바로 OS UI --------------- */
-          <Button
-            className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"
-            size="icon"
-            onClick={openMobilePicker}
-          >
-            <Camera className="!w-10 !h-10" />
-          </Button>
-        ) : (
-          /* ---------------- 데스크탑: Dropdown 메뉴 --------------- */
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"
-                size="icon"
-              >
-                <Camera className="!w-10 !h-10" />
-              </Button>
-            </DropdownMenuTrigger>
+        {/* 모바일도 Dropdown 표시 */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"
+              size="icon"
+            >
+              <Camera className="!w-10 !h-10" />
+            </Button>
+          </DropdownMenuTrigger>
 
-            <DropdownMenuContent className="w-48 p-2 rounded-lg shadow-xl">
-              <DropdownMenuItem
-                onClick={handlePhotoLibraryClick}
-                className="cursor-pointer p-3 flex items-center space-x-2 text-base"
-              >
-                <Image className="w-4 h-4" />
-                <span>사진 보관함</span>
-              </DropdownMenuItem>
+          <DropdownMenuContent className="w-48 p-2 rounded-lg shadow-xl">
 
-              <DropdownMenuItem
-                onClick={handleFileClick}
-                className="cursor-pointer p-3 flex items-center space-x-2 text-base"
-              >
-                <FileText className="w-4 h-4" />
-                <span>파일 선택</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+            {/* 사진 촬영 */}
+            <DropdownMenuItem
+              onClick={handleTakePhoto}
+              className="cursor-pointer p-3 flex items-center space-x-2 text-base"
+            >
+              <Camera className="w-4 h-4" />
+              <span>사진 촬영</span>
+            </DropdownMenuItem>
+
+            {/* 갤러리 선택 */}
+            <DropdownMenuItem
+              onClick={handleSelectFromGallery}
+              className="cursor-pointer p-3 flex items-center space-x-2 text-base"
+            >
+              <Image className="w-4 h-4" />
+              <span>사진 선택</span>
+            </DropdownMenuItem>
+
+            {/* 파일 선택 */}
+            <DropdownMenuItem
+              onClick={handleSelectFile}
+              className="cursor-pointer p-3 flex items-center space-x-2 text-base"
+            >
+              <FileText className="w-4 h-4" />
+              <span>파일 선택</span>
+            </DropdownMenuItem>
+
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
