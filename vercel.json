@@ -2,11 +2,11 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://[api.qrex.kro.kr/api/:path*"
+            "destination": "https://api.qrex.kro.kr/api/:path*"
         },
         {
             "source": "/oauth2/:path*",
-            "destination": "https://api.qrex.kro.kr]/oauth2/:path*"
+            "destination": "https://api.qrex.kro.kr/oauth2/:path*"
         },
         {
             "source": "/login/oauth2/:path*",
