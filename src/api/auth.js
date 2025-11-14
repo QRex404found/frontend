@@ -12,7 +12,7 @@ export async function loginApi(credentials) {
     });
 
     const token = response.data.token;
-    localStorage.setItem('jwtToken', token);
+    localStorage.setItem('jwtToken', token); //발급받은 토큰을 localStorage에 저장
     setToken(token);
 
     return { success: true, token: token };
