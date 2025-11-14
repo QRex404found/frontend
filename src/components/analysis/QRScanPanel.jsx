@@ -1,12 +1,15 @@
 import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 import { Camera, Image, FileText } from 'lucide-react';
 import jsQR from 'jsqr';
 
-/**
- * QR 이미지에서 URL 추출
- */
+/* ---------------- QR 이미지에서 URL 추출 ---------------- */
 const scanFileForQrUrl = async (file) => {
   let imageBitmap;
   try {
@@ -19,6 +22,7 @@ const scanFileForQrUrl = async (file) => {
   const canvas = document.createElement("canvas");
   canvas.width = imageBitmap.width;
   canvas.height = imageBitmap.height;
+
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   ctx.drawImage(imageBitmap, 0, 0);
 
@@ -61,20 +65,19 @@ const scanFileForQrUrl = async (file) => {
 };
 
 
-/**
- * QRScanPanel
- */
+/* ---------------- QRScanPanel ---------------- */
 export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
   const fileInputRef = useRef(null);
-  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
+  /* 분석 시작 */
   const startAnalysis = async (file) => {
     if (!file) return;
     try {
       const extractedUrl = await scanFileForQrUrl(file);
-      if (onAnalysisStart) onAnalysisStart(file, extractedUrl);
+      onAnalysisStart?.(file, extractedUrl);
     } catch (error) {
-      if (onAnalysisResult) onAnalysisResult(null, error.message);
+      onAnalysisResult?.(null, error.message);
     }
   };
 
@@ -84,29 +87,32 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
     e.target.value = null;
   };
 
-  const openMobileFilePicker = () => {
-    // 모바일 기본 제공 메뉴 열기
+  /* ---------------- 모바일: OS 자동 UI 띄우기 ---------------- */
+  const openMobilePicker = () => {
     if (!fileInputRef.current) return;
-    fileInputRef.current.removeAttribute('capture');
+
+    /**
+     * 핵심 포인트:
+     * - accept="image/*" : 사진 + 카메라 + 파일 앱
+     * - capture 속성 제거: OS 기본 메뉴(카메라/사진/파일) 전체 제공
+     */
     fileInputRef.current.accept = "image/*";
+    fileInputRef.current.removeAttribute("capture");
+
+    // OS 기본 UI 실행
     fileInputRef.current.click();
   };
 
+  /* ---------------- 데스크탑: 기존 Dropdown 유지 ---------------- */
   const handlePhotoLibraryClick = () => {
-    fileInputRef.current?.removeAttribute('capture');
     fileInputRef.current.accept = "image/*";
-    fileInputRef.current.click();
-  };
-
-  const handleCameraClick = () => {
-    fileInputRef.current?.setAttribute('capture', 'environment');
-    fileInputRef.current.accept = "image/*";
+    fileInputRef.current.removeAttribute('capture');
     fileInputRef.current.click();
   };
 
   const handleFileClick = () => {
-    fileInputRef.current?.removeAttribute('capture');
     fileInputRef.current.accept = "*/*";
+    fileInputRef.current.removeAttribute('capture');
     fileInputRef.current.click();
   };
 
@@ -118,29 +124,25 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
         <input
           type="file"
           ref={fileInputRef}
-          onChange={handleFileSelect}
           className="hidden"
+          onChange={handleFileSelect}
         />
 
-        {/* ---------------------------------------------------
-            모바일: Dropdown 제거 → 아이콘 클릭 시 바로 파일 선택
-        ------------------------------------------------------ */}
         {isMobile ? (
+          /* ---------------- 모바일: 바로 OS UI --------------- */
           <Button
-            className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600 transition-transform transform hover:scale-105"
+            className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"
             size="icon"
-            onClick={openMobileFilePicker}
+            onClick={openMobilePicker}
           >
             <Camera className="!w-10 !h-10" />
           </Button>
         ) : (
-        /* ---------------------------------------------------
-            데스크탑: 기존 Dropdown 유지
-        ------------------------------------------------------ */
+          /* ---------------- 데스크탑: Dropdown 메뉴 --------------- */
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600 transition-transform transform hover:scale-105"
+                className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"
                 size="icon"
               >
                 <Camera className="!w-10 !h-10" />
@@ -148,7 +150,6 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-48 p-2 rounded-lg shadow-xl">
-              {/* 사진 보관함 */}
               <DropdownMenuItem
                 onClick={handlePhotoLibraryClick}
                 className="cursor-pointer p-3 flex items-center space-x-2 text-base"
@@ -157,7 +158,6 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
                 <span>사진 보관함</span>
               </DropdownMenuItem>
 
-              {/* 파일 선택 */}
               <DropdownMenuItem
                 onClick={handleFileClick}
                 className="cursor-pointer p-3 flex items-center space-x-2 text-base"

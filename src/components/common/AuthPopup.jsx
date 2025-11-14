@@ -11,19 +11,23 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
-export function AuthPopup({ show, isMandatory, onClose }) {
+export function AuthPopup({ show, isMandatory }) {
   const navigate = useNavigate();
 
-  // 로그인 버튼 — 팝업을 닫지 않고 직접 로그인 페이지로 이동
+  /** 로그인 버튼 → 로그인 화면으로 이동 */
   const handleLoginClick = () => {
-    navigate('/login'); 
+    navigate('/login', { replace: true });
   };
 
-  // X 버튼(팝업 바깥 클릭 포함)
+  /**
+   * X 버튼, 바깥 클릭 →
+   * shadcn Dialog 특성상 뒤로가기가 먼저 발생할 수 있으므로
+   * ⚠ navigate(-1) 같은 동작이 절대 일어나지 않도록
+   * 무조건 홈('/')으로 강제 이동 처리
+   */
   const handlePopupClose = (isOpen) => {
     if (!isOpen) {
-      // 전달된 onClose가 있으면 실행
-      if (onClose) onClose();
+      navigate('/', { replace: true });
     }
   };
 
@@ -38,16 +42,18 @@ export function AuthPopup({ show, isMandatory, onClose }) {
         </DialogHeader>
 
         <div className="flex justify-end gap-2">
-
+          {/* 선택적 취소 버튼 (isMandatory=false인 경우에만 표시) */}
           {!isMandatory && (
-            <Button variant="outline" onClick={() => onClose?.()}>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/', { replace: true })}
+            >
               취소
             </Button>
           )}
 
           <Button onClick={handleLoginClick}>로그인</Button>
         </div>
-
       </DialogContent>
     </Dialog>
   );
