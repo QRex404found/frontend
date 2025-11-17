@@ -24,13 +24,18 @@ export function Header() {
   const location = useLocation();
   const { isLoggedIn, user, logout } = useAuth();
 
+  console.log('헤더에 전달된 User 객체:', user);
+
   const [open, setOpen] = React.useState(false);
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
 
   // ✅ [핵심] 소셜 유저 판별 (ID가 kakao_ 또는 google_ 로 시작)
-  const isSocialUser = user?.userId && (
-    user.userId.startsWith('kakao_') || 
-    user.userId.startsWith('google_')
+  const currentUserId = user?.id || user?.userId;
+
+  // 2. 찾아낸 ID로 소셜 유저인지 판별합니다.
+  const isSocialUser = currentUserId && (
+    currentUserId.startsWith('kakao_') || 
+    currentUserId.startsWith('google_')
   );
 
   React.useEffect(() => {
