@@ -14,21 +14,25 @@ import { LogOut, CircleUser, Menu } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import EditProfileTab from "@/components/profile/EditProfileTab";
-import DeleteAccountTab from "@/components/profile/DeleteAccountTab";
+
+// 🔥 컴포넌트 경로가 맞는지 확인해주세요!
+import EditProfileTab from "@/components/profile/EditProfileTab"; 
+import DeleteAccountTab from "@/components/DeleteAccountTab"; // 아까 수정한 파일 경로
 
 export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isLoggedIn, user, logout } = useAuth();
 
-  const fallbackLetter = (user?.username?.charAt(0) ?? "U").toUpperCase();
   const [open, setOpen] = React.useState(false);
-
-  // 🔥 모바일 햄버거 메뉴 제어
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
 
-  // 페이지 이동 시 자동으로 햄버거 메뉴 닫기
+  // ✅ [핵심] 소셜 유저 판별 (ID가 kakao_ 또는 google_ 로 시작)
+  const isSocialUser = user?.userId && (
+    user.userId.startsWith('kakao_') || 
+    user.userId.startsWith('google_')
+  );
+
   React.useEffect(() => {
     setIsSheetOpen(false);
   }, [location.pathname]);
@@ -36,60 +40,52 @@ export function Header() {
   const handleLogout = () => {
     removeToken();
     logout?.();
-    setIsSheetOpen(false);   // 🔥 로그아웃 후 메뉴 닫기
+    setIsSheetOpen(false);
   };
 
   return (
-    <header className="relative sticky top-0 z-50 h-20 bg-white shadow-sm">
-      <div className="flex items-center h-full px-4 gap-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 h-20 bg-white shadow-sm">
+      <div className="flex items-center h-full gap-4 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
-        {/* Logo */}
+        {/* 로고 */}
         <Link to="/" className="flex items-center flex-shrink-0">
           <img
             src={logoSrc}
             alt="QREX Logo"
-            className="object-contain w-auto h-9 md:h-14 select-none"
+            className="object-contain w-auto select-none h-9 md:h-14"
           />
         </Link>
 
-        {/* Desktop Navigation */}
-        <NavigationMenu className="hidden md:flex absolute left-1/2 -translate-x-1/2">
+        {/* 데스크탑 메뉴 */}
+        <NavigationMenu className="absolute hidden -translate-x-1/2 md:flex left-1/2">
           <NavigationMenuList className="flex items-center justify-center gap-10">
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link to="/analysis" className="text-sm md:text-lg font-medium hover:text-primary">
-                  Analysis
-                </Link>
+                <Link to="/analysis" className="text-sm font-medium md:text-lg hover:text-primary">Analysis</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
-
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link to="/community" className="text-sm md:text-lg font-medium hover:text-primary">
-                  Community
-                </Link>
+                <Link to="/community" className="text-sm font-medium md:text-lg hover:text-primary">Community</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
-
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link to="/mypost" className="text-sm md:text-lg font-medium hover:text-primary">
-                  My post
-                </Link>
+                <Link to="/mypost" className="text-sm font-medium md:text-lg hover:text-primary">My post</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Right Section */}
+        {/* 오른쪽 영역 */}
         <div className="flex items-center gap-3 ml-auto md:gap-4">
 
-          {/* Profile Popover */}
+          {/* 프로필 팝업 (로그인 상태일 때) */}
           {isLoggedIn ? (
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <CircleUser
-                  className="w-7 h-7 md:w-6 md:h-6 text-gray-700 hover:text-black cursor-pointer"
+                  className="text-gray-700 cursor-pointer w-7 h-7 md:w-6 md:h-6 hover:text-black"
                   strokeWidth={1.6}
                 />
               </PopoverTrigger>
@@ -101,20 +97,29 @@ export function Header() {
                 alignOffset={-200}
                 className="w-[420px] p-4 rounded-xl bg-white shadow-lg border max-w-[100vw]"
               >
-                <Tabs defaultValue="edit" className="w-full">
+                {/* ✅ [핵심] 소셜 유저면 'delete' 탭이 기본, 아니면 'edit'이 기본 */}
+                <Tabs defaultValue={isSocialUser ? "delete" : "edit"} className="w-full">
 
                   <TabsList className="inline-flex bg-gray-200 rounded-md p-1.5 gap-1 max-w-max">
-                    <TabsTrigger value="edit" className="px-3 py-2 rounded text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                      Edit Profile
-                    </TabsTrigger>
+                    
+                    {/* ✅ 소셜 유저가 아닐 때만 수정 버튼 보이기 */}
+                    {!isSocialUser && (
+                      <TabsTrigger value="edit" className="px-3 py-2 rounded text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                        Edit Profile
+                      </TabsTrigger>
+                    )}
+                    
                     <TabsTrigger value="delete" className="px-3 py-2 rounded text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm">
                       Delete Account
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="edit" className="pt-4 text-sm max-h-[330px] overflow-y-auto">
-                    <EditProfileTab onClose={() => setOpen(false)} />
-                  </TabsContent>
+                  {/* ✅ 소셜 유저가 아닐 때만 수정 내용 보이기 */}
+                  {!isSocialUser && (
+                    <TabsContent value="edit" className="pt-4 text-sm max-h-[330px] overflow-y-auto">
+                      <EditProfileTab onClose={() => setOpen(false)} />
+                    </TabsContent>
+                  )}
 
                   <TabsContent value="delete" className="pt-4 text-sm max-h-[330px] overflow-y-auto">
                     <DeleteAccountTab onClose={() => setOpen(false)} />
@@ -124,65 +129,37 @@ export function Header() {
             </Popover>
           ) : (
             <Link to="/login">
-              <CircleUser className="w-7 h-7 text-gray-700 hover:text-black md:w-6 md:h-6" />
+              <CircleUser className="text-gray-700 w-7 h-7 hover:text-black md:w-6 md:h-6" />
             </Link>
           )}
 
-          {/* Desktop Logout */}
+          {/* 로그아웃 버튼 (데스크탑) */}
           {isLoggedIn && (
             <Button
               onClick={handleLogout}
               variant="ghost"
-              className="hidden md:flex text-base hover:text-primary"
+              className="hidden text-base md:flex hover:text-primary"
             >
               <LogOut className="w-6 h-6" />
             </Button>
           )}
 
-          {/* Mobile Hamburger Menu */}
+          {/* 햄버거 메뉴 (모바일) */}
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-            <SheetTrigger className="md:hidden p-2 rounded hover:bg-gray-100">
-              <Menu className="w-7 h-7 text-gray-800" />
+            <SheetTrigger className="p-2 rounded md:hidden hover:bg-gray-100">
+              <Menu className="text-gray-800 w-7 h-7" />
             </SheetTrigger>
 
             <SheetContent side="right" className="p-6 w-[260px] bg-white shadow-lg">
-              <nav className="flex flex-col gap-6 text-lg font-medium mt-4">
-
-                <Link
-                  to="/analysis"
-                  className="hover:text-primary"
-                  onClick={() => setIsSheetOpen(false)}  // 🔥 자동 닫힘
-                >
-                  Analysis
-                </Link>
-
-                <Link
-                  to="/community"
-                  className="hover:text-primary"
-                  onClick={() => setIsSheetOpen(false)}  // 🔥 자동 닫힘
-                >
-                  Community
-                </Link>
-
-                <Link
-                  to="/mypost"
-                  className="hover:text-primary"
-                  onClick={() => setIsSheetOpen(false)}  // 🔥 자동 닫힘
-                >
-                  My post
-                </Link>
+              <nav className="flex flex-col gap-6 mt-4 text-lg font-medium">
+                <Link to="/analysis" className="hover:text-primary" onClick={() => setIsSheetOpen(false)}>Analysis</Link>
+                <Link to="/community" className="hover:text-primary" onClick={() => setIsSheetOpen(false)}>Community</Link>
+                <Link to="/mypost" className="hover:text-primary" onClick={() => setIsSheetOpen(false)}>My post</Link>
 
                 {isLoggedIn && (
                   <>
-                    <div className="border-t pt-4"></div>
-
-                    <button
-                      onClick={() => {
-                        handleLogout();
-                        setIsSheetOpen(false);
-                      }}
-                      className="flex items-center gap-3 text-left hover:text-primary"
-                    >
+                    <div className="pt-4 border-t"></div>
+                    <button onClick={handleLogout} className="flex items-center gap-3 text-left hover:text-primary">
                       <LogOut className="w-6 h-6" />
                     </button>
                   </>
