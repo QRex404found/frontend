@@ -25,20 +25,25 @@ export function Header() {
   const fallbackLetter = (user?.username?.charAt(0) ?? "U").toUpperCase();
   const [open, setOpen] = React.useState(false);
 
+  // 🔥 모바일 햄버거 메뉴 제어
+  const [isSheetOpen, setIsSheetOpen] = React.useState(false);
+
+  // 페이지 이동 시 자동으로 햄버거 메뉴 닫기
   React.useEffect(() => {
-    setOpen(false);
+    setIsSheetOpen(false);
   }, [location.pathname]);
 
   const handleLogout = () => {
     removeToken();
     logout?.();
+    setIsSheetOpen(false);   // 🔥 로그아웃 후 메뉴 닫기
   };
 
   return (
     <header className="relative sticky top-0 z-50 h-20 bg-white shadow-sm">
       <div className="flex items-center h-full px-4 gap-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
-        {/* --------------------------- Logo --------------------------- */}
+        {/* Logo */}
         <Link to="/" className="flex items-center flex-shrink-0">
           <img
             src={logoSrc}
@@ -47,10 +52,9 @@ export function Header() {
           />
         </Link>
 
-        {/* --------------------------- Desktop Navigation --------------------------- */}
+        {/* Desktop Navigation */}
         <NavigationMenu className="hidden md:flex absolute left-1/2 -translate-x-1/2">
           <NavigationMenuList className="flex items-center justify-center gap-10">
-
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
                 <Link to="/analysis" className="text-sm md:text-lg font-medium hover:text-primary">
@@ -74,14 +78,13 @@ export function Header() {
                 </Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
-
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* --------------------------- Right Section --------------------------- */}
+        {/* Right Section */}
         <div className="flex items-center gap-3 ml-auto md:gap-4">
 
-          {/* ---------------------- Profile Popover (Mobile + Desktop) ---------------------- */}
+          {/* Profile Popover */}
           {isLoggedIn ? (
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
@@ -116,7 +119,6 @@ export function Header() {
                   <TabsContent value="delete" className="pt-4 text-sm max-h-[330px] overflow-y-auto">
                     <DeleteAccountTab onClose={() => setOpen(false)} />
                   </TabsContent>
-
                 </Tabs>
               </PopoverContent>
             </Popover>
@@ -126,7 +128,7 @@ export function Header() {
             </Link>
           )}
 
-          {/* ---------------------- Desktop logout button ---------------------- */}
+          {/* Desktop Logout */}
           {isLoggedIn && (
             <Button
               onClick={handleLogout}
@@ -137,25 +139,36 @@ export function Header() {
             </Button>
           )}
 
-          {/* ---------------------- Mobile Hamburger Menu ---------------------- */}
-          <Sheet>
+          {/* Mobile Hamburger Menu */}
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger className="md:hidden p-2 rounded hover:bg-gray-100">
               <Menu className="w-7 h-7 text-gray-800" />
             </SheetTrigger>
 
             <SheetContent side="right" className="p-6 w-[260px] bg-white shadow-lg">
-
               <nav className="flex flex-col gap-6 text-lg font-medium mt-4">
 
-                <Link to="/analysis" className="hover:text-primary">
+                <Link
+                  to="/analysis"
+                  className="hover:text-primary"
+                  onClick={() => setIsSheetOpen(false)}  // 🔥 자동 닫힘
+                >
                   Analysis
                 </Link>
 
-                <Link to="/community" className="hover:text-primary">
+                <Link
+                  to="/community"
+                  className="hover:text-primary"
+                  onClick={() => setIsSheetOpen(false)}  // 🔥 자동 닫힘
+                >
                   Community
                 </Link>
 
-                <Link to="/mypost" className="hover:text-primary">
+                <Link
+                  to="/mypost"
+                  className="hover:text-primary"
+                  onClick={() => setIsSheetOpen(false)}  // 🔥 자동 닫힘
+                >
                   My post
                 </Link>
 
@@ -164,16 +177,17 @@ export function Header() {
                     <div className="border-t pt-4"></div>
 
                     <button
-                      onClick={handleLogout}
+                      onClick={() => {
+                        handleLogout();
+                        setIsSheetOpen(false);
+                      }}
                       className="flex items-center gap-3 text-left hover:text-primary"
                     >
                       <LogOut className="w-6 h-6" />
                     </button>
                   </>
                 )}
-
               </nav>
-
             </SheetContent>
           </Sheet>
 

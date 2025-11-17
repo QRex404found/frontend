@@ -32,7 +32,6 @@ export function Community() {
 
         const transformedPosts = data.content
           .slice()
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))  // 최신 -> 오래된 순 정렬
           .map((post) => ({
             id: post.boardId,
             title: post.title,

@@ -155,9 +155,7 @@ export function Analysis() {
             </div>
           </ResizablePanel>
 
-          <ResizableHandle className="px-[1px] cursor-col-resize">
-            <div className="w-[1px] h-[85%] bg-gray-300 hover:bg-gray-400 transition-colors rounded" />
-          </ResizableHandle>
+          <ResizableHandle/>
 
           <ResizablePanel minSize={30}>
             <div className="pl-4 h-full flex flex-col">
