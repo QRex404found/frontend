@@ -24,8 +24,6 @@ export function Header() {
   const location = useLocation();
   const { isLoggedIn, user, logout } = useAuth();
 
-  console.log('헤더에 전달된 User 객체:', user);
-
   const [open, setOpen] = React.useState(false);
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
 

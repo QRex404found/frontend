@@ -88,44 +88,6 @@ export function AnalysisHistory({ onSelectResult, refreshKey, titleUpdateRef }) 
                 rowHeightClass="h-12"
             />
 
-            {/* 페이지네이션 — MyPost와 동일하게 게시판 바로 아래 */}
-            <div className="py-4 flex justify-center">
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    setCurrentPage(prev => Math.max(prev - 1, 1));
-                                }}
-                                disabled={currentPage === 1}
-                                aria-disabled={currentPage === 1}
-                                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                            />
-                        </PaginationItem>
-
-                        <PaginationItem>
-                            <span className="px-4 py-2 text-sm">
-                                Page {currentPage} / {totalPages < 1 ? 1 : totalPages}
-                            </span>
-                        </PaginationItem>
-
-                        <PaginationItem>
-                            <PaginationNext
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    setCurrentPage(prev => Math.min(prev + 1, totalPages));
-                                }}
-                                disabled={currentPage === totalPages || totalPages < 1}
-                                aria-disabled={currentPage === totalPages || totalPages < 1}
-                                className={(currentPage === totalPages || totalPages < 1) ? "pointer-events-none opacity-50" : ""}
-                            />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            </div>
 
         </div>
     );
