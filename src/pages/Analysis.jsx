@@ -1,5 +1,3 @@
-// src/pages/Analysis.jsx
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
@@ -151,10 +149,7 @@ export function Analysis() {
 
   return (
     <>
-      {/* ✔ 최상위 wrapper — MyPost와 100% 동일 + 아래 여백 pb-4 */}
       <div className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4">
-
-        {/* ✔ PC 레이아웃 — 내부 콘텐츠 동일 유지 */}
         <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel defaultSize={50} minSize={30}>
@@ -179,7 +174,6 @@ export function Analysis() {
           </ResizablePanelGroup>
         </div>
 
-        {/* ✔ 모바일 레이아웃 — 원본 유지 */}
         <div className="lg:hidden mt-4 w-full">
           <div className="mb-3 flex items-center justify-center">
             <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
@@ -235,7 +229,6 @@ export function Analysis() {
 
       </div>
 
-      {/* Alert Dialog (원본 유지) */}
       <CustomAlertDialog
         isOpen={alertDialogState.isOpen}
         onClose={() =>

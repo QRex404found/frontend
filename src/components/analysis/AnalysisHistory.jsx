@@ -1,14 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Loader2 } from 'lucide-react';
 import { getAnalysisHistoryApi } from '@/api/analysis';
 import { CommonBoard } from '@/components/common/CommonBoard';
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
 
 export function AnalysisHistory({ onSelectResult, refreshKey, titleUpdateRef }) {
     const [history, setHistory] = useState([]);
@@ -19,7 +11,6 @@ export function AnalysisHistory({ onSelectResult, refreshKey, titleUpdateRef }) 
     const pageSize = 8;
     const fetchingRef = useRef(false);
 
-    // 🔥 페이지 변경 / refreshKey 변경 시 fetch
     useEffect(() => {
         if (!fetchingRef.current) fetchHistory(currentPage);
     }, [currentPage, refreshKey]);
@@ -55,7 +46,6 @@ export function AnalysisHistory({ onSelectResult, refreshKey, titleUpdateRef }) 
         onSelectResult(item.id);
     };
 
-    // 🔥 제목 변경 즉시 반영
     useEffect(() => {
         if (!titleUpdateRef) return;
 
@@ -66,17 +56,14 @@ export function AnalysisHistory({ onSelectResult, refreshKey, titleUpdateRef }) 
                 )
             );
         };
-    }, [titleUpdateRef]);
+    }, []); 
 
     return (
         <div className="w-full px-2 md:px-4 py-2 flex flex-col">
-
-            {/* 제목 */}
             <h1 className="mb-6 text-3xl font-semibold hidden lg:block">
                 QR Analysis History
             </h1>
 
-            {/* 게시판 */}
             <CommonBoard
                 posts={history}
                 isLoading={isLoading}
@@ -87,8 +74,6 @@ export function AnalysisHistory({ onSelectResult, refreshKey, titleUpdateRef }) 
                 showIndex={true}
                 rowHeightClass="h-12"
             />
-
-
         </div>
     );
 }

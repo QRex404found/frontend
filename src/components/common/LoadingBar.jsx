@@ -3,10 +3,8 @@
 import * as React from "react";
 import { useNavigate } from 'react-router-dom';
 import { Progress } from "@/components/ui/progress";
-// ⭐️ 1. axios 대신 apiClient를 import 합니다.
 import apiClient from '@/api/index'; 
 
-// 로딩 단계 정의
 const LOADING_STAGES = {
   FAKING: 'FAKING',
   PROCESSING: 'PROCESSING',
@@ -22,7 +20,7 @@ export function LoadingBar({ file, extractedUrl }) {
   const [statusMessage, setStatusMessage] = React.useState('분석을 준비 중입니다...');
 
   const intervalRef = React.useRef(null);
-  const apiCalledRef = React.useRef(false); // 중복 호출 방지
+  const apiCalledRef = React.useRef(false);
 
   const stopFakeProgress = () => {
     if (intervalRef.current) {
@@ -31,37 +29,16 @@ export function LoadingBar({ file, extractedUrl }) {
     }
   };
 
-  // 실제 API 호출 함수
+  // 실제 API 호출
   const callApi = async () => {
     try {
-      // ⭐️ 2. apiClient를 사용하도록 수정합니다.
-      // (헤더는 apiClient의 interceptor가 자동으로 처리해 줍니다)
       const response = await apiClient.post(
-        '/analysis/analyze', // (apiClient에 baseURL이 이미 설정됨)
+        '/analysis/analyze',
         null,
         {
           params: { url: extractedUrl },
-          // (헤더의 'Authorization'은 apiClient가 자동으로 넣어줌)
         }
       );
-      
-      // ⭐️ (기존 코드)
-      /*
-      const token = localStorage.getItem('jwtToken');
-      if (!token) {
-        // ... (이 로직은 apiClient의 interceptor로 이동됨) ...
-        return;
-      }
-      const response = await axios.post(
-        'http://localhost:8080/api/analysis/analyze', // ⬅️ 이 부분이 문제였습니다.
-        null,
-        {
-          params: { url: extractedUrl },
-          headers: { 'Authorization': `Bearer ${token}` }
-        }
-      );
-      */
-      // ⭐️ (수정 완료)
 
       stopFakeProgress();
       setProgress(100);
@@ -97,7 +74,6 @@ export function LoadingBar({ file, extractedUrl }) {
           setStage(LOADING_STAGES.ERROR);
         }
       } else if (error.request) {
-        // ⭐️ 3. (수정) 이제 Network Error (ERR_CONNECTION_REFUSED)는 이쪽으로 잡힙니다.
         const msg = "서버에 연결할 수 없습니다. (IP: " + (error.config?.baseURL || 'Error') + ")";
         setStatusMessage(`오류 발생: ${msg}`);
         redirectMessage = { analysisError: msg };
@@ -118,7 +94,7 @@ export function LoadingBar({ file, extractedUrl }) {
     }
   };
 
-  // 진행 애니메이션 + API 호출
+  // 진행률 애니메이션 및 API 호출
   const processFile = () => {
     if (!extractedUrl) {
       setStatusMessage('오류: 분석할 URL이 없습니다.');
@@ -133,7 +109,6 @@ export function LoadingBar({ file, extractedUrl }) {
     setStage(LOADING_STAGES.FAKING);
     setStatusMessage('분석 진행 중...');
 
-    // 가짜 진행률 (0~90%)
     intervalRef.current = setInterval(() => {
       setProgress(prev => {
         const next = prev + 5;
@@ -141,7 +116,7 @@ export function LoadingBar({ file, extractedUrl }) {
           stopFakeProgress();
           setStage(LOADING_STAGES.PROCESSING);
           setStatusMessage('거의 완료되었습니다. 잠시만 기다려주세요...');
-          if (!apiCalledRef.current) { // 중복 방지
+          if (!apiCalledRef.current) {
             apiCalledRef.current = true;
             callApi();
           }
@@ -153,13 +128,13 @@ export function LoadingBar({ file, extractedUrl }) {
   };
 
   React.useEffect(() => {
-    if (apiCalledRef.current) return; // 중복 방지
+    if (apiCalledRef.current) return;
     processFile();
     return () => stopFakeProgress();
   }, [extractedUrl]);
 
+
   return (
-    // ... (이하 렌더링 부분은 동일) ...
     <div className="w-full max-w-xl p-6 mx-auto bg-white rounded-lg shadow-lg">
       <h3 className="mb-4 text-xl font-bold text-center">QR 코드 분석 과정</h3>
 
@@ -183,7 +158,9 @@ export function LoadingBar({ file, extractedUrl }) {
             ? 'text-red-600 font-bold'
             : 'text-gray-700'}`}
       >
-        {(stage === LOADING_STAGES.FAKING || stage === LOADING_STAGES.PROCESSING) && `${progress}% `}
+
+        {stage === LOADING_STAGES.FAKING && `${progress}% `}
+
         {statusMessage}
       </p>
     </div>
