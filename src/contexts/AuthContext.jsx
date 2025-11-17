@@ -1,6 +1,5 @@
-// src/contexts/AuthContext.jsx
+// src/contexts/AuthContext.jsx (이 코드로 덮어쓰세요)
 
-// ✅ 1. useCallback을 import 합니다.
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 
 // 1. JWT 토큰을 해독(decode)하는 헬퍼 함수
@@ -24,25 +23,35 @@ const parseJwt = (token) => {
 const getInitialUser = () => {
   const token = localStorage.getItem('jwtToken');
   if (!token) {
-    return { userId: null, username: null };
+    return { id: null, username: null };
   }
 
   const decoded = parseJwt(token);
 
-  // (백엔드 수정이 적용되었다는 가정 하에 username까지 확인)
-  if (!decoded || !decoded.sub || decoded.exp * 1000 < Date.now()) {
+  if (!decoded || decoded.exp * 1000 < Date.now()) {
     localStorage.removeItem('jwtToken');
-    return { userId: null, username: null };
+    return { id: null, username: null };
   }
 
-  return { userId: decoded.sub, username: decoded.username || null };
+  // [수정] 0일 수도 있는 ID를 확인합니다. (?? = nullish coalescing 연산자)
+  // decoded.sub도 없고, decoded.id도 없으면 null이 됩니다.
+  // **만약 다른 키(예: userId)라면 decoded.userId ?? null 처럼 수정하세요.**
+  const userId = decoded.sub ?? decoded.id;
+
+  // [수정] userId가 0일 경우를 대비해 null/undefined만 체크합니다.
+  if (userId == null) { 
+    localStorage.removeItem('jwtToken');
+    return { id: null, username: null };
+  }
+
+  return { id: userId, username: decoded.username || null };
 };
 
 // 3. Context 생성 (기본값)
 export const AuthContext = createContext({
   isLoggedIn: false,
-  user: { userId: null, username: null }, 
-  login: (token) => {},
+  user: { id: null, username: null }, // user.id 사용
+  login: (token, userInfo) => {}, // userInfo 인자 받도록 수정
   logout: () => {},
   setUser: (userInfo) => {},
   isChecked: false,
@@ -51,7 +60,7 @@ export const AuthContext = createContext({
 export const AuthProvider = ({ children }) => {
   const initialUser = getInitialUser();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(!!initialUser.userId);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!initialUser.id || initialUser.id === 0); // 0도 true로
   const [user, setUser] = useState(initialUser);
   const [isChecked, setIsChecked] = useState(false);
 
@@ -59,26 +68,40 @@ export const AuthProvider = ({ children }) => {
     setIsChecked(true);
   }, []);
 
-  // ✅ 2. (핵심) login 함수를 useCallback으로 감싸줍니다.
-  // 이 함수는 이제 AuthProvider가 리렌더링되어도 재생성되지 않습니다.
-  const login = useCallback((token) => {
+  const login = useCallback((token, userInfo) => {
     localStorage.setItem('jwtToken', token);
     setIsLoggedIn(true);
 
-    const decoded = parseJwt(token);
-    if (decoded && decoded.sub) {
-      setUser({ userId: decoded.sub, username: decoded.username || null });
-    }
-  }, []); // ⬅️ 의존성 배열이 비어있으므로, 절대 다시 생성되지 않습니다.
+    if (userInfo) {
+      // (Case 1) 일반 로그인
+      setUser(userInfo);
+    } else {
+      // (Case 2) 소셜 로그인
+      const decoded = parseJwt(token);
+      
+      // [디버깅 1] 브라우저 콘솔에서 이 로그를 확인하세요!
+      console.log('AuthContext: 해독된 토큰 페이로드:', decoded); 
 
-  // ✅ 3. (핵심) logout 함수도 useCallback으로 감싸줍니다.
+      // [수정] 0일 수도 있는 ID를 확인합니다.
+      // **만약 다른 키(예: userId)라면 decoded.userId ?? null 처럼 수정하세요.**
+      const userId = decoded?.sub ?? decoded?.id;
+      
+      // [수정] 0을 false로 취급하지 않도록 검사 방식을 변경합니다.
+      if (userId != null) { // (userId !== null && userId !== undefined)와 동일
+        console.log('AuthContext: 사용자 ID 설정:', userId);
+        setUser({ id: userId, username: decoded.username || null });
+      } else {
+        console.error('AuthContext: 토큰에서 사용자 ID("sub" 또는 "id")를 찾을 수 없습니다.');
+      }
+    }
+  }, []); 
+
   const logout = useCallback(() => {
     localStorage.removeItem('jwtToken');
     setIsLoggedIn(false);
-    setUser({ userId: null, username: null }); 
+    setUser({ id: null, username: null }); 
   }, []);
 
-  // ✅ 4. (핵심) 프로필 수정 함수도 useCallback으로 감싸줍니다.
   const updateProfile = useCallback((newUserInfo) => {
     setUser(newUserInfo);
   }, []);
@@ -87,15 +110,13 @@ export const AuthProvider = ({ children }) => {
     isLoggedIn,
     user,
     isChecked,
-    login, // ⬅️ useCallback으로 감싸진 안정적인 함수
-    logout, // ⬅️ useCallback으로 감싸진 안정적인 함수
-    setUser: updateProfile, // ⬅️ useCallback으로 감싸진 안정적인 함수
+    login,
+    logout,
+    setUser: updateProfile,
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
