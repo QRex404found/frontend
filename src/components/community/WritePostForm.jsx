@@ -70,57 +70,56 @@ const WritePostForm = ({ onPostSuccess }) => {
     };
 
     return (
-        <div className="w-full h-full">
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="w-full h-full flex flex-col">
 
-                {/* PHOTO */}
-                <div className="flex flex-col items-center">
-                    <label
-                        htmlFor="photo-upload"
-                        className="
-                            relative flex flex-col items-center justify-center
-                            w-44 h-40 border-2 border-dashed rounded-md cursor-pointer
-                            hover:bg-gray-50 transition
-                        "
-                    >
-                        {previewUrl ? (
-                            <>
-                                <img
-                                    src={previewUrl}
-                                    alt="미리보기"
-                                    className="object-cover w-full h-full rounded-md"
-                                />
-                                <button
-                                    onClick={handleCancelPreview}
-                                    className="absolute top-1 right-1 p-0.5 bg-gray-900 bg-opacity-50 text-white rounded-full hover:bg-opacity-75"
-                                >
-                                    <X size={14} />
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <CameraIcon className="w-6 h-6 text-gray-500" />
-                                <span className="mt-1 text-sm text-gray-500">PHOTO</span>
-                            </>
-                        )}
-                    </label>
-
-                    <input
-                        id="photo-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                    />
-
-                    {previewUrl && photoFile && (
-                        <span className="text-xs truncate max-w-[200px] mt-1">
-                            {photoFile.name}
-                        </span>
+            {/* -------------------- PHOTO 영역 -------------------- */}
+            <div className="flex flex-col items-center justify-center flex-[1.2]">
+                <label
+                    htmlFor="photo-upload"
+                    className="
+                        relative flex flex-col items-center justify-center
+                        w-48 h-44 border-2 border-dashed rounded-md cursor-pointer
+                        hover:bg-gray-50 transition
+                    "
+                >
+                    {previewUrl ? (
+                        <>
+                            <img
+                                src={previewUrl}
+                                alt="미리보기"
+                                className="object-cover w-full h-full rounded-md"
+                            />
+                            <button
+                                onClick={handleCancelPreview}
+                                className="absolute top-1 right-1 p-0.5 bg-gray-900 bg-opacity-50 text-white rounded-full hover:bg-opacity-75"
+                            >
+                                <X size={14} />
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <CameraIcon className="w-7 h-7 text-gray-500" />
+                            <span className="mt-1 text-sm text-gray-500">PHOTO</span>
+                        </>
                     )}
-                </div>
+                </label>
 
-                {/* TITLE */}
+                <input
+                    id="photo-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                />
+
+                {previewUrl && photoFile && (
+                    <span className="text-xs truncate max-w-[200px] mt-1">{photoFile.name}</span>
+                )}
+            </div>
+
+            {/* -------------------- INPUT 영역 -------------------- */}
+            <div className="flex flex-col flex-[1.6] space-y-3 mt-4">
+
                 <Input
                     placeholder="TITLE"
                     value={title}
@@ -128,7 +127,6 @@ const WritePostForm = ({ onPostSuccess }) => {
                     className="text-sm"
                 />
 
-                {/* URL */}
                 <Input
                     placeholder="URL (선택)"
                     value={url}
@@ -136,25 +134,27 @@ const WritePostForm = ({ onPostSuccess }) => {
                     className="text-sm"
                 />
 
-                {/* CONTEXT */}
                 <Textarea
                     placeholder="CONTEXT"
                     value={context}
                     onChange={(e) => setContext(e.target.value)}
-                    className="resize-none h-28 text-sm"
+                    className="resize-none h-32 text-sm"
                 />
+            </div>
 
-                {/* SUBMIT */}
+            {/* -------------------- BUTTON 영역 -------------------- */}
+            <div className="flex-[0.5] flex items-center mt-4">
                 <Button
                     type="submit"
-                    className="w-full mt-2 text-sm font-medium"
+                    onClick={handleSubmit}
+                    className="w-full text-sm font-medium"
                     style={{ backgroundColor: '#7CCF00' }}
                     disabled={isLoading}
                 >
                     {isLoading ? '등록 중...' : 'Write'}
                 </Button>
+            </div>
 
-            </form>
         </div>
     );
 };
