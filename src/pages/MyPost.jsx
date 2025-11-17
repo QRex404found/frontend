@@ -1,3 +1,5 @@
+// src/pages/MyPost.jsx
+
 import React, { useState, useEffect } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { AuthPopup } from '@/components/common/AuthPopup';
@@ -8,6 +10,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CommonBoard } from '@/components/common/CommonBoard';
 import { useNavigate } from 'react-router-dom';
+import { Card } from "@/components/ui/card";   // 🔥 반드시 필요
 
 import {
   ResizablePanelGroup,
@@ -117,7 +120,7 @@ export function MyPost() {
   /* ----------------------- 실제 렌더링 ----------------------- */
 
   return (
-    <div className="px-4 md:px-8 max-w-[1300px] mx-auto">
+    <div className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4">
 
       {/* 상세 모달 */}
       {showDetail && (
@@ -130,13 +133,18 @@ export function MyPost() {
       )}
 
       {/* ---------------- PC 화면 ---------------- */}
-      <div className="hidden lg:flex justify-center gap-8 min-h-[500px]">
+      <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
         <ResizablePanelGroup direction="horizontal">
 
           {/* 왼쪽 패널: 글 작성 */}
           <ResizablePanel defaultSize={50} minSize={30}>
-            <div className="max-w-[550px] mx-auto">
-              <WritePostForm onPostSuccess={() => fetchPosts(1)} />
+            <div className="max-w-[550px] mx-auto h-full flex flex-col">
+              
+              {/* 🔥 QRScanPanel 카드 레이아웃과 동일하게 변경 */}
+              <Card className="h-full w-full p-6 flex flex-col">
+                <WritePostForm onPostSuccess={() => fetchPosts(1)} />
+              </Card>
+
             </div>
           </ResizablePanel>
 
@@ -146,7 +154,6 @@ export function MyPost() {
           <ResizablePanel minSize={30}>
             <div className="max-w-[550px] mx-auto">
 
-              {/* ✔ 게시판 상단 제목 — AnalysisHistory와 동일 스타일 */}
               <h1 className="mb-6 text-3xl font-semibold">
                 My Post
               </h1>
@@ -196,7 +203,6 @@ export function MyPost() {
       {/* ---------------- 모바일 화면 ---------------- */}
       <div className="lg:hidden mt-4 w-full">
 
-        {/* 탭 전환 */}
         <div className="mb-3 flex justify-center">
           <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
             <button
@@ -222,13 +228,14 @@ export function MyPost() {
 
             {/* 모바일 글 작성 */}
             <div className="w-1/2 p-4">
-              <WritePostForm onPostSuccess={() => fetchPosts(1)} />
+              <Card className="w-full h-full p-4 flex flex-col">
+                <WritePostForm onPostSuccess={() => fetchPosts(1)} />
+              </Card>
             </div>
 
             {/* 모바일 게시판 */}
             <div className="w-1/2 p-4">
 
-              {/* ✔ 모바일에서도 AnalysisHistory 스타일로 제목 적용 */}
               <h1 className="text-2xl font-semibold mb-4">
                 My Post
               </h1>

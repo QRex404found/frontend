@@ -4,10 +4,9 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
-import { createPostApi } from '@/api/community';
 import { CameraIcon, X } from 'lucide-react';
 import { toast } from "sonner";
+import { createPostApi } from '@/api/community';
 
 const WritePostForm = ({ onPostSuccess }) => {
     const [title, setTitle] = useState('');
@@ -71,84 +70,92 @@ const WritePostForm = ({ onPostSuccess }) => {
     };
 
     return (
-        <Card className="w-full min-h-[500px]">
-            <CardContent className="pt-6">
-                {/* ✅ 간격은 space-y-3 유지 */}
-                <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="w-full h-full">
+            <form onSubmit={handleSubmit} className="space-y-4">
 
-                    {/* ✅ PHOTO (중간 크기: w-44 h-40) */}
-                    <div className="flex flex-col items-center">
-                        <label
-                            htmlFor="photo-upload"
-                            className="relative flex flex-col items-center justify-center w-44 h-40 border-2 border-dashed rounded-md cursor-pointer hover:bg-gray-50 transition"
-                        >
-                            {previewUrl ? (
-                                <>
-                                    <img src={previewUrl} alt="미리보기" className="object-cover w-full h-full rounded-md" />
-                                    <button
-                                        onClick={handleCancelPreview}
-                                        className="absolute top-1 right-1 p-0.5 bg-gray-900 bg-opacity-50 text-white rounded-full hover:bg-opacity-75"
-                                    >
-                                        <X size={14} />
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <CameraIcon className="w-6 h-6 text-gray-500" />
-                                    <span className="mt-1 text-sm text-gray-500">PHOTO</span>
-                                </>
-                            )}
-                        </label>
-
-                        <input
-                            id="photo-upload"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            className="hidden"
-                        />
-
-                        {previewUrl && photoFile && (
-                            <span className="text-xs truncate max-w-[200px] mt-1">{photoFile.name}</span>
-                        )}
-                    </div>
-
-                    {/* TITLE */}
-                    <Input
-                        placeholder="TITLE"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="text-sm"
-                    />
-
-                    {/* URL */}
-                    <Input
-                        placeholder="URL (선택)"
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        className="text-sm"
-                    />
-
-                    {/* CONTEXT (적절히 줄인 높이 유지) */}
-                    <Textarea
-                        placeholder="CONTEXT"
-                        value={context}
-                        onChange={(e) => setContext(e.target.value)}
-                        className="resize-none h-28 text-sm"
-                    />
-
-                    {/* ✅ 버튼 위 간격 유지 */}
-                    <Button
-                        type="submit"
-                        className="w-full mt-2 text-sm font-medium"
-                        style={{ backgroundColor: '#7CCF00' }}
-                        disabled={isLoading}
+                {/* PHOTO */}
+                <div className="flex flex-col items-center">
+                    <label
+                        htmlFor="photo-upload"
+                        className="
+                            relative flex flex-col items-center justify-center
+                            w-44 h-40 border-2 border-dashed rounded-md cursor-pointer
+                            hover:bg-gray-50 transition
+                        "
                     >
-                        {isLoading ? '등록 중...' : 'Write'}
-                    </Button>
-                </form>
-            </CardContent>
-        </Card>
+                        {previewUrl ? (
+                            <>
+                                <img
+                                    src={previewUrl}
+                                    alt="미리보기"
+                                    className="object-cover w-full h-full rounded-md"
+                                />
+                                <button
+                                    onClick={handleCancelPreview}
+                                    className="absolute top-1 right-1 p-0.5 bg-gray-900 bg-opacity-50 text-white rounded-full hover:bg-opacity-75"
+                                >
+                                    <X size={14} />
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <CameraIcon className="w-6 h-6 text-gray-500" />
+                                <span className="mt-1 text-sm text-gray-500">PHOTO</span>
+                            </>
+                        )}
+                    </label>
+
+                    <input
+                        id="photo-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                    />
+
+                    {previewUrl && photoFile && (
+                        <span className="text-xs truncate max-w-[200px] mt-1">
+                            {photoFile.name}
+                        </span>
+                    )}
+                </div>
+
+                {/* TITLE */}
+                <Input
+                    placeholder="TITLE"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="text-sm"
+                />
+
+                {/* URL */}
+                <Input
+                    placeholder="URL (선택)"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    className="text-sm"
+                />
+
+                {/* CONTEXT */}
+                <Textarea
+                    placeholder="CONTEXT"
+                    value={context}
+                    onChange={(e) => setContext(e.target.value)}
+                    className="resize-none h-28 text-sm"
+                />
+
+                {/* SUBMIT */}
+                <Button
+                    type="submit"
+                    className="w-full mt-2 text-sm font-medium"
+                    style={{ backgroundColor: '#7CCF00' }}
+                    disabled={isLoading}
+                >
+                    {isLoading ? '등록 중...' : 'Write'}
+                </Button>
+
+            </form>
+        </div>
     );
 };
 
