@@ -1,3 +1,5 @@
+// --- AnalysisResultPanel.jsx ---
+
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,6 +18,39 @@ export default function AnalysisResultPanel({ result, onTitleUpdated }) {
         setIsDetailView(false);
     }, [result]);
 
+
+    /* ------------------------------------------------
+       Submit → 제목 저장 및 상위 컴포넌트에 전달
+    --------------------------------------------------- */
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!title.trim() || !result?.analysisId) {
+            toast.warning("제목은 공백일 수 없습니다.");
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            await updateAnalysisTitleApi(result.analysisId, title.trim());
+
+            // 상위 컴포넌트에 전달
+            if (onTitleUpdated) {
+                onTitleUpdated(result.analysisId, title.trim());
+            }
+
+            toast.success("분석 기록 제목이 성공적으로 저장되었습니다.");
+
+        } catch (error) {
+            toast.error(error.message || "제목 저장 중 오류가 발생했습니다.");
+
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
     const getStatusProps = (riskLevel) => {
         switch (riskLevel) {
             case 'SAFE':
@@ -32,43 +67,28 @@ export default function AnalysisResultPanel({ result, onTitleUpdated }) {
     const statusProps = getStatusProps(result?.riskLevel);
     const Icon = statusProps.icon;
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!title.trim() || !result?.analysisId) {
-            toast.warning("제목은 공백일 수 없습니다.");
-            return;
-        }
-
-        setIsLoading(true);
-        try {
-            await updateAnalysisTitleApi(result.analysisId, title.trim());
-
-            // 🔥 부모에게 id + newTitle 전달 → History와 상세 화면 즉시 반영
-            if (onTitleUpdated) {
-                onTitleUpdated(result.analysisId, title.trim());
-            }
-
-            toast.success("분석 기록 제목이 성공적으로 저장되었습니다.");
-
-        } catch (error) {
-            toast.error(error.message || "제목 저장 중 오류가 발생했습니다.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     if (!result) {
-        return <div className="text-center text-gray-500">분석 결과나 이력 항목을 선택해 주세요.</div>;
+        return (
+            <div className="text-center text-gray-500">
+                분석 결과나 이력 항목을 선택해 주세요.
+            </div>
+        );
     }
+
 
     return (
         <div className="w-full h-full flex flex-col space-y-6">
-            <h2 className="!text-4xl font-medium border-b pb-2 mb-4">QR Analysis Result</h2>
 
-            {/* 요약 화면 */}
+            <h2 className="!text-4xl font-medium border-b pb-2 mb-4">
+                QR Analysis Result
+            </h2>
+
+
+            {/* ---------- 요약 ---------- */}
             {!isDetailView && (
                 <div className="space-y-6">
+
                     <div className={`p-4 rounded-lg ${statusProps.bg} flex items-center space-x-3`}>
                         <Icon className={`h-6 w-6 ${statusProps.color}`} />
                         <span className={`text-lg font-semibold ${statusProps.color}`}>
@@ -78,17 +98,27 @@ export default function AnalysisResultPanel({ result, onTitleUpdated }) {
 
                     <div className="grid gap-2">
                         <label className="text-sm font-semibold text-gray-700">URL</label>
-                        <Input value={result.url} readOnly className="bg-gray-100 cursor-default" />
+                        <Input
+                            value={result.url}
+                            readOnly
+                            className="bg-gray-100 cursor-default"
+                        />
                     </div>
 
                     <div className="grid gap-2">
                         <label className="text-sm font-semibold text-gray-700">IP Address</label>
-                        <Input value={result.ipAddress} readOnly className="bg-gray-100 cursor-default" />
+                        <Input
+                            value={result.ipAddress}
+                            readOnly
+                            className="bg-gray-100 cursor-default"
+                        />
                     </div>
+
                 </div>
             )}
 
-            {/* 상세 화면 */}
+
+            {/* ---------- 상세 보기 ---------- */}
             {isDetailView && (
                 <div className="grid gap-2">
                     <label className="text-sm font-semibold text-gray-700">상세 분석 결과</label>
@@ -98,11 +128,17 @@ export default function AnalysisResultPanel({ result, onTitleUpdated }) {
                 </div>
             )}
 
-            {/* 제목 수정 */}
+
+            {/* ---------- 제목 수정 ---------- */}
             {!isDetailView && (
                 <form onSubmit={handleSubmit} className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">제목 (사용자 설정)</label>
+
+                    <label className="text-sm font-semibold text-gray-700">
+                        제목 (사용자 설정)
+                    </label>
+
                     <div className="flex items-end gap-2">
+
                         <Input
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
@@ -110,6 +146,7 @@ export default function AnalysisResultPanel({ result, onTitleUpdated }) {
                             required
                             className="flex-grow"
                         />
+
                         <Button
                             type="submit"
                             className="w-auto h-10 bg-lime-500 hover:bg-lime-600 text-white font-bold shadow-md"
@@ -117,13 +154,14 @@ export default function AnalysisResultPanel({ result, onTitleUpdated }) {
                         >
                             {isLoading ? (
                                 <Loader2 className="h-5 w-5 animate-spin" />
-                            ) : (
-                                "Submit"
-                            )}
+                            ) : "Submit"}
                         </Button>
+
                     </div>
+
                 </form>
             )}
+
 
             <Button
                 type="button"
@@ -138,6 +176,7 @@ export default function AnalysisResultPanel({ result, onTitleUpdated }) {
             >
                 {isDetailView ? "Back" : "Detail"}
             </Button>
+
         </div>
     );
 }

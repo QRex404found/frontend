@@ -1,3 +1,5 @@
+// --- Analysis.jsx ---
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
@@ -24,6 +26,8 @@ export function Analysis() {
   const [analysisResult, setAnalysisResult] = useState(null);
   const [selectedHistory, setSelectedHistory] = useState(null);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
+
+  // 🔥 History만 강제로 새로고침시키는 트리거
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   const [alertDialogState, setAlertDialogState] = useState({
@@ -36,6 +40,9 @@ export function Analysis() {
   const [mobileTab, setMobileTab] = useState('scan');
   const titleUpdateRef = useRef(null);
 
+  /* ---------------------------------------------
+     QR 분석 완료 시 처리
+  --------------------------------------------- */
   const handleAnalysisResult = useCallback((result, error) => {
     if (error) {
       setAlertDialogState({
@@ -49,12 +56,21 @@ export function Analysis() {
       });
       return;
     }
+
+    // 분석 완료 시 LeftPanel을 result 화면으로 전환
     setAnalysisResult(result);
     setSelectedHistory(null);
-    setHistoryRefreshKey((prev) => prev + 1);
+
+    // 🔥 이 경우에만 History 목록 새로 fetch
+    setHistoryRefreshKey(prev => prev + 1);
+
     setMobileTab('scan');
   }, []);
 
+
+  /* ---------------------------------------------
+     라우터 state로 전달된 분석 결과 처리
+  --------------------------------------------- */
   useEffect(() => {
     const stateResult = location.state?.analysisResult;
     const stateError = location.state?.analysisError;
@@ -64,26 +80,36 @@ export function Analysis() {
         analysisResult &&
         stateResult &&
         analysisResult.analysisId === stateResult.analysisId
-      )
-        return;
+      ) return;
+
       navigate('.', { replace: true, state: null });
       handleAnalysisResult(stateResult, stateError);
     }
   }, [location.state, navigate, handleAnalysisResult, analysisResult]);
 
+
+  /* ---------------------------------------------
+     새로운 파일 분석 시작
+  --------------------------------------------- */
   const handleAnalysisStart = (file, url) => {
     navigate('/analyzing-qr', {
       state: { fileToAnalyze: file, extractedUrl: url }
     });
+
     setAnalysisResult(null);
     setSelectedHistory(null);
     setMobileTab('scan');
   };
 
+
+  /* ---------------------------------------------
+     History 목록에서 항목 선택 → 상세 데이터 가져오기
+  --------------------------------------------- */
   const handleHistorySelect = async (analysisId) => {
     setAnalysisResult(null);
     setSelectedHistory(null);
     setIsDetailLoading(true);
+
     try {
       const response = await getAnalysisResultApi(analysisId);
       setSelectedHistory(response);
@@ -100,16 +126,27 @@ export function Analysis() {
     }
   };
 
+
+  /* ---------------------------------------------
+     🔥 제목 수정 후 상태 즉시 반영 + History만 새로고침
+  --------------------------------------------- */
   const handleTitleUpdated = (id, newTitle) => {
+    // LeftPanel 수정
     if (selectedHistory && selectedHistory.analysisId === id) {
-      setSelectedHistory((prev) => ({ ...prev, analysisTitle: newTitle }));
+      setSelectedHistory(prev => ({ ...prev, analysisTitle: newTitle }));
     } else if (analysisResult && analysisResult.analysisId === id) {
-      setAnalysisResult((prev) => ({ ...prev, analysisTitle: newTitle }));
+      setAnalysisResult(prev => ({ ...prev, analysisTitle: newTitle }));
     }
+
+    // History 목록 로컬 업데이트
     if (titleUpdateRef.current) {
       titleUpdateRef.current(id, newTitle);
     }
+
+    // 🔥 서버 최신 데이터로 History만 다시 새로고침
+    setHistoryRefreshKey(prev => prev + 1);
   };
+
 
   if (!isChecked) {
     return (
@@ -129,8 +166,11 @@ export function Analysis() {
     );
   }
 
+
+  // 현재 왼쪽 패널에 표시할 데이터
   const currentResult = selectedHistory || analysisResult;
 
+  // LeftPanel 렌더링 콘텐츠
   const LeftPanelContent = isDetailLoading ? (
     <div className="flex justify-center items-center h-full">
       <Loader2 className="h-8 w-8 animate-spin text-green-500" />
@@ -147,11 +187,15 @@ export function Analysis() {
     />
   );
 
+
   return (
     <>
       <div className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4">
+
+        {/* ---- 데스크탑 레이아웃 ---- */}
         <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
           <ResizablePanelGroup direction="horizontal">
+
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className="max-w-[550px] mx-auto h-full flex flex-col">
                 <Card className="h-full w-full p-6 flex items-center justify-center">
@@ -171,10 +215,14 @@ export function Analysis() {
                 />
               </div>
             </ResizablePanel>
+
           </ResizablePanelGroup>
         </div>
 
+
+        {/* ---- 모바일 레이아웃 ---- */}
         <div className="lg:hidden mt-4 w-full">
+
           <div className="mb-3 flex items-center justify-center">
             <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
               <button
@@ -187,6 +235,7 @@ export function Analysis() {
               >
                 QR 분석
               </button>
+
               <button
                 onClick={() => setMobileTab('history')}
                 className={`px-4 py-1.5 text-sm rounded-full transition-colors ${
@@ -199,6 +248,7 @@ export function Analysis() {
               </button>
             </div>
           </div>
+
 
           <div className="overflow-hidden rounded-lg border relative">
             <div
@@ -223,11 +273,14 @@ export function Analysis() {
                   />
                 </div>
               </div>
+
             </div>
           </div>
+
         </div>
 
       </div>
+
 
       <CustomAlertDialog
         isOpen={alertDialogState.isOpen}
