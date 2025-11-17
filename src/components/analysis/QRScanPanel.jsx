@@ -1,3 +1,5 @@
+// src/components/analysis/QRScanPanel.jsx
+
 import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -68,7 +70,9 @@ const scanFileForQrUrl = async (file) => {
 /* ---------------- QRScanPanel ---------------- */
 export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
   const fileInputRef = useRef(null);
-  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  const isMobile =
+    typeof navigator !== "undefined" &&
+    /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
   /* 분석 시작 */
   const startAnalysis = async (file) => {
@@ -87,7 +91,16 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
     e.target.value = null;
   };
 
-  /* ---------------- 모바일/데스크탑 공통: input click 핸들러 ---------------- */
+  /* ---------------- 데스크탑 전용: 카메라 버튼 = 파일 탐색기 ---------------- */
+  const handleDesktopClick = () => {
+    if (!fileInputRef.current) return;
+
+    fileInputRef.current.accept = "image/*"; // 필요하면 "*/*" 로 변경
+    fileInputRef.current.removeAttribute("capture");
+    fileInputRef.current.click();
+  };
+
+  /* ---------------- 모바일 전용: 드롭다운 메뉴용 핸들러 ---------------- */
 
   // 사진 촬영 → 카메라 강제 실행
   const handleTakePhoto = () => {
@@ -105,16 +118,17 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
     fileInputRef.current.click();
   };
 
-  // 파일 앱에서 선택
+  // 파일 앱 / OS 앱 선택 UI
   const handleSelectFile = () => {
     if (!fileInputRef.current) return;
+    // ★ 여기 설정은 네가 예전에 "파일 선택" 썼을 때 쓰던 그대로 두면 된다
     fileInputRef.current.accept = "*/*";
     fileInputRef.current.removeAttribute("capture");
     fileInputRef.current.click();
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[400px]">
+    <div className="flex flex-col items-center justify-center min-h-[450px]">
       <div className="flex flex-col items-center justify-center p-6 space-y-6">
         <p className="text-2xl font-semibold text-gray-700">QR Scan</p>
 
@@ -125,48 +139,46 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
           onChange={handleFileSelect}
         />
 
-        {/* 모바일도 Dropdown 표시 */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"
-              size="icon"
-            >
-              <Camera className="!w-10 !h-10" />
-            </Button>
-          </DropdownMenuTrigger>
+        {/* ✅ 데스크탑: 예전처럼 드롭다운 없이 바로 파일 탐색기 */}
+        {!isMobile && (
+          <Button
+            className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"
+            size="icon"
+            onClick={handleDesktopClick}
+          >
+            <Camera className="!w-10 !h-10" />
+          </Button>
+        )}
 
-          <DropdownMenuContent className="w-48 p-2 rounded-lg shadow-xl">
+        {/* ✅ 모바일: 카메라 아이콘 클릭 시 = "파일 선택"과 동일 동작 */}
+        {isMobile && (
+          <Button
+            className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"
+            size="icon"
+            onClick={handleSelectFile}  // 🔥 핵심 포인트: 파일 선택과 완전히 동일한 로직
+          >
+            <Camera className="!w-10 !h-10" />
+          </Button>
+        )}
 
-            {/* 사진 촬영 */}
-            <DropdownMenuItem
-              onClick={handleTakePhoto}
-              className="cursor-pointer p-3 flex items-center space-x-2 text-base"
-            >
-              <Camera className="w-4 h-4" />
-              <span>사진 촬영</span>
-            </DropdownMenuItem>
+        {/*
+          만약 드롭다운 UI 자체도 유지하고 싶으면,
+          위 Button 대신 아래 블록을 쓰면 된다:
 
-            {/* 갤러리 선택 */}
-            <DropdownMenuItem
-              onClick={handleSelectFromGallery}
-              className="cursor-pointer p-3 flex items-center space-x-2 text-base"
-            >
-              <Image className="w-4 h-4" />
-              <span>사진 선택</span>
-            </DropdownMenuItem>
-
-            {/* 파일 선택 */}
-            <DropdownMenuItem
-              onClick={handleSelectFile}
-              className="cursor-pointer p-3 flex items-center space-x-2 text-base"
-            >
-              <FileText className="w-4 h-4" />
-              <span>파일 선택</span>
-            </DropdownMenuItem>
-
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {isMobile && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button ...>
+                <Camera .../>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent ...>
+              ...
+              <DropdownMenuItem onClick={handleSelectFile}>파일 선택</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+        */}
       </div>
     </div>
   );

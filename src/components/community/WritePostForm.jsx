@@ -71,7 +71,7 @@ const WritePostForm = ({ onPostSuccess }) => {
     };
 
     return (
-        <Card className="w-full">
+        <Card className="w-full min-h-[500px]">
             <CardContent className="pt-6">
                 {/* ✅ 간격은 space-y-3 유지 */}
                 <form onSubmit={handleSubmit} className="space-y-3">

@@ -7,12 +7,12 @@ import { PostDetailModal } from '@/components/community/PostDetailModal';
 import { getCommunityPostsApi } from '@/api/community';
 import { Loader2 } from 'lucide-react';
 import { CommonBoard } from '@/components/common/CommonBoard';
-import { useNavigate } from 'react-router-dom';   // ⭐ 추가됨
+import { useNavigate } from 'react-router-dom';   // 추가됨
 
 const PAGE_SIZE = 8;
 
 export function Community() {
-  const navigate = useNavigate();  // ⭐ 추가됨
+  const navigate = useNavigate();  // 추가됨
   const { isLoggedIn, isChecked } = useAuth();
 
   const [posts, setPosts] = useState([]);
@@ -32,12 +32,13 @@ export function Community() {
 
         const transformedPosts = data.content
           .slice()
-          .reverse()
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))  // 최신 -> 오래된 순 정렬
           .map((post) => ({
             id: post.boardId,
             title: post.title,
             date: post.createdAt,
           }));
+
 
         setPosts(transformedPosts);
         setTotalPages(data.totalPages || 1);
@@ -63,13 +64,13 @@ export function Community() {
     );
   }
 
-  // ⭐ 새 AuthPopup 구조 적용
+  // 새 AuthPopup 구조 적용
   if (!isLoggedIn) {
     return (
       <AuthPopup
         show={true}
         isMandatory={true}
-        onClose={() => navigate('/')}   // ⭐ Analysis와 동일한 안정 구조
+        onClose={() => navigate('/')}   // Analysis와 동일한 안정 구조
       />
     );
   }

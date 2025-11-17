@@ -1,5 +1,3 @@
-// src/components/analysis/AnalysisHistory.jsx (이 코드로 파일 전체를 덮어쓰세요)
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { getAnalysisHistoryApi } from '@/api/analysis';
@@ -17,28 +15,32 @@ export function AnalysisHistory({ onSelectResult, refreshKey, titleUpdateRef }) 
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
+
     const pageSize = 8;
     const fetchingRef = useRef(false);
 
+    // 🔥 페이지 변경 / refreshKey 변경 시 fetch
     useEffect(() => {
-        if (!fetchingRef.current) {
-            fetchHistory(currentPage);
-        }
+        if (!fetchingRef.current) fetchHistory(currentPage);
     }, [currentPage, refreshKey]);
 
     const fetchHistory = async (page) => {
         fetchingRef.current = true;
         setIsLoading(true);
+
         try {
             const data = await getAnalysisHistoryApi(page - 1, pageSize);
+
             const mappedData = data.content.map(item => ({
                 id: item.analysisId,
                 title: item.analysisTitle || item.analysisUrl,
                 date: item.createdAt,
             }));
+
             setHistory(mappedData);
-            setTotalPages(data.totalPages);
+            setTotalPages(data.totalPages || 1);
             setCurrentPage(page);
+
         } catch (error) {
             console.error('분석 기록 로드 실패:', error);
             setHistory([]);
@@ -53,42 +55,40 @@ export function AnalysisHistory({ onSelectResult, refreshKey, titleUpdateRef }) 
         onSelectResult(item.id);
     };
 
+    // 🔥 제목 변경 즉시 반영
     useEffect(() => {
-        if (titleUpdateRef) {
-            titleUpdateRef.current = (id, newTitle) => {
-                setHistory(prev =>
-                    prev.map(item => item.id === id ? { ...item, title: newTitle } : item)
-                );
-            };
-        }
+        if (!titleUpdateRef) return;
+
+        titleUpdateRef.current = (id, newTitle) => {
+            setHistory(prev =>
+                prev.map(item =>
+                    item.id === id ? { ...item, title: newTitle } : item
+                )
+            );
+        };
     }, [titleUpdateRef]);
 
-    const handlePreviousPage = () => {
-        setCurrentPage(prev => Math.max(prev - 1, 1));
-    };
-
-    const handleNextPage = () => {
-        setCurrentPage(prev => Math.min(prev + 1, totalPages));
-    };
-
     return (
-        <div className="flex flex-col justify-between h-full">
-            <div className="max-w-5xl mx-auto w-full p-4 md:p-8 -mt-5 flex-1">
-                <h1 className="mb-6 text-4xl font-medium hidden lg:block">
-                    QR Analysis History
-                </h1>
+        <div className="w-full px-2 md:px-4 py-2 flex flex-col">
 
-                <CommonBoard
-                    posts={history}
-                    isLoading={isLoading}
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    // onPageChange={setCurrentPage} // CommonBoard 자체 페이지네이션 사용 안 함
-                    onItemClick={handleTitleClick}
-                    showIndex={false}
-                />
-            </div>
+            {/* 제목 */}
+            <h1 className="mb-6 text-3xl font-semibold hidden lg:block">
+                QR Analysis History
+            </h1>
 
+            {/* 게시판 */}
+            <CommonBoard
+                posts={history}
+                isLoading={isLoading}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                onItemClick={handleTitleClick}
+                showIndex={true}
+                rowHeightClass="h-12"
+            />
+
+            {/* 페이지네이션 — MyPost와 동일하게 게시판 바로 아래 */}
             <div className="py-4 flex justify-center">
                 <Pagination>
                     <PaginationContent>
@@ -97,25 +97,26 @@ export function AnalysisHistory({ onSelectResult, refreshKey, titleUpdateRef }) 
                                 href="#"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    handlePreviousPage();
+                                    setCurrentPage(prev => Math.max(prev - 1, 1));
                                 }}
                                 disabled={currentPage === 1}
                                 aria-disabled={currentPage === 1}
                                 className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                             />
                         </PaginationItem>
+
                         <PaginationItem>
                             <span className="px-4 py-2 text-sm">
                                 Page {currentPage} / {totalPages < 1 ? 1 : totalPages}
                             </span>
                         </PaginationItem>
+
                         <PaginationItem>
                             <PaginationNext
                                 href="#"
-                                // ⬇️ [수정] 여기 있던 '_' 제거
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    handleNextPage();
+                                    setCurrentPage(prev => Math.min(prev + 1, totalPages));
                                 }}
                                 disabled={currentPage === totalPages || totalPages < 1}
                                 aria-disabled={currentPage === totalPages || totalPages < 1}
@@ -125,6 +126,7 @@ export function AnalysisHistory({ onSelectResult, refreshKey, titleUpdateRef }) 
                     </PaginationContent>
                 </Pagination>
             </div>
+
         </div>
     );
 }

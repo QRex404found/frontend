@@ -24,6 +24,7 @@ export function MyPost() {
   const navigate = useNavigate();
   const { isLoggedIn, isChecked } = useAuth();
 
+  // ❗ 모든 Hook은 컴포넌트 최상단에 위치해야 하며 절대 조건문 위에 놓이면 안 된다.
   const [myPosts, setMyPosts] = useState([]);
   const [selectedPosts, setSelectedPosts] = useState([]);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -37,29 +38,12 @@ export function MyPost() {
 
   const [mobileTab, setMobileTab] = useState("write");
 
-  /* ----------------------- 인증 체크 ----------------------- */
-  if (!isChecked) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-gray-500">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn) {
-    return (
-      <AuthPopup
-        show={true}
-        isMandatory={true}
-        onClose={() => navigate('/')}
-      />
-    );
-  }
-
   /* ----------------------- 게시글 목록 로드 ----------------------- */
   useEffect(() => {
-    fetchPosts(currentPage);
-  }, [currentPage]);
+    if (isChecked && isLoggedIn) {
+      fetchPosts(currentPage);
+    }
+  }, [currentPage, isChecked, isLoggedIn]);
 
   const fetchPosts = async (page) => {
     setIsLoading(true);
@@ -114,9 +98,32 @@ export function MyPost() {
 
   const showEmpty = !isLoading && myPosts.length === 0;
 
-  /* ----------------------- 화면 렌더링 ----------------------- */
+  /* ----------------------- 인증 상태에 따른 UI 렌더링 ----------------------- */
+
+  // 1) 체크 중
+  if (!isChecked) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
+  // 2) 로그인 안 됨
+  if (!isLoggedIn) {
+    return (
+      <AuthPopup
+        show={true}
+        isMandatory={true}
+        onClose={() => navigate('/')}
+      />
+    );
+  }
+
+  /* ----------------------- 실제 화면 렌더링 ----------------------- */
+
   return (
-    <div className="px-4 md:px-8 pb-8 max-w-[1300px] mx-auto">
+    <div className="px-4 md:px-8 max-w-[1300px] mx-auto">
 
       {/* 상세 모달 */}
       {showDetail && (
@@ -129,7 +136,7 @@ export function MyPost() {
       )}
 
       {/* ---------------- PC 화면 ---------------- */}
-      <div className="hidden lg:flex justify-center gap-8 min-h-[620px]">
+      <div className="hidden lg:flex justify-center gap-8 min-h-[500px]">
         <ResizablePanelGroup direction="horizontal">
 
           <ResizablePanel defaultSize={50} minSize={30}>

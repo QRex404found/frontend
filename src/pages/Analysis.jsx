@@ -92,13 +92,19 @@ export function Analysis() {
     }
   };
 
+  // ✅ id + newTitle 둘 다 받는 함수
   const handleTitleUpdated = (id, newTitle) => {
+    // 현재 선택된 상세 결과 업데이트
     if (selectedHistory && selectedHistory.analysisId === id) {
       setSelectedHistory(prev => ({ ...prev, analysisTitle: newTitle }));
     } else if (analysisResult && analysisResult.analysisId === id) {
       setAnalysisResult(prev => ({ ...prev, analysisTitle: newTitle }));
     }
-    if (titleUpdateRef.current) titleUpdateRef.current(id, newTitle);
+
+    // ✅ History 리스트(옆 게시판) 제목도 즉시 반영
+    if (titleUpdateRef.current) {
+      titleUpdateRef.current(id, newTitle);
+    }
   };
 
   if (!isChecked) {
@@ -114,6 +120,7 @@ export function Analysis() {
   }
 
   const currentResult = selectedHistory || analysisResult;
+
   const LeftPanelContent = isDetailLoading ? (
     <div className="flex justify-center items-center h-full">
       <Loader2 className="h-8 w-8 animate-spin text-green-500" />
@@ -121,7 +128,8 @@ export function Analysis() {
   ) : currentResult ? (
     <AnalysisResultPanel
       result={currentResult}
-      onTitleUpdated={(newTitle) => handleTitleUpdated(currentResult.analysisId, newTitle)}
+      // 🔥 여기 수정: 래핑 함수 제거, 그대로 넘김
+      onTitleUpdated={handleTitleUpdated}
     />
   ) : (
     <QRScanPanel
@@ -133,7 +141,7 @@ export function Analysis() {
   return (
     <div className="px-4 md:px-8 pb-8">
 
-      {/* ✅ PC (슬라이드 없음 / 기존 유지) */}
+      {/* PC 레이아웃 */}
       <div className="hidden lg:flex w-full min-h-[500px]">
         <ResizablePanelGroup direction="horizontal" className="w-full">
 
@@ -144,7 +152,6 @@ export function Analysis() {
                   {LeftPanelContent}
                 </Card>
               </div>
-              <div className="py-10" />
             </div>
           </ResizablePanel>
 
@@ -164,7 +171,7 @@ export function Analysis() {
         </ResizablePanelGroup>
       </div>
 
-      {/* ✅ 모바일 (슬라이드 + 한 패널씩 정상 표시) */}
+      {/* 모바일 레이아웃 */}
       <div className="lg:hidden mt-4 w-full">
         <div className="mb-3 flex items-center justify-center">
           <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
@@ -196,7 +203,6 @@ export function Analysis() {
             className="flex w-[200%] transition-transform duration-300 ease-out"
             style={{ transform: mobileTab === 'scan' ? 'translateX(0)' : 'translateX(-50%)' }}
           >
-            {/* ✅ 패널 너비: w-full 로 수정 → 한 화면씩만 보임 */}
             <div className="w-full">
               <Card className="min-h-[520px] shadow-lg p-4 sm:p-6">
                 {LeftPanelContent}
