@@ -17,7 +17,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 // 🔥 컴포넌트 경로가 맞는지 확인해주세요!
 import EditProfileTab from "@/components/profile/EditProfileTab"; 
-import DeleteAccountTab from "@/components/DeleteAccountTab"; // 아까 수정한 파일 경로
+import DeleteAccountTab from "@/components/profile/DeleteAccountTab"; // 아까 수정한 파일 경로
 
 export function Header() {
   const navigate = useNavigate();
