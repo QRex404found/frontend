@@ -72,8 +72,8 @@ const WritePostForm = ({ onPostSuccess }) => {
     return (
         <div className="w-full h-full flex flex-col">
 
-            {/* -------------------- PHOTO 영역 -------------------- */}
-            <div className="flex flex-col items-center justify-center flex-[1.2]">
+            {/* PHOTO 영역 */}
+            <div className="flex flex-col items-center justify-center flex-none">
                 <label
                     htmlFor="photo-upload"
                     className="
@@ -117,8 +117,8 @@ const WritePostForm = ({ onPostSuccess }) => {
                 )}
             </div>
 
-            {/* -------------------- INPUT 영역 -------------------- */}
-            <div className="flex flex-col flex-[1.6] space-y-3 mt-4">
+            {/* INPUT + CONTEXT 영역 */}
+            <div className="flex flex-col space-y-3 mt-6 flex-grow">
 
                 <Input
                     placeholder="TITLE"
@@ -134,16 +134,23 @@ const WritePostForm = ({ onPostSuccess }) => {
                     className="text-sm"
                 />
 
+                {/* 🔥 스크롤 가능 Textarea (높이 고정 + 내용 많으면 스크롤) */}
                 <Textarea
                     placeholder="CONTEXT"
                     value={context}
                     onChange={(e) => setContext(e.target.value)}
-                    className="resize-none h-32 text-sm"
+                    className="
+                        resize-none 
+                        min-h-[200px]
+                        max-h-[200px]
+                        overflow-y-auto
+                        text-sm
+                    "
                 />
             </div>
 
-            {/* -------------------- BUTTON 영역 -------------------- */}
-            <div className="flex-[0.5] flex items-center mt-4">
+            {/* BUTTON 영역 */}
+            <div className="mt-4 flex-none">
                 <Button
                     type="submit"
                     onClick={handleSubmit}
