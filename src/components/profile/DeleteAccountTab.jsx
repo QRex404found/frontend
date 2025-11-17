@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import { removeToken } from "@/utils/tokenUtils";
 import { CheckCircle2 } from "lucide-react";
+import { toast } from "sonner"; // ✅ Toaster 사용을 위해 import
 
 export default function DeleteAccountTab({ onClose }) {
   const [isDeleted, setIsDeleted] = useState(false);
@@ -12,48 +13,46 @@ export default function DeleteAccountTab({ onClose }) {
   const { logout } = useAuth();
 
   const handleDelete = async () => {
-    if (!window.confirm("정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+    if (!window.confirm("Are you sure you want to delete your account? This cannot be undone.")) {
       return;
     }
 
     try {
-      // 1. 백엔드 탈퇴 요청 (여기서 DB 데이터는 삭제됨)
+      // 1. 백엔드 탈퇴 요청
       await deleteAccountApi();
 
-      // ⭐️ [절대 수정 금지] 
-      // 여기서 removeToken()이나 logout()을 절대 호출하지 마세요!
-      // 토큰이 사라지면 앱이 그걸 감지하고 로그인 창으로 납치해갑니다.
-      // 토큰은 그냥 둡니다. (어차피 서버에선 이미 죽은 토큰입니다)
+      // 2. 토큰만 조용히 삭제 (logout()은 호출 안 함 -> 자동 이동 방지)
+      removeToken(); 
 
-      // 2. 화면만 교체합니다.
+      // 3. ✅ [복구 완료] 원래 나오던 그 Toast 메시지를 띄웁니다!
+      toast.success("Your account has been successfully deleted.");
+
+      // 4. 화면 상태 변경 (입력창 숨기고 성공 화면 표시)
       setIsDeleted(true);
 
     } catch (error) {
       console.error("Delete failed:", error);
-      alert("탈퇴 처리에 실패했습니다. 다시 시도해 주세요.");
+      // 에러 메시지도 Toast로 띄우면 더 통일감 있습니다
+      toast.error("An error occurred while deleting your account.");
     }
   };
 
-  // 사용자가 "로그인 화면으로 가기" 버튼을 눌렀을 때 실행
   const handleFinalExit = () => {
-    // 3. 사용자가 떠나겠다고 마음먹었을 때, 비로소 토큰을 지웁니다.
-    removeToken(); 
+    // 5. 확인 버튼 누르면 그때 로그아웃 처리하고 이동
     if (logout) logout();
-    
-    // 4. 그리고 이동합니다.
+    if (onClose) onClose();
     navigate('/login', { replace: true });
   };
 
-  // ✅ 탈퇴 완료 화면
+  // ✅ 탈퇴 성공 시 보여줄 화면
   if (isDeleted) {
     return (
       <div className="flex flex-col items-center justify-center h-64 p-6 space-y-4 text-center border rounded-md bg-gray-50">
         <CheckCircle2 className="w-16 h-16 text-green-500" />
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-gray-900">탈퇴가 완료되었습니다.</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Goodbye!</h3>
           <p className="text-sm text-gray-500">
-            그동안 이용해 주셔서 감사합니다.<br/>
-            언제든 다시 돌아오시길 기다리겠습니다.
+            이용해 주셔서 감사합니다.
           </p>
         </div>
         <Button 
@@ -61,13 +60,13 @@ export default function DeleteAccountTab({ onClose }) {
           onClick={handleFinalExit} 
           className="mt-4"
         >
-          로그인 화면으로 가기
+          로그인 화면으로 돌아가기
         </Button>
       </div>
     );
   }
 
-  // 기존 화면
+  // 기존 화면 (경고문 및 탈퇴 버튼)
   return (
     <div className="p-3 space-y-4 text-sm bg-white border rounded-md">
       <p className="text-base font-medium text-red-600">

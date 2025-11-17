@@ -148,7 +148,7 @@ export function Analysis() {
           <ResizablePanel defaultSize={50} minSize={30}>
             <div className="h-full flex flex-col justify-between">
               <div className="p-4 md:p-8 px-10 flex-1 pt-0">
-                <Card className="h-full w-full shadow-lg p-6 flex items-center justify-center">
+                <Card className="h-full w-full  p-6 flex items-center justify-center">
                   {LeftPanelContent}
                 </Card>
               </div>
