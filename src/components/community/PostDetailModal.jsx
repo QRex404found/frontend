@@ -37,7 +37,7 @@ export function PostDetailModal({
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
   const [refetchCounter, setRefetchCounter] = useState(0);
 
-  // 데이터 로딩
+  // 데이터 로딩중
   useEffect(() => {
     if (isOpen && boardId) {
       setIsLoading(true);
