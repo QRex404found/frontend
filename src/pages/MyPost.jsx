@@ -1,5 +1,3 @@
-// src/pages/MyPost.jsx
-
 import React, { useState, useEffect } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { AuthPopup } from '@/components/common/AuthPopup';
@@ -24,7 +22,6 @@ export function MyPost() {
   const navigate = useNavigate();
   const { isLoggedIn, isChecked } = useAuth();
 
-  // ❗ 모든 Hook은 컴포넌트 최상단에 위치해야 하며 절대 조건문 위에 놓이면 안 된다.
   const [myPosts, setMyPosts] = useState([]);
   const [selectedPosts, setSelectedPosts] = useState([]);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -98,9 +95,7 @@ export function MyPost() {
 
   const showEmpty = !isLoading && myPosts.length === 0;
 
-  /* ----------------------- 인증 상태에 따른 UI 렌더링 ----------------------- */
-
-  // 1) 체크 중
+  /* ----------------------- 인증 상태 ----------------------- */
   if (!isChecked) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -109,7 +104,6 @@ export function MyPost() {
     );
   }
 
-  // 2) 로그인 안 됨
   if (!isLoggedIn) {
     return (
       <AuthPopup
@@ -120,7 +114,7 @@ export function MyPost() {
     );
   }
 
-  /* ----------------------- 실제 화면 렌더링 ----------------------- */
+  /* ----------------------- 실제 렌더링 ----------------------- */
 
   return (
     <div className="px-4 md:px-8 max-w-[1300px] mx-auto">
@@ -139,6 +133,7 @@ export function MyPost() {
       <div className="hidden lg:flex justify-center gap-8 min-h-[500px]">
         <ResizablePanelGroup direction="horizontal">
 
+          {/* 왼쪽 패널: 글 작성 */}
           <ResizablePanel defaultSize={50} minSize={30}>
             <div className="max-w-[550px] mx-auto">
               <WritePostForm onPostSuccess={() => fetchPosts(1)} />
@@ -147,10 +142,14 @@ export function MyPost() {
 
           <ResizableHandle />
 
+          {/* 오른쪽 패널: 게시판 */}
           <ResizablePanel minSize={30}>
             <div className="max-w-[550px] mx-auto">
 
-              <h2 className="text-2xl font-medium mb-4">My Post</h2>
+              {/* ✔ 게시판 상단 제목 — AnalysisHistory와 동일 스타일 */}
+              <h1 className="mb-6 text-3xl font-semibold">
+                My Post
+              </h1>
 
               <div className="flex justify-end mb-3">
                 <Button
@@ -193,8 +192,11 @@ export function MyPost() {
         </ResizablePanelGroup>
       </div>
 
+
       {/* ---------------- 모바일 화면 ---------------- */}
       <div className="lg:hidden mt-4 w-full">
+
+        {/* 탭 전환 */}
         <div className="mb-3 flex justify-center">
           <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
             <button
@@ -218,12 +220,18 @@ export function MyPost() {
             style={{ transform: mobileTab === "write" ? "translateX(0)" : "translateX(-50%)" }}
           >
 
+            {/* 모바일 글 작성 */}
             <div className="w-1/2 p-4">
               <WritePostForm onPostSuccess={() => fetchPosts(1)} />
             </div>
 
+            {/* 모바일 게시판 */}
             <div className="w-1/2 p-4">
-              <h2 className="text-xl font-medium mb-3">My Post</h2>
+
+              {/* ✔ 모바일에서도 AnalysisHistory 스타일로 제목 적용 */}
+              <h1 className="text-2xl font-semibold mb-4">
+                My Post
+              </h1>
 
               <div className="flex justify-end mb-3">
                 <Button
