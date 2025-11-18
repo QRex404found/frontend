@@ -12,8 +12,7 @@ export default function DeleteAccountTab({ onClose }) {
 
   const handleDelete = async () => {
 
-     console.log("🔥 handleDelete 호출됨 (현재 버전)");
-    // 🔹 Google One-Tap 자동 팝업 억제
+    // Google One-Tap 자동 팝업 억제
     try {
       window.google?.accounts?.id?.cancel?.();
       window.google?.accounts?.id?.disableAutoSelect?.();
@@ -21,7 +20,7 @@ export default function DeleteAccountTab({ onClose }) {
       console.warn("Google cleanup skipped:", e);
     }
 
-    // 🔹 Kakao SDK 자동 팝업/자동 로그아웃 억제
+    // Kakao SDK 자동 팝업/자동 로그아웃 억제
     try {
       if (window.Kakao?.Auth) {
         // logout(), unlink()는 절대 호출하지 말 것
@@ -32,16 +31,16 @@ export default function DeleteAccountTab({ onClose }) {
     }
 
     try {
-      // 🔹 1) 백엔드에 탈퇴 요청
+      //1) 백엔드에 탈퇴 요청
       await deleteAccountApi();
 
-      // 🔹 2) 로컬 토큰 삭제
+      // 2) 로컬 토큰 삭제
       removeToken();
 
-      // 🔹 3) 전역 auth 상태 로그아웃
+      // 3) 전역 auth 상태 로그아웃
       logout?.();
 
-      // 🔹 4) 마이페이지 탭 닫기
+      // 4) 마이페이지 탭 닫기
       onClose?.();
 
       // 🔹 5) 성공 toast
