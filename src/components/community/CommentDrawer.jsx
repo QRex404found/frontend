@@ -138,7 +138,7 @@ export const CommentDrawer = ({
 
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <button className="flex-shrink-0 p-1 mt-1 text-gray-500 hover:text-gray-700">
+                            <button className="flex-shrink-0 p-1 mt-1 mr-2 text-gray-500 hover:text-gray-700">
                               <MoreHorizontal className="w-4 h-4" />
                             </button>
                           </DropdownMenuTrigger>
@@ -180,7 +180,7 @@ export const CommentDrawer = ({
             placeholder="Add a comment..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            className="flex-grow min-h-0 break-all resize-none max-h-24"
+            className="flex-grow min-h-0 break-words resize-none max-h-24"
             rows={1}
           />
           <Button type="submit" className="bg-[#7CCF00] text-white hover:bg-[#65A30D]">

@@ -32,23 +32,6 @@ export default function ChatBody({ isOpen }) {
     }
   };
 
-  // ⭐ 3) 시트 닫힐 때 메시지 초기화 + sessionStorage도 초기화
-  useEffect(() => {
-    if (!isOpen) {
-      const timer = setTimeout(() => {
-        sessionStorage.removeItem("qrex_chat_messages"); // ⭐ 추가됨
-        setMessages([
-          {
-            id: 1,
-            role: "assistant",
-            text: "안녕하세요! QRex 보안 에이전트입니다. 무엇을 도와드릴까요? 🛡️",
-          },
-        ]);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
@@ -61,7 +44,7 @@ export default function ChatBody({ isOpen }) {
     }
   }, []);
 
-  // ⭐ 2) 메시지가 변할 때마다 저장
+  // 2) 메시지가 변할 때마다 저장
   useEffect(() => {
     sessionStorage.setItem("qrex_chat_messages", JSON.stringify(messages));
   }, [messages]);
@@ -91,7 +74,7 @@ export default function ChatBody({ isOpen }) {
       const response = await apiClient.get("/ai/chat", {
         params: {
           message: trimmed,
-          // ⭐️ userId로 guestId를 전송 (백엔드에서 conversationId로 사용됨)
+          // userId로 guestId를 전송 (백엔드에서 conversationId로 사용됨)
           userId: guestId
         },
       });
