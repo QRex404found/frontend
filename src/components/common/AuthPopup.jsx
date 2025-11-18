@@ -52,7 +52,7 @@ export function AuthPopup({ show, isMandatory }) {
             </Button>
           )}
 
-          <Button onClick={handleLoginClick}>로그인</Button>
+          <Button onClick={handleLoginClick} className="bg-lime-500 hover:bg-lime-600">로그인</Button>
         </div>
       </DialogContent>
     </Dialog>

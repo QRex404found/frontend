@@ -1,5 +1,3 @@
-// src/App.jsx (이 코드로 파일 전체를 덮어쓰세요)
-
 import { Routes, Route } from 'react-router-dom';
 import { Header } from './components/common/Header.jsx';
 import { Home } from './pages/Home.jsx';
@@ -10,8 +8,8 @@ import { Community } from './pages/Community.jsx';
 import { MyPost } from './pages/MyPost.jsx';
 import AnalyzingQR from './pages/AnalyzingQR.jsx';
 import { Toaster } from "sonner";
-// ⬇️ [수정 1] OAuthCallback 페이지 임포트
 import { OAuthCallback } from './pages/OAuthCallback.jsx';
+import QrexChatWidget from '@/components/chat/QrexChatWidget.jsx'; //챗봇 버튼+sheet 전체.
 
 function App() {
   return (
@@ -30,7 +28,7 @@ function App() {
           <Route path="/login/callback" element={<OAuthCallback />} />
         </Routes>
       </main>
-
+      <QrexChatWidget />
       <Toaster
         toastOptions={{
           className: "qrex-toast",

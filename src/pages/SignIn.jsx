@@ -77,7 +77,7 @@ export function SignIn() {
               required
             />
             {error && <p className="text-sm text-red-500">{error}</p>}
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full bg-lime-500 hover:bg-lime-600">
               로그인
             </Button>
           </form>
