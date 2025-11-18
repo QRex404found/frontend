@@ -24,7 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { toast } from "sonner"; // ✅ toast 적용
+import { toast } from "sonner";
 
 export const CommentDrawer = ({
   isOpen,
@@ -50,7 +50,6 @@ export const CommentDrawer = ({
     return () => unlockScroll();
   }, [isOpen]);
 
-  // ✅ 댓글 등록
   const handleSubmitComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -67,7 +66,6 @@ export const CommentDrawer = ({
     }
   };
 
-  // ✅ 댓글 신고
   const handleReportComment = async (commentId) => {
     try {
       await reportCommentApi(commentId);
@@ -77,7 +75,6 @@ export const CommentDrawer = ({
     }
   };
 
-  // ✅ 댓글 삭제 (자동 새로고침 포함)
   const handleDeleteComment = async (commentId) => {
     try {
       await deleteCommentApi(commentId);
@@ -98,12 +95,13 @@ export const CommentDrawer = ({
       disablePreventScroll
     >
       <DrawerContent className={`h-[70vh] flex flex-col rounded-t-xl ${className}`}>
+        
         <DrawerHeader>
           <DrawerTitle>COMMENT</DrawerTitle>
         </DrawerHeader>
 
-        {/* 댓글 목록 */}
-        <ScrollArea className="flex-grow p-4">
+        {/* ✅ 댓글 영역만 스크롤되도록 수정 */}
+        <ScrollArea className="flex-grow min-h-0 p-4">
           <div className="space-y-6">
             {comments.length === 0 ? (
               <div className="py-10 text-center text-gray-500">
@@ -111,7 +109,6 @@ export const CommentDrawer = ({
               </div>
             ) : (
               comments.map((comment) => {
-                // ✅ 본인 댓글 판별 (게시글과 동일 방식)
                 const authorId =
                   comment?.userId ??
                   comment?.user?.id ??
@@ -139,7 +136,6 @@ export const CommentDrawer = ({
                           </p>
                         </div>
 
-                        {/* 메뉴 */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <button className="flex-shrink-0 p-1 mt-1 text-gray-500 hover:text-gray-700">
@@ -175,8 +171,11 @@ export const CommentDrawer = ({
           </div>
         </ScrollArea>
 
-        {/* 댓글 입력 */}
-        <form onSubmit={handleSubmitComment} className="flex items-end gap-2 p-4 border-t">
+        {/* 입력창 고정 (절대 밀리지 않도록) */}
+        <form
+          onSubmit={handleSubmitComment}
+          className="flex items-end gap-2 p-4 border-t flex-shrink-0"
+        >
           <Textarea
             placeholder="Add a comment..."
             value={newComment}
@@ -184,10 +183,11 @@ export const CommentDrawer = ({
             className="flex-grow min-h-0 break-all resize-none max-h-24"
             rows={1}
           />
-          <Button type="submit" className="bg-[#81BF59] text-white hover:bg-[#7CB54C]">
+          <Button type="submit" className="bg-[#7CCF00] text-white hover:bg-[#65A30D]">
             Submit
           </Button>
         </form>
+
       </DrawerContent>
     </Drawer>
   );

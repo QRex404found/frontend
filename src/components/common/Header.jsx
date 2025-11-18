@@ -14,8 +14,6 @@ import { LogOut, CircleUser, Menu } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-
-// 🔥 컴포넌트 경로가 맞는지 확인해주세요!
 import EditProfileTab from "@/components/profile/EditProfileTab"; 
 import DeleteAccountTab from "@/components/profile/DeleteAccountTab"; // 아까 수정한 파일 경로
 
@@ -27,10 +25,10 @@ export function Header() {
   const [open, setOpen] = React.useState(false);
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
 
-  // ✅ [핵심] 소셜 유저 판별 (ID가 kakao_ 또는 google_ 로 시작)
+  // [핵심] 소셜 유저 판별 (ID가 kakao_ 또는 google_ 로 시작)
   const currentUserId = user?.id || user?.userId;
 
-  // 2. 찾아낸 ID로 소셜 유저인지 판별합니다.
+  // 2. 찾아낸 ID로 소셜 유저인지 판별.
   const isSocialUser = currentUserId && (
     currentUserId.startsWith('kakao_') || 
     currentUserId.startsWith('google_')
@@ -64,7 +62,15 @@ export function Header() {
           <NavigationMenuList className="flex items-center justify-center gap-10">
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link to="/analysis" className="text-sm font-medium md:text-lg hover:text-primary">Analysis</Link>
+                <Link to="/analysis" onClick={(e) => { 
+                  e.preventDefault();
+                  navigate(`/analysis?refresh=${Date.now()}`);
+                  }}
+                  className="text-sm font-medium md:text-lg hover:text-primary"
+                >
+                  Analysis
+                </Link>
+
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
@@ -100,12 +106,12 @@ export function Header() {
                 alignOffset={-200}
                 className="w-[420px] p-4 rounded-xl bg-white shadow-lg border max-w-[100vw]"
               >
-                {/* ✅ [핵심] 소셜 유저면 'delete' 탭이 기본, 아니면 'edit'이 기본 */}
+                {/* [핵심] 소셜 유저면 'delete' 탭이 기본, 아니면 'edit'이 기본 */}
                 <Tabs defaultValue={isSocialUser ? "delete" : "edit"} className="w-full">
 
                   <TabsList className="inline-flex bg-gray-200 rounded-md p-1.5 gap-1 max-w-max">
                     
-                    {/* ✅ 소셜 유저가 아닐 때만 수정 버튼 보이기 */}
+                    {/* 소셜 유저가 아닐 때만 수정 버튼 보이기 */}
                     {!isSocialUser && (
                       <TabsTrigger value="edit" className="px-3 py-2 rounded text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm">
                         Edit Profile
@@ -117,7 +123,7 @@ export function Header() {
                     </TabsTrigger>
                   </TabsList>
 
-                  {/* ✅ 소셜 유저가 아닐 때만 수정 내용 보이기 */}
+                  {/* 소셜 유저가 아닐 때만 수정 내용 보이기 */}
                   {!isSocialUser && (
                     <TabsContent value="edit" className="pt-4 text-sm max-h-[330px] overflow-y-auto">
                       <EditProfileTab onClose={() => setOpen(false)} />

@@ -134,7 +134,7 @@ const WritePostForm = ({ onPostSuccess }) => {
                     className="text-sm"
                 />
 
-                {/* 🔥 스크롤 가능 Textarea (높이 고정 + 내용 많으면 스크롤) */}
+                {/*  스크롤 가능 Textarea (높이 고정 + 내용 많으면 스크롤) */}
                 <Textarea
                     placeholder="CONTEXT"
                     value={context}
