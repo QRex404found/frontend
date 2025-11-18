@@ -7,10 +7,8 @@ import WritePostForm from '@/components/community/WritePostForm';
 import { getMyPostsApi, deletePostApi } from '@/api/community';
 import { PostDetailModal } from '@/components/community/PostDetailModal';
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { CommonBoard } from '@/components/common/CommonBoard';
 import { useNavigate } from 'react-router-dom';
-import { Card } from "@/components/ui/card";   // 🔥 반드시 필요
+import { Card } from "@/components/ui/card";
 
 import {
   ResizablePanelGroup,
@@ -18,10 +16,11 @@ import {
   ResizableHandle,
 } from "@/components/ui/resizable";
 
+import MyPostBoard from '@/components/community/MyPostBoard'; // 🔥 추가됨
+
 const ITEMS_PER_PAGE = 8;
 
 export function MyPost() {
-
   const navigate = useNavigate();
   const { isLoggedIn, isChecked } = useAuth();
 
@@ -38,7 +37,7 @@ export function MyPost() {
 
   const [mobileTab, setMobileTab] = useState("write");
 
-  /* ----------------------- 게시글 목록 로드 ----------------------- */
+  /* 게시글 로드 */
   useEffect(() => {
     if (isChecked && isLoggedIn) {
       fetchPosts(currentPage);
@@ -54,6 +53,7 @@ export function MyPost() {
         title: p.title,
         date: p.createdAt,
       }));
+
       setMyPosts(mapped);
       setTotalPages(Math.max(data.totalPages || 1, 1));
     } finally {
@@ -61,7 +61,7 @@ export function MyPost() {
     }
   };
 
-  /* ----------------------- 삭제 모드 ----------------------- */
+  /* 삭제 모드 */
   const toggleDeleteMode = () => {
     if (isDeleting && selectedPosts.length > 0) {
       deleteSelected();
@@ -90,7 +90,7 @@ export function MyPost() {
     );
   };
 
-  /* ----------------------- 상세보기 ----------------------- */
+  /* 상세 */
   const openDetail = (item) => {
     setSelectedBoardId(item.id);
     setShowDetail(true);
@@ -98,11 +98,11 @@ export function MyPost() {
 
   const showEmpty = !isLoading && myPosts.length === 0;
 
-  /* ----------------------- 인증 상태 ----------------------- */
+  /* 인증 체크 */
   if (!isChecked) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-gray-500">Loading...</div>
+      <div className="flex items-center justify-center h-screen text-gray-500">
+        Loading...
       </div>
     );
   }
@@ -117,12 +117,10 @@ export function MyPost() {
     );
   }
 
-  /* ----------------------- 실제 렌더링 ----------------------- */
-
+  /* 렌더링 */
   return (
     <div className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4">
 
-      {/* 상세 모달 */}
       {showDetail && (
         <PostDetailModal
           isOpen={showDetail}
@@ -132,75 +130,46 @@ export function MyPost() {
         />
       )}
 
-      {/* ---------------- PC 화면 ---------------- */}
+      {/* PC 화면 */}
       <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
         <ResizablePanelGroup direction="horizontal">
 
-          {/* 왼쪽 패널: 글 작성 */}
+          {/* 왼쪽: 글 작성 */}
           <ResizablePanel defaultSize={50} minSize={30}>
             <div className="max-w-[550px] mx-auto h-full flex flex-col">
-              
-              {/* 🔥 QRScanPanel 카드 레이아웃과 동일하게 변경 */}
               <Card className="h-full w-full p-6 flex flex-col">
                 <WritePostForm onPostSuccess={() => fetchPosts(1)} />
               </Card>
-
             </div>
           </ResizablePanel>
 
           <ResizableHandle />
 
-          {/* 오른쪽 패널: 게시판 */}
+          {/* 오른쪽: 게시판 (분리된 컴포넌트 사용) */}
           <ResizablePanel minSize={30}>
             <div className="max-w-[550px] mx-auto">
-
-              <h1 className="mb-6 text-3xl font-semibold">
-                My Post
-              </h1>
-
-              <div className="flex justify-end mb-3">
-                <Button
-                  onClick={toggleDeleteMode}
-                  variant={isDeleting ? "default" : "outline"}
-                  className={`
-                    w-[80px] text-sm font-medium
-                    ${isDeleting
-                      ? "bg-[#7CCF00] text-white border-[#7CCF00] hover:bg-[#6AC600]"
-                      : "text-gray-700 border-gray-300 hover:bg-gray-100"
-                    }
-                  `}
-                >
-                  {isDeleting ? "Submit" : "Delete"}
-                </Button>
-              </div>
-
-              {!showEmpty ? (
-                <CommonBoard
-                  posts={myPosts}
-                  isLoading={isLoading}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                  onItemClick={openDetail}
-                  isDeleting={isDeleting}
-                  selectedPosts={selectedPosts}
-                  onCheckboxChange={toggleSelect}
-                  rowHeightClass="h-12"
-                />
-              ) : (
-                <div className="py-10 text-center text-gray-500">
-                  등록된 게시물이 없습니다.
-                </div>
-              )}
-
+              <MyPostBoard
+                title="My Post"
+                isDeleting={isDeleting}
+                toggleDeleteMode={toggleDeleteMode}
+                myPosts={myPosts}
+                isLoading={isLoading}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                setCurrentPage={setCurrentPage}
+                openDetail={openDetail}
+                selectedPosts={selectedPosts}
+                toggleSelect={toggleSelect}
+                showEmpty={showEmpty}
+                rowHeightClass="h-12"
+              />
             </div>
           </ResizablePanel>
 
         </ResizablePanelGroup>
       </div>
 
-
-      {/* ---------------- 모바일 화면 ---------------- */}
+      {/* 모바일 화면 */}
       <div className="lg:hidden mt-4 w-full">
 
         <div className="mb-3 flex justify-center">
@@ -221,6 +190,7 @@ export function MyPost() {
         </div>
 
         <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+
           <div
             className="flex w-[200%] transition-transform duration-300"
             style={{ transform: mobileTab === "write" ? "translateX(0)" : "translateX(-50%)" }}
@@ -233,52 +203,28 @@ export function MyPost() {
               </Card>
             </div>
 
-            {/* 모바일 게시판 */}
+            {/* 모바일 게시판 (분리된 컴포넌트 재사용) */}
             <div className="w-1/2 p-4">
-
-              <h1 className="text-2xl font-semibold mb-4">
-                My Post
-              </h1>
-
-              <div className="flex justify-end mb-3">
-                <Button
-                  onClick={toggleDeleteMode}
-                  variant={isDeleting ? "default" : "outline"}
-                  className={`
-                    w-[80px] text-sm font-medium
-                    ${isDeleting
-                      ? "bg-[#7CCF00] text-white border-[#7CCF00] hover:bg-[#6AC600]"
-                      : "text-gray-700 border-gray-300 hover:bg-gray-100"
-                    }
-                  `}
-                >
-                  {isDeleting ? "Submit" : "Delete"}
-                </Button>
-              </div>
-
-              {!showEmpty ? (
-                <CommonBoard
-                  posts={myPosts}
-                  isLoading={isLoading}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                  onItemClick={openDetail}
-                  isDeleting={isDeleting}
-                  selectedPosts={selectedPosts}
-                  onCheckboxChange={toggleSelect}
-                  rowHeightClass="h-14"
-                />
-              ) : (
-                <div className="py-10 text-center text-gray-500">
-                  등록된 게시물이 없습니다.
-                </div>
-              )}
-
+              <MyPostBoard
+                title="My Post"
+                isDeleting={isDeleting}
+                toggleDeleteMode={toggleDeleteMode}
+                myPosts={myPosts}
+                isLoading={isLoading}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                setCurrentPage={setCurrentPage}
+                openDetail={openDetail}
+                selectedPosts={selectedPosts}
+                toggleSelect={toggleSelect}
+                showEmpty={showEmpty}
+                rowHeightClass="h-14"
+              />
             </div>
 
           </div>
         </div>
+
       </div>
 
     </div>

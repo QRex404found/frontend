@@ -204,7 +204,7 @@ export function SignUp() {
 
             <Button
               type="submit"
-              className="w-full mt-4 h-10 bg-lime-500 hover:bg-lime-600 text-lg font-bold shadow-md"
+              className="w-full mt-4 h-10 bg-lime-500 hover:bg-lime-600 text-lg font-medium shadow-md"
             >
               Sign up
             </Button>

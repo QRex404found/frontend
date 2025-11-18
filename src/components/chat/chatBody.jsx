@@ -1,19 +1,22 @@
 // src/components/chat/ChatBody.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send } from "lucide-react";
+import { Send, Loader2 } from "lucide-react"; // ⭐️ 로딩 아이콘 추가
+import axios from "axios"; // ⭐️ 통신용 라이브러리
 import qrexProfile from "@/assets/qrex_profile.png";
 
-export default function ChatBody() {
+// ⭐️ 부모에게서 isOpen(채팅창 열림 여부)을 prop으로 받습니다.
+export default function ChatBody({ isOpen }) {
   const [messages, setMessages] = useState([
     {
       id: 1,
       role: "assistant",
-      text: "안녕하세요! 어떤 도움이 필요하신가요?",
+      text: "안녕하세요! QRex 보안 에이전트입니다. 무엇을 도와드릴까요? 🛡️",
     },
   ]);
 
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // ⭐️ 답변 대기 상태 관리
 
   const viewportRef = useRef(null);
 
@@ -24,78 +27,124 @@ export default function ChatBody() {
     }
   };
 
-  //메시지 배열이 변할 때 마다 맨 아래로 가도록.
+  // ⭐️ [핵심] 채팅창이 닫히면(isOpen === false) 대화 내용 초기화
+  useEffect(() => {
+    if (!isOpen) {
+      // 약간의 지연을 주어 닫히는 애니메이션 동안은 내용이 보이게 함 (선택사항)
+      const timer = setTimeout(() => {
+        setMessages([
+          {
+            id: 1,
+            role: "assistant",
+            text: "안녕하세요! QRex 보안 에이전트입니다. 무엇을 도와드릴까요? 🛡️",
+          },
+        ]);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isLoading]); // 로딩 상태가 변할 때도 스크롤
 
-  //컴포넌트가 처음 렌더링될 때 실행.
+  // 초기 렌더링 시 스크롤
   useEffect(() => {
-    const viewport = document.querySelector(
-      "[data-radix-scroll-area-viewport]"
-    );
+    const viewport = document.querySelector("[data-radix-scroll-area-viewport]");
     if (viewport) {
       viewportRef.current = viewport;
       scrollToBottom();
     }
   }, []);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const trimmed = input.trim();
-    if (!trimmed) return; //아무 내용이 없다면(공백) 메시지 전송없이 함수 종료
+    if (!trimmed || isLoading) return; // 로딩 중이면 전송 막기
 
+    // 1. 사용자 메시지 화면에 즉시 추가
     const userMessage = {
       id: Date.now(),
       role: "user",
       text: trimmed,
     };
-
-    const mockReply = {
-      id: Date.now() + 1,
-      role: "assistant",
-      text: "아직은 UI만 연결된 상태예요. 곧 QRex 에이전트와 연결됩니다!",
-    };
-
-    setMessages((prev) => [...prev, userMessage, mockReply]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    scrollToBottom();
+    setIsLoading(true); // 로딩 시작
+
+    try {
+      // ❌ 삭제: 프론트에서 토큰 확인해서 isLoggedIn 보낼 필요 없음!
+      // const token = localStorage.getItem("accessToken");
+      // const isLoggedIn = !!token; 
+
+      // 2. Main Backend(8080)로 요청 전송 (토큰이 있다면 헤더에 자동 포함됨)
+      // axios 설정(interceptor)이 되어 있다면 헤더에 Authorization이 자동으로 붙어서 갑니다.
+      const response = await axios.get("http://localhost:8080/api/ai/chat", {
+        params: {
+          message: trimmed,
+          // isLoggedIn 파라미터 제거 (백엔드가 SecurityContext에서 확인함)
+        },
+        // 만약 axios global 설정이 안 되어 있다면 아래처럼 명시적으로 헤더 추가
+        headers: {
+          Authorization: localStorage.getItem("accessToken")
+            ? `Bearer ${localStorage.getItem("accessToken")}`
+            : ""
+        }
+      });
+
+      // 4. AI 응답 추가
+      const aiMessage = {
+        id: Date.now() + 1,
+        role: "assistant",
+        text: response.data, // 서버에서 준 String 응답
+      };
+      setMessages((prev) => [...prev, aiMessage]);
+
+    } catch (error) {
+      console.error("AI Error:", error);
+      const errorMessage = {
+        id: Date.now() + 2,
+        role: "assistant",
+        text: "죄송합니다. AI 서버와 연결할 수 없습니다. 😢",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false); // 로딩 끝
+    }
   };
 
-  const handleEnter = (e) => { //엔터키 누르면 전송 가능
-    if (e.key === "Enter" && !e.shiftKey) { //shift+ender는 줄바꿈
+  const handleEnter = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex flex-col h-full">
       {/* 메시지 영역 */}
-      <div className="flex-1 overflow-hidden px-4">
+      <div className="flex-1 px-4 overflow-hidden">
         <ScrollArea className="h-full pr-2">
-          <div className="flex flex-col justify-end min-h-full gap-5">
+          <div className="flex flex-col justify-end min-h-full gap-5 pb-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex items-end ${
-                  msg.role === "user" ? "justify-end" : "justify-start"
-                }`}
+                className={`flex items-end ${msg.role === "user" ? "justify-end" : "justify-start"
+                  }`}
               >
                 {msg.role === "assistant" && (
                   <img
                     src={qrexProfile}
                     alt="Q-Rex"
-                    className="w-10 h-10 rounded-full mr-2 object-contain bg-white shadow-sm"
+                    className="object-contain w-10 h-10 mr-2 bg-white border rounded-full shadow-sm"
                   />
                 )}
 
                 <div
                   className={`
-                    max-w-[75%] px-4 py-2 text-sm rounded-2xl
-                    ${
-                      msg.role === "user"
-                        ? "bg-lime-500 text-white rounded-br-none"
-                        : "bg-[#E2E8F0] text-black rounded-bl-none"
+                    max-w-[75%] px-4 py-2 text-sm rounded-2xl whitespace-pre-wrap 
+                    ${msg.role === "user"
+                      ? "bg-lime-500 text-white rounded-br-none"
+                      : "bg-[#E2E8F0] text-black rounded-bl-none"
                     }
                   `}
                 >
@@ -103,25 +152,45 @@ export default function ChatBody() {
                 </div>
               </div>
             ))}
+
+            {/* ⭐️ 로딩 인디케이터 (답변 생성 중일 때 표시) */}
+            {isLoading && (
+              <div className="flex items-end justify-start">
+                <img
+                  src={qrexProfile}
+                  alt="Q-Rex"
+                  className="object-contain w-10 h-10 mr-2 bg-white border rounded-full shadow-sm"
+                />
+                <div className="bg-[#E2E8F0] text-gray-500 px-4 py-2 text-sm rounded-2xl rounded-bl-none flex items-center">
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  답변 생성 중...
+                </div>
+              </div>
+            )}
           </div>
         </ScrollArea>
       </div>
 
       {/* 입력창 */}
-      <div className="border-t px-4 py-3 bg-white">
-        <div className="flex items-center w-full bg-[#F1F5F9] rounded-full px-4 py-[6px] shadow-sm">
+      <div className="px-4 py-3 bg-white border-t">
+        <div className="flex items-center w-full bg-[#F1F5F9] rounded-full px-4 py-[6px] shadow-sm focus-within:ring-2 focus-within:ring-lime-200 transition-all">
           <input
-            className="flex-grow bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400"
-            placeholder="Write a message..."
+            className="flex-grow text-sm text-gray-800 bg-transparent outline-none placeholder:text-gray-400"
+            placeholder={isLoading ? "답변을 기다리는 중..." : "메시지를 입력하세요..."}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleEnter}
+            disabled={isLoading} // 로딩 중엔 입력 방지
           />
           <button
             onClick={handleSend}
-            className="ml-2 h-9 w-9 rounded-full bg-lime-500 hover:bg-lime-600 flex items-center justify-center transition-colors"
+            disabled={isLoading || !input.trim()}
+            className={`ml-2 h-9 w-9 rounded-full flex items-center justify-center transition-colors ${isLoading || !input.trim()
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-lime-500 hover:bg-lime-600"
+              }`}
           >
-            <Send className="h-4 w-4 text-white" />
+            <Send className="w-4 h-4 text-white" />
           </button>
         </div>
       </div>

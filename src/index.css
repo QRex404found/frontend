@@ -69,7 +69,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* ✅ 이제 전역 적용 */
+/* ✅ 전역 설정 */
 html {
   @apply font-kopub;
   scrollbar-gutter: stable; /*스크롤바 유무와 상관없이 레이아웃 폭을 일정하게 유지*/
@@ -162,14 +162,20 @@ html {
   background: rgba(255,255,255,0.16);
 }
 
-
-
-
+/* ⭐⭐⭐ [수정된 부분] ⭐⭐⭐ 
+  기본 스타일 레이어에 입력창, 버튼, Sonner(알림창) 폰트 강제 적용 규칙 추가
+*/
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground font-light;
+  }
+
+  /* 👇 여기가 핵심입니다! */
+  /* input, button, select, 그리고 Sonner 라이브러리(data-sonner-toaster)까지 모두 KoPub 폰트 강제 적용 */
+  input, textarea, button, select, [data-sonner-toaster] {
+    font-family: "KoPubWorldDotum", sans-serif !important;
   }
 }
