@@ -130,7 +130,7 @@ export function MyPost() {
         />
       )}
 
-      {/* PC 화면 */}
+      {/* ---------------- PC 화면 ---------------- */}
       <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
         <ResizablePanelGroup direction="horizontal">
 
@@ -147,35 +147,39 @@ export function MyPost() {
 
           {/* 오른쪽: 게시판 */}
           <ResizablePanel minSize={30}>
-            {/* 🔥 QR Analysis History와 동일한 시작점 맞춤 (pt-2) */}
-            <div className="max-w-[550px] mx-auto pt-2">
+            {/* 🔥 AnalysisHistory와 100% 동일한 구조 */}
+            <div className="pl-4 h-full flex flex-col">
+              <div className="w-full px-2 md:px-4 py-2 flex flex-col">
 
-              {/* 🔥 PC에서만 제목 렌더링 */}
-              <h1 className="mb-6 text-3xl font-semibold hidden lg:block">
-                My Post
-              </h1>
+                {/* 제목 (PC 전용) */}
+                <h1 className="mb-6 text-3xl font-semibold hidden lg:block">
+                  My Post
+                </h1>
 
-              <MyPostBoard
-                isDeleting={isDeleting}
-                toggleDeleteMode={toggleDeleteMode}
-                myPosts={myPosts}
-                isLoading={isLoading}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                setCurrentPage={setCurrentPage}
-                openDetail={openDetail}
-                selectedPosts={selectedPosts}
-                toggleSelect={toggleSelect}
-                showEmpty={showEmpty}
-                rowHeightClass="h-12"
-              />
+                {/* 게시판 */}
+                <MyPostBoard
+                  isDeleting={isDeleting}
+                  toggleDeleteMode={toggleDeleteMode}
+                  myPosts={myPosts}
+                  isLoading={isLoading}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  setCurrentPage={setCurrentPage}
+                  openDetail={openDetail}
+                  selectedPosts={selectedPosts}
+                  toggleSelect={toggleSelect}
+                  showEmpty={showEmpty}
+                  rowHeightClass="h-12"
+                />
+
+              </div>
             </div>
           </ResizablePanel>
 
         </ResizablePanelGroup>
       </div>
 
-      {/* 모바일 화면 */}
+      {/* ---------------- 모바일 화면 ---------------- */}
       <div className="lg:hidden mt-4 w-full">
 
         <div className="mb-3 flex justify-center">
@@ -211,9 +215,7 @@ export function MyPost() {
 
             {/* 모바일 게시판 */}
             <div className="w-1/2 p-4">
-
-              {/* 🔥 모바일에서는 제목 렌더링X (Analysis 페이지와 동일한 정책 적용) */}
-
+              {/* 제목 없음 (Analysis와 동일 정책) */}
               <MyPostBoard
                 isDeleting={isDeleting}
                 toggleDeleteMode={toggleDeleteMode}

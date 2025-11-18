@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Loader2 } from "lucide-react"; // ⭐️ 로딩 아이콘 추가
-import apiClient from "@/api";
+import apiClient from "@/api/index";
 
 
 // ⭐️ 부모에게서 isOpen(채팅창 열림 여부)을 prop으로 받습니다.

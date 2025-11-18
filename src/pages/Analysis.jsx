@@ -150,8 +150,8 @@ export function Analysis() {
 
   if (!isChecked) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
       </div>
     );
   }
@@ -172,8 +172,8 @@ export function Analysis() {
 
   // LeftPanel 렌더링 콘텐츠
   const LeftPanelContent = isDetailLoading ? (
-    <div className="flex justify-center items-center h-full">
-      <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+    <div className="flex items-center justify-center h-full">
+      <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
     </div>
   ) : currentResult ? (
     <AnalysisResultPanel
@@ -198,7 +198,7 @@ export function Analysis() {
 
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className="max-w-[550px] mx-auto h-full flex flex-col">
-                <Card className="h-full w-full p-6 flex items-center justify-center">
+                <Card className="flex items-center justify-center w-full h-full p-6">
                   {LeftPanelContent}
                 </Card>
               </div>
@@ -207,7 +207,7 @@ export function Analysis() {
             <ResizableHandle />
 
             <ResizablePanel minSize={30}>
-              <div className="pl-4 h-full flex flex-col">
+              <div className="flex flex-col h-full pl-4">
                 <AnalysisHistory
                   onSelectResult={handleHistorySelect}
                   refreshKey={historyRefreshKey}
@@ -221,10 +221,10 @@ export function Analysis() {
 
 
         {/* ---- 모바일 레이아웃 ---- */}
-        <div className="lg:hidden mt-4 w-full">
+        <div className="w-full mt-4 lg:hidden">
 
-          <div className="mb-3 flex items-center justify-center">
-            <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-center mb-3">
+            <div className="inline-flex p-1 bg-gray-100 border border-gray-200 rounded-full shadow-sm">
               <button
                 onClick={() => setMobileTab('scan')}
                 className={`px-4 py-1.5 text-sm rounded-full transition-colors ${
@@ -250,7 +250,7 @@ export function Analysis() {
           </div>
 
 
-          <div className="overflow-hidden rounded-lg border relative">
+          <div className="relative overflow-hidden border rounded-lg">
             <div
               className="flex w-[200%] transition-transform duration-300 ease-out"
               style={{
