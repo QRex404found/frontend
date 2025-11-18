@@ -8,25 +8,26 @@
 /* ---------------- 폰트 파일 등록 */
 @font-face {
   font-family: 'KoPubWorldDotum';
-  src: url('/src/assets/fonts/KoPubWorld Dotum Light.woff2') format('woff2');
+  src: url('/fonts/KoPubWorldDotum-Light.woff2') format('woff2');
   font-weight: 300;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'KoPubWorldDotum';
-  src: url('/src/assets/fonts/KoPubWorld Dotum Medium.woff2') format('woff2');
+  src: url('/fonts/KoPubWorldDotum-Medium.woff2') format('woff2');
   font-weight: 500;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'KoPubWorldDotum';
-  src: url('/src/assets/fonts/KoPubWorld Dotum Bold.woff2') format('woff2');
+  src: url('/fonts/KoPubWorldDotum-Bold.woff2') format('woff2');
   font-weight: 700;
   font-display: swap;
 }
 /* -------------------------------- */
+
 
 /* ✅ Tailwind v4 방식 폰트 유틸리티 정의 */
 @theme inline {

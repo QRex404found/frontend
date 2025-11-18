@@ -16,7 +16,7 @@ import {
   ResizableHandle,
 } from "@/components/ui/resizable";
 
-import MyPostBoard from '@/components/community/MyPostBoard'; // 🔥 추가됨
+import MyPostBoard from '@/components/community/MyPostBoard';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -90,7 +90,7 @@ export function MyPost() {
     );
   };
 
-  /* 상세 */
+  /* 상세 보기 */
   const openDetail = (item) => {
     setSelectedBoardId(item.id);
     setShowDetail(true);
@@ -145,11 +145,17 @@ export function MyPost() {
 
           <ResizableHandle />
 
-          {/* 오른쪽: 게시판 (분리된 컴포넌트 사용) */}
+          {/* 오른쪽: 게시판 */}
           <ResizablePanel minSize={30}>
-            <div className="max-w-[550px] mx-auto">
+            {/* 🔥 QR Analysis History와 동일한 시작점 맞춤 (pt-2) */}
+            <div className="max-w-[550px] mx-auto pt-2">
+
+              {/* 🔥 PC에서만 제목 렌더링 */}
+              <h1 className="mb-6 text-3xl font-semibold hidden lg:block">
+                My Post
+              </h1>
+
               <MyPostBoard
-                title="My Post"
                 isDeleting={isDeleting}
                 toggleDeleteMode={toggleDeleteMode}
                 myPosts={myPosts}
@@ -203,10 +209,12 @@ export function MyPost() {
               </Card>
             </div>
 
-            {/* 모바일 게시판 (분리된 컴포넌트 재사용) */}
+            {/* 모바일 게시판 */}
             <div className="w-1/2 p-4">
+
+              {/* 🔥 모바일에서는 제목 렌더링X (Analysis 페이지와 동일한 정책 적용) */}
+
               <MyPostBoard
-                title="My Post"
                 isDeleting={isDeleting}
                 toggleDeleteMode={toggleDeleteMode}
                 myPosts={myPosts}

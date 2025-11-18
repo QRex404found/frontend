@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { CommonBoard } from "@/components/common/CommonBoard";
 
 export default function MyPostBoard({
-  title = "My Post",
   isDeleting,
   toggleDeleteMode,
   myPosts,
@@ -20,10 +19,9 @@ export default function MyPostBoard({
   rowHeightClass = "h-12",
 }) {
   return (
-    <>
-      <h1 className="mb-6 text-3xl font-semibold">{title}</h1>
+    <div className="w-full px-2 md:px-4 py-2 flex flex-col">
 
-      {/* Delete / Submit 버튼 */}
+      {/* Delete / Submit */}
       <div className="flex justify-end mb-3">
         <Button
           onClick={toggleDeleteMode}
@@ -60,6 +58,6 @@ export default function MyPostBoard({
           등록된 게시물이 없습니다.
         </div>
       )}
-    </>
+    </div>
   );
 }

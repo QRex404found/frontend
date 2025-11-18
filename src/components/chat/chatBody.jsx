@@ -2,8 +2,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Loader2 } from "lucide-react"; // ⭐️ 로딩 아이콘 추가
-import axios from "axios"; // ⭐️ 통신용 라이브러리
-import qrexProfile from "@/assets/qrex_profile.png";
+import apiClient from "@/api";
+
 
 // ⭐️ 부모에게서 isOpen(채팅창 열림 여부)을 prop으로 받습니다.
 export default function ChatBody({ isOpen }) {
@@ -59,9 +59,9 @@ export default function ChatBody({ isOpen }) {
 
   const handleSend = async () => {
     const trimmed = input.trim();
-    if (!trimmed || isLoading) return; // 로딩 중이면 전송 막기
+    if (!trimmed || isLoading) return;
 
-    // 1. 사용자 메시지 화면에 즉시 추가
+    // 1. 사용자 메시지 화면 표시
     const userMessage = {
       id: Date.now(),
       role: "user",
@@ -69,33 +69,23 @@ export default function ChatBody({ isOpen }) {
     };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setIsLoading(true); // 로딩 시작
+    setIsLoading(true);
 
     try {
-      // ❌ 삭제: 프론트에서 토큰 확인해서 isLoggedIn 보낼 필요 없음!
-      // const token = localStorage.getItem("accessToken");
-      // const isLoggedIn = !!token; 
-
-      // 2. Main Backend(8080)로 요청 전송 (토큰이 있다면 헤더에 자동 포함됨)
-      // axios 설정(interceptor)이 되어 있다면 헤더에 Authorization이 자동으로 붙어서 갑니다.
-      const response = await axios.get("http://localhost:8080/api/ai/chat", {
+      // 2. apiClient를 사용하여 요청 전송
+      // ✅ [수정됨] baseURL이 이미 설정되어 있으므로 경로는 '/ai/chat'만 쓰면 됩니다.
+      // ✅ [수정됨] 헤더(Authorization) 설정 삭제 (apiClient가 알아서 함)
+      const response = await apiClient.get("/ai/chat", {
         params: {
           message: trimmed,
-          // isLoggedIn 파라미터 제거 (백엔드가 SecurityContext에서 확인함)
         },
-        // 만약 axios global 설정이 안 되어 있다면 아래처럼 명시적으로 헤더 추가
-        headers: {
-          Authorization: localStorage.getItem("accessToken")
-            ? `Bearer ${localStorage.getItem("accessToken")}`
-            : ""
-        }
       });
 
-      // 4. AI 응답 추가
+      // 3. AI 응답 표시
       const aiMessage = {
         id: Date.now() + 1,
         role: "assistant",
-        text: response.data, // 서버에서 준 String 응답
+        text: response.data,
       };
       setMessages((prev) => [...prev, aiMessage]);
 
@@ -108,7 +98,7 @@ export default function ChatBody({ isOpen }) {
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
-      setIsLoading(false); // 로딩 끝
+      setIsLoading(false);
     }
   };
 
@@ -133,10 +123,11 @@ export default function ChatBody({ isOpen }) {
               >
                 {msg.role === "assistant" && (
                   <img
-                    src={qrexProfile}
+                    src="/qrex_profile.png"
                     alt="Q-Rex"
                     className="object-contain w-10 h-10 mr-2 bg-white border rounded-full shadow-sm"
                   />
+
                 )}
 
                 <div
@@ -153,7 +144,7 @@ export default function ChatBody({ isOpen }) {
               </div>
             ))}
 
-            {/* ⭐️ 로딩 인디케이터 (답변 생성 중일 때 표시) */}
+            {/* 로딩 인디케이터 (답변 생성 중일 때 표시) */}
             {isLoading && (
               <div className="flex items-end justify-start">
                 <img
@@ -186,8 +177,8 @@ export default function ChatBody({ isOpen }) {
             onClick={handleSend}
             disabled={isLoading || !input.trim()}
             className={`ml-2 h-9 w-9 rounded-full flex items-center justify-center transition-colors ${isLoading || !input.trim()
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-lime-500 hover:bg-lime-600"
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-lime-500 hover:bg-lime-600"
               }`}
           >
             <Send className="w-4 h-4 text-white" />
