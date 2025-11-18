@@ -38,7 +38,7 @@ export default function AnalyzingQR() {
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
             
-            {/* ⭐ 추가 1: "Analyzing QR" 제목 텍스트 (굵고 크게) */}
+            {/* 추가 1: "Analyzing QR" 제목 텍스트 (굵고 크게) */}
             <h1 className="mb-8 text-4xl font-medium">Analyzing QR</h1> 
 
             <LoadingBar 
@@ -46,7 +46,7 @@ export default function AnalyzingQR() {
                 extractedUrl={extractedUrl}
             />
             
-            {/* ⭐ 추가 2: "Please Wait..." 안내 텍스트 (굵고 크게) */}
+            {/* 추가 2: "Please Wait..." 안내 텍스트 (굵고 크게) */}
             <p className="mt-8 text-3xl font-medium text-gray-800">Please Wait...</p>
         </div>
     );

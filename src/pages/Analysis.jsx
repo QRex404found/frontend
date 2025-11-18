@@ -61,7 +61,7 @@ export function Analysis() {
     setAnalysisResult(result);
     setSelectedHistory(null);
 
-    // 🔥 이 경우에만 History 목록 새로 fetch
+    // 이 경우에만 History 목록 새로 fetch
     setHistoryRefreshKey(prev => prev + 1);
 
     setMobileTab('scan');
@@ -128,7 +128,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-     🔥 제목 수정 후 상태 즉시 반영 + History만 새로고침
+     제목 수정 후 상태 즉시 반영 + History만 새로고침
   --------------------------------------------- */
   const handleTitleUpdated = (id, newTitle) => {
     // LeftPanel 수정
@@ -143,7 +143,7 @@ export function Analysis() {
       titleUpdateRef.current(id, newTitle);
     }
 
-    // 🔥 서버 최신 데이터로 History만 다시 새로고침
+    // 서버 최신 데이터로 History만 다시 새로고침
     setHistoryRefreshKey(prev => prev + 1);
   };
 

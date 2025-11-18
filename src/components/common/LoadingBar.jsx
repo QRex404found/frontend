@@ -159,7 +159,7 @@ export function LoadingBar({ file, extractedUrl }) {
             : 'text-gray-700'}`}
       >
 
-        {stage === LOADING_STAGES.FAKING && `${progress}% `}
+        {/* {stage === LOADING_STAGES.FAKING && `${progress}% `} */} 
 
         {statusMessage}
       </p>

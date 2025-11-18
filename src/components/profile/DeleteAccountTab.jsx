@@ -31,7 +31,7 @@ export default function DeleteAccountTab({ onClose }) {
     }
 
     try {
-      //1) 백엔드에 탈퇴 요청
+      // 1) 백엔드에 탈퇴 요청
       await deleteAccountApi();
 
       // 2) 로컬 토큰 삭제
@@ -43,10 +43,10 @@ export default function DeleteAccountTab({ onClose }) {
       // 4) 마이페이지 탭 닫기
       onClose?.();
 
-      // 🔹 5) 성공 toast
+      // 5) 성공 toast
       toast.success("Your account has been successfully deleted.");
 
-      // 🔹 6) 홈으로 이동
+      // 6) 홈으로 이동
       navigate("/", { replace: true });
 
     } catch (error) {

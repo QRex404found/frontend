@@ -149,7 +149,7 @@ export default function ChatBody({ isOpen }) {
             {isLoading && (
               <div className="flex items-end justify-start">
                 <img
-                  src={qrexProfile}
+                  src="/qrex_profile.png" 
                   alt="Q-Rex"
                   className="object-contain w-10 h-10 mr-2 bg-white border rounded-full shadow-sm"
                 />
