@@ -152,7 +152,7 @@ export function MyPost() {
               <div className="w-full px-2 md:px-4 py-2 flex flex-col">
 
                 {/* 제목 (PC 전용) */}
-                <h1 className="mb-6 text-3xl font-semibold hidden lg:block">
+                <h1 className="mb-4 text-4xl font-medium hidden lg:block">
                   My Post
                 </h1>
 

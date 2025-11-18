@@ -1,10 +1,12 @@
+// src/pages/SignUp.jsx
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { signupApi, checkIdApi } from '@/api/auth';
-import SignupResultDialog from '@/components/common/SignupResultDialog';
+import { toast } from "sonner";
 
 export function SignUp() {
   const [form, setForm] = useState({
@@ -15,17 +17,12 @@ export function SignUp() {
   });
   const [isIdChecked, setIsIdChecked] = useState(false);
   const [idCheckMessage, setIdCheckMessage] = useState('');
-  const [dialogState, setDialogState] = useState({
-    isOpen: false,
-    type: 'success',
-    title: '',
-    message: '',
-  });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setForm((prev) => ({ ...prev, [id]: value }));
+
     if (id === 'id') {
       setIsIdChecked(false);
       setIdCheckMessage('');
@@ -53,64 +50,32 @@ export function SignUp() {
     }
   };
 
-  const handleDialogAction = (actionType) => {
-    setDialogState({ ...dialogState, isOpen: false });
-
-    if (actionType === 'success') {
-      navigate('/login');
-    } else if (actionType === 'failure') {
-      setForm({ name: '', id: '', password: '', confirmPassword: '' });
-      setIsIdChecked(false);
-      setIdCheckMessage('');
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (form.password !== form.confirmPassword) {
-      setDialogState({
-        isOpen: true,
-        type: 'warning',
-        title: '비밀번호 불일치',
-        message: '비밀번호와 비밀번호 확인이 일치하지 않습니다.',
-      });
+      toast.warning("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
       return;
     }
+
     if (!isIdChecked) {
-      setDialogState({
-        isOpen: true,
-        type: 'warning',
-        title: '필수 확인 누락',
-        message: 'ID 중복 확인을 완료해야 회원가입을 진행할 수 있습니다.',
-      });
+      toast.warning("ID 중복 확인을 먼저 완료해야 합니다.");
       return;
     }
 
     try {
-      // ✅ 백엔드 DTO(userPw)에 맞게 수정
-      const response = await signupApi({
+      await signupApi({
         userName: form.name,
         userId: form.id,
         userPw: form.password,
       });
 
-      console.log('회원가입 응답:', response); // ✅ 반드시 콘솔에서 확인 가능
+      toast.success("회원가입이 완료되었습니다!");
+      navigate('/login');
 
-      setDialogState({
-        isOpen: true,
-        type: 'success',
-        title: '회원가입 성공',
-        message: '회원가입이 완료되었습니다!',
-      });
     } catch (error) {
-      console.error('회원가입 실패:', error); // ✅ 실패 로그 추가
-      setDialogState({
-        isOpen: true,
-        type: 'failure',
-        title: '회원가입 실패',
-        message: error.message || '회원가입 중 문제가 발생했습니다.',
-      });
+      console.error("회원가입 실패:", error);
+      toast.error(error.message || "회원가입 중 오류가 발생했습니다.");
     }
   };
 
@@ -123,13 +88,13 @@ export function SignUp() {
             Sign up to QREX and be part of a community!
           </p>
         </CardHeader>
+
         <CardContent className="grid gap-4">
           <form onSubmit={handleSubmit} className="grid gap-4">
+
             {/* Name */}
             <div className="grid gap-2">
-              <label htmlFor="name" className="font-semibold">
-                Name
-              </label>
+              <label htmlFor="name" className="font-semibold">Name</label>
               <Input
                 id="name"
                 type="text"
@@ -140,11 +105,9 @@ export function SignUp() {
               />
             </div>
 
-            {/* ID (with Check Button) */}
+            {/* ID */}
             <div className="grid gap-2">
-              <label htmlFor="id" className="font-semibold">
-                ID
-              </label>
+              <label htmlFor="id" className="font-semibold">ID</label>
               <div className="flex gap-2">
                 <Input
                   id="id"
@@ -174,9 +137,7 @@ export function SignUp() {
 
             {/* Password */}
             <div className="grid gap-2">
-              <label htmlFor="password" className="font-semibold">
-                Password
-              </label>
+              <label htmlFor="password" className="font-semibold">Password</label>
               <Input
                 id="password"
                 type="password"
@@ -211,16 +172,6 @@ export function SignUp() {
           </form>
         </CardContent>
       </Card>
-
-      {/* 회원가입 결과 Dialog */}
-      <SignupResultDialog
-        isOpen={dialogState.isOpen}
-        type={dialogState.type}
-        title={dialogState.title}
-        message={dialogState.message}
-        onClose={() => setDialogState({ ...dialogState, isOpen: false })}
-        onAction={handleDialogAction}
-      />
     </div>
   );
 }

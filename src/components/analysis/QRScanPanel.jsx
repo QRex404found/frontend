@@ -130,8 +130,7 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[450px]">
       <div className="flex flex-col items-center justify-center p-6 space-y-6">
-        <p className="text-2xl font-semibold text-gray-700">QR Scan</p>
-
+        <p className="mb-4 text-2xl font-medium text-gray-700">QR Scan</p>
         <input
           type="file"
           ref={fileInputRef}
@@ -139,7 +138,7 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
           onChange={handleFileSelect}
         />
 
-        {/* ✅ 데스크탑: 예전처럼 드롭다운 없이 바로 파일 탐색기 */}
+        {/* 데스크탑: 바로 파일 탐색기 */}
         {!isMobile && (
           <Button
             className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"
@@ -150,12 +149,12 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
           </Button>
         )}
 
-        {/* ✅ 모바일: 카메라 아이콘 클릭 시 = "파일 선택"과 동일 동작 */}
+        {/*  모바일: 카메라 아이콘 클릭 시 */}
         {isMobile && (
           <Button
             className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"
             size="icon"
-            onClick={handleSelectFile}  // 🔥 핵심 포인트: 파일 선택과 완전히 동일한 로직
+            onClick={handleSelectFile}  
           >
             <Camera className="!w-10 !h-10" />
           </Button>
