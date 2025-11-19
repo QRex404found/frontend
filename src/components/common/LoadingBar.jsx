@@ -15,7 +15,7 @@ export function LoadingBar({ file, extractedUrl }) {
 
   const [progress, setProgress] = React.useState(0);
   const [stage, setStage] = React.useState(LOADING_STAGES.FAKING);
-  const [statusMessage, setSatusMessage] = React.useState('분석 진행 중이니다....');
+  const [statusMessage, setStatusMessage] = React.useState('분석 진행 중입니다...잠시만 기다려주세요.');
 
   const intervalRef = React.useRef(null);
   const apiCalledRef = React.useRef(false);
@@ -40,7 +40,7 @@ export function LoadingBar({ file, extractedUrl }) {
       stopFakeProgress();
       setProgress(100);
       setStage(LOADING_STAGES.COMPLETE);
-      setStatusMessage('분석 완료! 결과 화면으로 이동합니다.'); 
+      setStatusMessage('분석 완료! 결과 화면으로 이동합니다.');
 
       setTimeout(() => {
         navigate('/analysis', {
