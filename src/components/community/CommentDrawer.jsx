@@ -131,8 +131,11 @@ export const CommentDrawer = ({
                             {authorId}
                           </p>
 
-                          {/* 수정된 부분: break-words -> break-all */}
-                          <p className="text-sm text-gray-700 break-all whitespace-pre-wrap">
+                          {/* [수정 포인트]
+                            break-words: 일반적인 단어 줄바꿈 유지
+                            [overflow-wrap:anywhere]: '??????' 같은 특수문자 연속도 강제로 줄바꿈 (핵심)
+                          */}
+                          <p className="text-sm text-gray-700 break-words whitespace-pre-wrap [overflow-wrap:anywhere]">
                             {comment.contents}
                           </p>
                         </div>
