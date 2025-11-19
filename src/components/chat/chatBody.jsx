@@ -6,7 +6,7 @@ import apiClient from "@/api/index";
 
 export default function ChatBody({ isOpen }) {
 
-  // ⭐ 1) sessionStorage에서 메시지 불러오기
+  // 1) sessionStorage에서 메시지 불러오기
   const [messages, setMessages] = useState(() => {
     const saved = sessionStorage.getItem("qrex_chat_messages");
     return saved
@@ -25,24 +25,20 @@ export default function ChatBody({ isOpen }) {
 
   const viewportRef = useRef(null);
 
+  // 스크롤을 아래로 이동시키는 함수
   const scrollToBottom = () => {
-    const viewport = viewportRef.current;
-    if (viewport) {
-      viewport.scrollTop = viewport.scrollHeight;
-    }
+    // setTimeout을 사용하여 DOM 렌더링 후 실행되도록 보장
+    setTimeout(() => {
+      const viewport = document.querySelector("[data-radix-scroll-area-viewport]");
+      if (viewport) {
+        viewport.scrollTop = viewport.scrollHeight;
+      }
+    }, 100);
   };
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading]);
-
-  useEffect(() => {
-    const viewport = document.querySelector("[data-radix-scroll-area-viewport]");
-    if (viewport) {
-      viewportRef.current = viewport;
-      scrollToBottom();
-    }
-  }, []);
+  }, [messages, isLoading, isOpen]); // isOpen이 변경될 때도 스크롤 조정
 
   // 2) 메시지가 변할 때마다 저장
   useEffect(() => {
@@ -64,7 +60,6 @@ export default function ChatBody({ isOpen }) {
     setIsLoading(true);
 
     try {
-      // ⭐️ [핵심] 대화 기억을 위한 ID 생성 로직 재추가
       let guestId = localStorage.getItem("guestId");
       if (!guestId) {
         guestId = "guest-" + Date.now();
@@ -74,16 +69,34 @@ export default function ChatBody({ isOpen }) {
       const response = await apiClient.get("/ai/chat", {
         params: {
           message: trimmed,
-          // userId로 guestId를 전송 (백엔드에서 conversationId로 사용됨)
           userId: guestId
         },
       });
+
+      console.log("Server Response:", response.data); // 디버깅용 로그
+
+      // ⭐️ [핵심 수정] 서버 응답 데이터 처리 로직
+      // 서버가 { "response": "내용" } 형태의 객체를 줄 경우를 대비
+      let aiText = "";
+      
+      if (typeof response.data === 'object' && response.data !== null) {
+        // 에러 로그에 나온대로 'response' 키가 있는지 확인
+        if (response.data.response) {
+           aiText = response.data.response;
+        } else {
+           // 키를 모를 경우 안전하게 문자열로 변환 (백지 방지)
+           aiText = JSON.stringify(response.data); 
+        }
+      } else {
+        // 단순 문자열인 경우
+        aiText = response.data;
+      }
 
       // 4. AI 응답 표시
       const aiMessage = {
         id: Date.now() + 1,
         role: "assistant",
-        text: response.data,
+        text: aiText, // 여기서 이제 확실한 String이 들어갑니다.
       };
       setMessages((prev) => [...prev, aiMessage]);
 
@@ -137,7 +150,10 @@ export default function ChatBody({ isOpen }) {
                     }
                   `}
                 >
-                  {msg.text}
+                  {/* 혹시라도 여전히 객체가 들어올 경우를 대비한 2차 방어선 
+                      객체라면 문자열로 변환해서 출력
+                  */}
+                  {typeof msg.text === 'object' ? JSON.stringify(msg.text) : msg.text}
                 </div>
               </div>
             ))}

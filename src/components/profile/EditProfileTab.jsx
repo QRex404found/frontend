@@ -5,7 +5,7 @@ import { updateProfileApi } from "@/api/auth";
 import { toast } from "sonner";
 
 export default function EditProfileTab({ onClose }) {
-  // ✅ 1. setUser를 가져옵니다 (이름 변경 시 즉시 반영하기 위해)
+  // 1. setUser를 가져옵니다 (이름 변경 시 즉시 반영하기 위해)
   const { user, setUser } = useAuth();
 
   const [name, setName] = useState(user?.username ?? "");
@@ -13,46 +13,50 @@ export default function EditProfileTab({ onClose }) {
   const [verifyPassword, setVerifyPassword] = useState("");
 
   const handleSave = async () => {
-    // 유효성 검사
     if (!name.trim()) {
       toast.error("이름을 입력해주세요.");
       return;
     }
 
-    // 비밀번호를 입력했는데 서로 다르면 중단
     if (password && password !== verifyPassword) {
       toast.error("비밀번호가 일치하지 않습니다.");
       return;
     }
 
     try {
-      // 2. 백엔드에 수정 요청 보내기
-      await updateProfileApi({
+      //  서버에서 새 JWT 토큰을 반환함
+      const res = await updateProfileApi({
         newName: name,
-        newPassword: password || null, // 빈 값이면 null로 보내서 비번 변경 안 함
+        newPassword: password || null,
         verifyPassword: verifyPassword || null,
       });
 
-      // 3. ✅ [핵심] 로그아웃/이동 코드 삭제함!
-      // 대신, 현재 로그인된 유저 상태(이름)만 업데이트합니다.
-      // (기존 user 객체를 복사하고 username만 새 이름으로 덮어씌움)
-      setUser({ ...user, username: name });
+      const newToken = res.data.token; // UserResponse.token
+      if (newToken) {
+        //  토큰 저장
+        localStorage.setItem("accessToken", newToken);
 
-      // 4. 성공 메시지 띄우기
+        //  새 토큰에서 username 추출
+        const payload = JSON.parse(atob(newToken.split(".")[1]));
+
+        // username 변경을 즉시 UI 반영
+        setUser({
+          userId: payload.sub,
+          username: payload.username,
+        });
+      }
+
       toast.success("회원정보가 수정되었습니다.");
 
-      // 5. 비밀번호 입력창 비우기 (보안상 안전)
       setPassword("");
       setVerifyPassword("");
-      
-      // (선택 사항) 수정 후 팝업을 닫고 싶으면 아래 주석 해제
-      // if (onClose) onClose();
 
     } catch (error) {
       console.error(error);
-      toast.error(error.message || "회원정보 수정에 실패했습니다.");
+      toast.error("회원정보 수정에 실패했습니다.");
     }
   };
+
 
   const getPasswordStateClass = () => {
     if (!password && !verifyPassword) return "";

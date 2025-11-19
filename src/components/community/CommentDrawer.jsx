@@ -100,8 +100,7 @@ export const CommentDrawer = ({
           <DrawerTitle>COMMENT</DrawerTitle>
         </DrawerHeader>
 
-        {/* ✅ 댓글 영역만 스크롤되도록 수정 */}
-        <ScrollArea className="flex-grow min-h-0 p-4">
+        <ScrollArea className="flex-grow min-h-0 p-4 overflow-x-hidden">
           <div className="space-y-6">
             {comments.length === 0 ? (
               <div className="py-10 text-center text-gray-500">
@@ -131,7 +130,8 @@ export const CommentDrawer = ({
                           <p className="text-sm font-semibold text-[#81BF59]">
                             {authorId}
                           </p>
-                          <p className="text-sm text-gray-700 break-all whitespace-pre-wrap">
+
+                          <p className="text-sm text-gray-700 break-words whitespace-pre-wrap">
                             {comment.contents}
                           </p>
                         </div>
@@ -171,7 +171,6 @@ export const CommentDrawer = ({
           </div>
         </ScrollArea>
 
-        {/* 입력창 고정 (절대 밀리지 않도록) */}
         <form
           onSubmit={handleSubmitComment}
           className="flex items-end gap-2 p-4 border-t flex-shrink-0"

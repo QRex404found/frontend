@@ -14,7 +14,7 @@ export const LatestCommentPreview = ({ comments }) => {
       <Card
         className={cn(
           'mt-4 p-3 cursor-pointer hover:bg-gray-50 transition-colors',
-          'shadow-sm border-2 border-transparent hover:border-green-500',
+          'shadow-sm border-2 border-transparent hover:border-lime-500',
         )}
       >
         {latestComment ? (
