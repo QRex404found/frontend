@@ -119,29 +119,25 @@ export const CommentDrawer = ({
 
                 return (
                   <div key={comment.commentId} className="flex items-start gap-3">
-                    {/* 아바타 영역 */}
                     <div className="flex-shrink-0 w-8 h-8 mt-1 bg-gray-300 rounded-full" />
                     
-                    {/* [변경 핵심]
-                       Grid를 사용하여 영역을 강제로 고정합니다.
-                       grid-cols-[1fr_auto]: 왼쪽은 남은 공간 전부(1fr), 오른쪽은 내용물 크기만큼(auto)
-                       gap-2: 두 영역 사이 간격
+                    {/* [수정 완료]
+                       grid-cols-[minmax(0,1fr)_auto]: 
+                       왼쪽 텍스트 영역을 '최소 0, 최대 1fr'로 설정하여
+                       내용물이 길어도 영역이 늘어나지 않고 강제로 갇히게 만듭니다.
                     */}
-                    <div className="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-2">
-                        <div className="min-w-0"> {/* 텍스트가 들어갈 고정 영역 */}
+                    <div className="flex-1 min-w-0 grid grid-cols-[minmax(0,1fr)_auto] gap-2">
+                        <div className="min-w-0"> 
                           <p className="text-sm font-semibold text-[#81BF59]">
                             {authorId}
                           </p>
 
-                          {/* break-all: 영역 끝에 닿으면 무조건 줄바꿈
-                             whitespace-pre-wrap: 엔터 줄바꿈 유지
-                          */}
+                          {/* break-all: 갇힌 영역 안에서 강제 줄바꿈 */}
                           <p className="text-sm text-gray-700 break-all whitespace-pre-wrap">
                             {comment.contents}
                           </p>
                         </div>
 
-                        {/* 버튼 영역 (고정됨) */}
                         <div className="pt-1">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
