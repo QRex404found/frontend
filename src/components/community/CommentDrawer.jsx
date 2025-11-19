@@ -57,9 +57,7 @@ export const CommentDrawer = ({
     try {
       await addCommentApi(boardId, newComment);
       setNewComment("");
-
       toast.success("댓글이 등록되었습니다.");
-
       if (onCommentUpdate) onCommentUpdate();
     } catch (error) {
       toast.error("댓글 등록에 실패했습니다.");
@@ -78,9 +76,7 @@ export const CommentDrawer = ({
   const handleDeleteComment = async (commentId) => {
     try {
       await deleteCommentApi(commentId);
-
       if (onCommentUpdate) onCommentUpdate();
-
       toast.success("댓글이 삭제되었습니다.");
     } catch {
       toast.error("댓글 삭제에 실패했습니다.");
@@ -123,52 +119,57 @@ export const CommentDrawer = ({
 
                 return (
                   <div key={comment.commentId} className="flex items-start gap-3">
+                    {/* 아바타 영역 */}
                     <div className="flex-shrink-0 w-8 h-8 mt-1 bg-gray-300 rounded-full" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0 pr-4">
+                    
+                    {/* [변경 핵심]
+                       Grid를 사용하여 영역을 강제로 고정합니다.
+                       grid-cols-[1fr_auto]: 왼쪽은 남은 공간 전부(1fr), 오른쪽은 내용물 크기만큼(auto)
+                       gap-2: 두 영역 사이 간격
+                    */}
+                    <div className="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-2">
+                        <div className="min-w-0"> {/* 텍스트가 들어갈 고정 영역 */}
                           <p className="text-sm font-semibold text-[#81BF59]">
                             {authorId}
                           </p>
 
-                          {/* [최종 해결책] 
-                            break-all: 특수문자 연속(????)도 강제로 끊어버림.
-                            w-full: 부모 영역을 넘지 않도록 너비 강제.
-                            whitespace-pre-wrap: 줄바꿈은 유지.
+                          {/* break-all: 영역 끝에 닿으면 무조건 줄바꿈
+                             whitespace-pre-wrap: 엔터 줄바꿈 유지
                           */}
-                          <p className="text-sm text-gray-700 break-all w-full whitespace-pre-wrap">
+                          <p className="text-sm text-gray-700 break-all whitespace-pre-wrap">
                             {comment.contents}
                           </p>
                         </div>
 
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            {/* flex-shrink-0을 유지하여 버튼이 찌그러지지 않게 함 */}
-                            <button className="flex-shrink-0 p-1 mt-1 mr-2 text-gray-500 hover:text-gray-700">
-                              <MoreHorizontal className="w-4 h-4" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40">
+                        {/* 버튼 영역 (고정됨) */}
+                        <div className="pt-1">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="p-1 text-gray-500 hover:text-gray-700">
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-40">
 
-                            {isMyComment ? (
-                              <DropdownMenuItem
-                                onClick={() => handleDeleteComment(comment.commentId)}
-                                className="text-red-600 focus:bg-red-50 focus:text-red-600"
-                              >
-                                delete comment
-                              </DropdownMenuItem>
-                            ) : (
-                              <DropdownMenuItem
-                                onClick={() => handleReportComment(comment.commentId)}
-                                className="text-[#CA8A04] focus:bg-yellow-50 focus:text-[#CA8A04]"
-                              >
-                                report comment
-                              </DropdownMenuItem>
-                            )}
+                                {isMyComment ? (
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteComment(comment.commentId)}
+                                    className="text-red-600 focus:bg-red-50 focus:text-red-600"
+                                  >
+                                    delete comment
+                                  </DropdownMenuItem>
+                                ) : (
+                                  <DropdownMenuItem
+                                    onClick={() => handleReportComment(comment.commentId)}
+                                    className="text-[#CA8A04] focus:bg-yellow-50 focus:text-[#CA8A04]"
+                                  >
+                                    report comment
+                                  </DropdownMenuItem>
+                                )}
 
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </div>
                   </div>
                 );
