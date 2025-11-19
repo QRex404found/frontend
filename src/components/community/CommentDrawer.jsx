@@ -131,7 +131,8 @@ export const CommentDrawer = ({
                             {authorId}
                           </p>
 
-                          <p className="text-sm text-gray-700 break-words whitespace-pre-wrap">
+                          {/* 수정된 부분: break-words -> break-all */}
+                          <p className="text-sm text-gray-700 break-all whitespace-pre-wrap">
                             {comment.contents}
                           </p>
                         </div>
