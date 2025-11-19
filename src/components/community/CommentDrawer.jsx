@@ -131,17 +131,19 @@ export const CommentDrawer = ({
                             {authorId}
                           </p>
 
-                          {/* [수정 포인트]
-                            break-words: 일반적인 단어 줄바꿈 유지
-                            [overflow-wrap:anywhere]: '??????' 같은 특수문자 연속도 강제로 줄바꿈 (핵심)
+                          {/* [최종 해결책] 
+                            break-all: 특수문자 연속(????)도 강제로 끊어버림.
+                            w-full: 부모 영역을 넘지 않도록 너비 강제.
+                            whitespace-pre-wrap: 줄바꿈은 유지.
                           */}
-                          <p className="text-sm text-gray-700 break-words whitespace-pre-wrap [overflow-wrap:anywhere]">
+                          <p className="text-sm text-gray-700 break-all w-full whitespace-pre-wrap">
                             {comment.contents}
                           </p>
                         </div>
 
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
+                            {/* flex-shrink-0을 유지하여 버튼이 찌그러지지 않게 함 */}
                             <button className="flex-shrink-0 p-1 mt-1 mr-2 text-gray-500 hover:text-gray-700">
                               <MoreHorizontal className="w-4 h-4" />
                             </button>
