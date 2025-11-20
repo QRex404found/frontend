@@ -40,11 +40,9 @@ export function Header() {
     removeToken();
     logout?.();
 
-    // ⭐⭐⭐ [추가된 핵심 기능: 로그아웃 시 채팅 기록 초기화] ⭐⭐⭐
     Object.keys(sessionStorage)
       .filter(key => key.startsWith("qrex_chat_"))
       .forEach(key => sessionStorage.removeItem(key));
-    // ----------------------------------------------------------------------
 
     setIsSheetOpen(false);
   };
@@ -53,7 +51,6 @@ export function Header() {
     <header className="sticky top-0 z-50 h-20 bg-white shadow-sm">
       <div className="flex items-center h-full gap-4 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
-        {/* 로고 */}
         <Link to="/" className="flex items-center flex-shrink-0">
           <img
             src={logoSrc}
@@ -62,7 +59,6 @@ export function Header() {
           />
         </Link>
 
-        {/* 데스크탑 메뉴 */}
         <NavigationMenu className="absolute hidden -translate-x-1/2 md:flex left-1/2">
           <NavigationMenuList className="flex items-center justify-center gap-10">
             <NavigationMenuItem>
@@ -71,6 +67,10 @@ export function Header() {
                   to="/analysis"
                   onClick={(e) => { 
                     e.preventDefault();
+
+                    // ⭐ Analysis 화면 초기화 요청 이벤트
+                    window.dispatchEvent(new Event("analysis-reset"));
+
                     navigate(`/analysis?refresh=${Date.now()}`);
                   }}
                   className="text-sm font-regular md:text-lg hover:text-primary"
@@ -79,6 +79,7 @@ export function Header() {
                 </Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
+
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
                 <Link to="/community" className="text-sm font-regular md:text-lg hover:text-primary">
@@ -86,6 +87,7 @@ export function Header() {
                 </Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
+
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
                 <Link to="/mypost" className="text-sm font-regular md:text-lg hover:text-primary">
@@ -96,10 +98,8 @@ export function Header() {
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* 오른쪽 영역 */}
         <div className="flex items-center gap-3 ml-auto md:gap-4">
 
-          {/* 프로필 팝업 */}
           {isLoggedIn ? (
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
@@ -146,7 +146,6 @@ export function Header() {
             </Link>
           )}
 
-          {/* 로그아웃 버튼 */}
           {isLoggedIn && (
             <Button
               onClick={handleLogout}
@@ -157,7 +156,6 @@ export function Header() {
             </Button>
           )}
 
-          {/* 모바일 메뉴 */}
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger className="p-2 rounded md:hidden hover:bg-gray-100">
               <Menu className="text-gray-800 w-7 h-7" />

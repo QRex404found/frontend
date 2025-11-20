@@ -27,7 +27,6 @@ export function Analysis() {
   const [selectedHistory, setSelectedHistory] = useState(null);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
 
-  // 🔥 History만 강제로 새로고침시키는 트리거
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   const [alertDialogState, setAlertDialogState] = useState({
@@ -41,7 +40,7 @@ export function Analysis() {
   const titleUpdateRef = useRef(null);
 
   // ----------------------------------------------------------------
-  // 🚨 AI 업데이트 이벤트 수신 → History 새로고침
+  // AI에 의한 데이터 변경 → History 새로고침
   // ----------------------------------------------------------------
   useEffect(() => {
     const handleAiUpdate = () => {
@@ -51,6 +50,22 @@ export function Analysis() {
     window.addEventListener("analysis-updated", handleAiUpdate);
     return () => window.removeEventListener("analysis-updated", handleAiUpdate);
   }, []);
+
+  // ----------------------------------------------------------------
+  // ⭐ 추가된 핵심 useEffect — Header에서 reset 이벤트 받으면 초기화
+  // ----------------------------------------------------------------
+  useEffect(() => {
+    const resetHandler = () => {
+      setAnalysisResult(null);
+      setSelectedHistory(null);
+      setMobileTab('scan');
+    };
+
+    window.addEventListener("analysis-reset", resetHandler);
+    return () => window.removeEventListener("analysis-reset", resetHandler);
+  }, []);
+  // ----------------------------------------------------------------
+
 
   /* ---------------------------------------------
      QR 분석 완료 처리
@@ -79,7 +94,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-     라우터 state 전달 결과 처리
+     라우터 state 전달 처리
   --------------------------------------------- */
   useEffect(() => {
     const stateResult = location.state?.analysisResult;
@@ -113,7 +128,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-     History 항목 선택 → 상세 데이터 가져오기
+     History 목록에서 선택 → 상세 정보 가져오기
   --------------------------------------------- */
   const handleHistorySelect = async (analysisId) => {
     setAnalysisResult(null);
@@ -138,7 +153,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-     제목 수정 후 상태 및 History 갱신
+     제목 수정 후 즉시 반영 + History 새로고침
   --------------------------------------------- */
   const handleTitleUpdated = (id, newTitle) => {
     if (selectedHistory && selectedHistory.analysisId === id) {
@@ -195,7 +210,6 @@ export function Analysis() {
 
   return (
     <>
-      {/* ⭐ 핵심: URL search가 바뀌면 이 전체가 remount됨 */}
       <div
         key={location.search}
         className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4"
