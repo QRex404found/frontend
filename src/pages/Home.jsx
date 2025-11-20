@@ -125,7 +125,6 @@ export function Home() {
 
           {/* What is QRex */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-20 mb-40 items-center">
-
             <div>
               <h3 className="text-3xl font-semibold mb-6">QRex란?</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-10">
@@ -172,197 +171,200 @@ export function Home() {
 
 
 
+
           {/* ====================================================== */}
           {/* NEW UI — Detailed Section (Analysis) */}
           {/* ====================================================== */}
-          <div className="mb-40">
-            <h3 className="text-4xl font-semibold mb-6">Analysis</h3>
-            <p className="text-slate-600 text-lg leading-relaxed mb-14 max-w-3xl">
-              QR 코드를 기반으로 URL 위험도, 도메인 신뢰도, 파라미터 구조 등을 분석하여  
-              보안 위협을 정확하게 판단합니다.
-            </p>
+          <div className="mb-48">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-10 items-start">
+              {/* LEFT — TEXT */}
+              <div>
+                <h3 className="text-4xl font-semibold mb-6">Analysis</h3>
+                <p className="text-slate-600 text-lg leading-relaxed mb-10">
+                  AI 기반 URL 패턴 분석, 파라미터 추출, 도메인 검증을 통해  
+                  QR 링크가 안전한지 즉시 판단합니다.
+                </p>
 
-              {/* Left Icon Column */}
-              <div className="md:col-span-2 flex flex-col items-center">
-                <div className="relative w-40 h-40 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-lime-300 to-lime-500 blur-3xl opacity-30"></div>
-                  <QrCode size={70} className="text-lime-600 relative z-10" />
+                <ul className="space-y-4">
+                  <li className="flex gap-3">
+                    <span className="text-lime-600 font-semibold mt-1">•</span>
+                    악성 URL / 피싱 사이트 실시간 탐지
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-lime-600 font-semibold mt-1">•</span>
+                    URL 파라미터 자동 구조 분석
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-lime-600 font-semibold mt-1">•</span>
+                    도메인 신뢰도 등급 제공
+                  </li>
+                </ul>
+              </div>
+
+              {/* RIGHT — UI PANEL MOCK */}
+              <div className="relative bg-white border border-slate-200 rounded-2xl p-8 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.1)]">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-lime-100 text-lime-700 rounded-xl">
+                    <QrCode size={32} />
+                  </div>
+                  <h4 className="text-xl font-semibold">QR 코드 분석 결과</h4>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between text-slate-600">
+                    <span>위험도 레벨</span>
+                    <span className="text-lime-600 font-semibold">LOW</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>도메인 신뢰도</span>
+                    <span className="text-slate-800 font-semibold">안전함</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>파라미터 수</span>
+                    <span className="text-slate-800 font-semibold">3개</span>
+                  </div>
+                </div>
+
+                <div className="mt-6 border-t border-slate-200 pt-4">
+                  <button className="text-lime-600 font-semibold hover:underline">
+                    상세 분석 보기 →
+                  </button>
                 </div>
               </div>
 
-              {/* Right features */}
-              <div className="md:col-span-3 space-y-6">
-
-                {/* Mini-card #1 */}
-                <div className="flex gap-4 items-start p-5 border border-slate-200 rounded-xl hover:border-lime-500 transition">
-                  <div className="p-3 bg-lime-100 text-lime-700 rounded-lg">
-                    <ArrowRight size={18} />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lg mb-1">위험한 QR 즉시 탐지</h4>
-                    <p className="text-slate-600">
-                      악성 URL, 피싱 도메인, 이상 패턴을 실시간으로 식별합니다.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Mini-card #2 */}
-                <div className="flex gap-4 items-start p-5 border border-slate-200 rounded-xl hover:border-lime-500 transition">
-                  <div className="p-3 bg-lime-100 text-lime-700 rounded-lg">
-                    <ArrowRight size={18} />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lg mb-1">파라미터 분석</h4>
-                    <p className="text-slate-600">
-                      URL에 포함된 추적 파라미터 및 의심 요소를 자동 추출합니다.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Mini-card #3 */}
-                <div className="flex gap-4 items-start p-5 border border-slate-200 rounded-xl hover:border-lime-500 transition">
-                  <div className="p-3 bg-lime-100 text-lime-700 rounded-lg">
-                    <ArrowRight size={18} />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lg mb-1">도메인 신뢰도 검증</h4>
-                    <p className="text-slate-600">
-                      등록 정보, 과거 위험 이력, 신뢰도 데이터를 기반으로 도메인을 평가합니다.
-                    </p>
-                  </div>
-                </div>
-
-              </div>
             </div>
           </div>
+
+
 
 
 
           {/* ====================================================== */}
           {/* NEW UI — Detailed Section (Community) */}
           {/* ====================================================== */}
-          <div className="mb-40">
-            <h3 className="text-4xl font-semibold mb-6">Community</h3>
-            <p className="text-slate-600 text-lg leading-relaxed mb-14 max-w-3xl">
-              사용자들이 보안 경험을 공유하고 정보를 나누며 함께 성장하는 공간입니다.
-            </p>
+          <div className="mb-48">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-10 items-start">
+              {/* LEFT IMAGE (Mock UI) */}
+              <div className="order-2 md:order-1 relative bg-white border border-slate-200 rounded-2xl p-8 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.1)]">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-purple-100 text-purple-700 rounded-xl">
+                    <Users size={32} />
+                  </div>
+                  <h4 className="text-xl font-semibold">커뮤니티 Q&A</h4>
+                </div>
 
-              {/* Left Icon Column */}
-              <div className="md:col-span-2 flex flex-col items-center">
-                <div className="relative w-40 h-40 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-purple-300 to-purple-500 blur-3xl opacity-30"></div>
-                  <Users size={70} className="text-purple-600 relative z-10" />
+                <div className="space-y-4">
+                  <div className="p-4 border border-slate-100 rounded-xl">
+                    <p className="font-medium text-slate-800">
+                      QR 코드가 이상한 사이트로 이동해요
+                    </p>
+                    <p className="text-slate-500 text-sm mt-1">
+                      도메인 신뢰도 확인이 필요합니다.
+                    </p>
+                  </div>
+
+                  <div className="p-4 border border-slate-100 rounded-xl">
+                    <p className="font-medium text-slate-800">
+                      피싱 QR인지 어떻게 알 수 있나요?
+                    </p>
+                    <p className="text-slate-500 text-sm mt-1">
+                      분석 기능을 활용하면 실시간 탐지가 가능합니다.
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Right Features */}
-              <div className="md:col-span-3 space-y-6">
+              {/* RIGHT TEXT */}
+              <div className="order-1 md:order-2">
+                <h3 className="text-4xl font-semibold mb-6">Community</h3>
+                <p className="text-slate-600 text-lg leading-relaxed mb-10">
+                  다양한 사용자들이 질문하고 답변하며  
+                  QR 보안에 대한 지식을 함께 확장해 나갑니다.
+                </p>
 
-                <div className="flex gap-4 items-start p-5 border border-slate-200 rounded-xl hover:border-purple-500 transition">
-                  <div className="p-3 bg-purple-100 text-purple-700 rounded-lg">
-                    <ArrowRight size={18} />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lg mb-1">QR 보안 Q&A</h4>
-                    <p className="text-slate-600">
-                      모르는 점을 빠르게 묻고 전문가/사용자에게 답을 얻을 수 있습니다.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 items-start p-5 border border-slate-200 rounded-xl hover:border-purple-500 transition">
-                  <div className="p-3 bg-purple-100 text-purple-700 rounded-lg">
-                    <ArrowRight size={18} />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lg mb-1">실제 사례 기반 학습</h4>
-                    <p className="text-slate-600">
-                      QR 피싱 사례, 문제 해결 과정 등 실제 경험을 통해 배울 수 있습니다.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 items-start p-5 border border-slate-200 rounded-xl hover:border-purple-500 transition">
-                  <div className="p-3 bg-purple-100 text-purple-700 rounded-lg">
-                    <ArrowRight size={18} />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lg mb-1">지식 공유</h4>
-                    <p className="text-slate-600">
-                      다양한 사용자들이 인사이트를 교환하며 서로 도와줍니다.
-                    </p>
-                  </div>
-                </div>
-
+                <ul className="space-y-4">
+                  <li className="flex gap-3">
+                    <span className="text-purple-600 font-semibold mt-1">•</span>
+                    실제 사례 기반 Q&A
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-purple-600 font-semibold mt-1">•</span>
+                    보안 지식 공유 및 토론
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-purple-600 font-semibold mt-1">•</span>
+                    사용자 경험 기반 인사이트 제공
+                  </li>
+                </ul>
               </div>
+
             </div>
           </div>
+
+
 
 
 
           {/* ====================================================== */}
           {/* NEW UI — Detailed Section (MyPost) */}
           {/* ====================================================== */}
-          <div className="mb-40">
-            <h3 className="text-4xl font-semibold mb-6">MyPost</h3>
-            <p className="text-slate-600 text-lg leading-relaxed mb-14 max-w-3xl">
-              내가 분석한 QR 기록을 한곳에서 관리하며 편리하게 접근할 수 있습니다.
-            </p>
+          <div className="mb-48">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-10 items-start">
+              {/* LEFT TEXT */}
+              <div>
+                <h3 className="text-4xl font-semibold mb-6">MyPost</h3>
+                <p className="text-slate-600 text-lg leading-relaxed mb-10">
+                  내가 분석한 QR 결과를 리스트로 모아  
+                  효율적으로 관리할 수 있습니다.
+                </p>
 
-              {/* Left Icon */}
-              <div className="md:col-span-2 flex flex-col items-center">
-                <div className="relative w-40 h-40 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-300 to-blue-500 blur-3xl opacity-30"></div>
-                  <FileText size={70} className="text-blue-600 relative z-10" />
+                <ul className="space-y-4">
+                  <li className="flex gap-3">
+                    <span className="text-blue-600 font-semibold mt-1">•</span>
+                    분석 리포트 히스토리 저장
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-blue-600 font-semibold mt-1">•</span>
+                    제목 수정 및 삭제 기능
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-blue-600 font-semibold mt-1">•</span>
+                    상세 리포트 확인
+                  </li>
+                </ul>
+              </div>
+
+              {/* RIGHT MOCK UI */}
+              <div className="relative bg-white border border-slate-200 rounded-2xl p-8 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.1)]">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-blue-100 text-blue-700 rounded-xl">
+                    <FileText size={32} />
+                  </div>
+                  <h4 className="text-xl font-semibold">My QR 기록</h4>
+                </div>
+
+                <div className="space-y-3">
+
+                  <div className="p-4 border border-slate-100 rounded-xl">
+                    <p className="font-medium text-slate-800">
+                      https://safe-site.com/login
+                    </p>
+                    <p className="text-slate-500 text-sm mt-1">위험도: 낮음</p>
+                  </div>
+
+                  <div className="p-4 border border-slate-100 rounded-xl">
+                    <p className="font-medium text-slate-800">
+                      https://unknown-domain.xyz/
+                    </p>
+                    <p className="text-slate-500 text-sm mt-1">위험도: 중간</p>
+                  </div>
+
                 </div>
               </div>
 
-              {/* Right */}
-              <div className="md:col-span-3 space-y-6">
-
-                <div className="flex gap-4 items-start p-5 border border-slate-200 rounded-xl hover:border-blue-500 transition">
-                  <div className="p-3 bg-blue-100 text-blue-700 rounded-lg">
-                    <ArrowRight size={18} />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lg mb-1">QR 분석 이력 관리</h4>
-                    <p className="text-slate-600">
-                      내가 분석한 모든 QR 코드를 시간순으로 확인할 수 있습니다.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 items-start p-5 border border-slate-200 rounded-xl hover:border-blue-500 transition">
-                  <div className="p-3 bg-blue-100 text-blue-700 rounded-lg">
-                    <ArrowRight size={18} />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lg mb-1">제목 수정·삭제</h4>
-                    <p className="text-slate-600">
-                      분석 결과 제목을 변경하거나, 필요 시 삭제할 수 있습니다.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 items-start p-5 border border-slate-200 rounded-xl hover:border-blue-500 transition">
-                  <div className="p-3 bg-blue-100 text-blue-700 rounded-lg">
-                    <ArrowRight size={18} />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lg mb-1">분석 결과 상세 보기</h4>
-                    <p className="text-slate-600">
-                      각 분석 리포트를 열어 상세한 결과를 볼 수 있습니다.
-                    </p>
-                  </div>
-                </div>
-
-              </div>
             </div>
           </div>
 
