@@ -122,53 +122,59 @@ export const CommentDrawer = ({
                   String(authorId) === String(currentUserId);
 
                 return (
-                  <div key={comment.commentId} className="flex items-start gap-3">
+                  <div key={comment.commentId} className="flex items-start gap-3 w-full">
                     {/* 아바타 */}
                     <div className="flex-shrink-0 w-8 h-8 mt-1 bg-gray-300 rounded-full" />
                     
-                    {/* 메인 컨텐츠 영역 (Flex로 텍스트와 버튼을 물리적으로 분리) */}
-                    <div className="flex-1 min-w-0"> 
-                        <div className="flex items-start justify-between gap-2">
-                          
-                          {/* 1. 텍스트 영역 */}
-                          {/* flex-1로 남은 공간을 다 차지하게 하고, break-all로 강제 줄바꿈 */}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-[#81BF59]">
-                              {authorId}
-                            </p>
-                            <p className="text-sm text-gray-700 break-all whitespace-pre-wrap">
-                              {comment.contents}
-                            </p>
-                          </div>
+                    {/* [문제 해결의 핵심 구간]
+                        1. min-w-0: Flex 자식 요소가 내용물보다 더 작아질 수 있게 허용 (이게 없으면 텍스트가 부모를 뚫고 나감)
+                        2. w-full: 가로폭을 꽉 채움
+                    */}
+                    <div className="relative flex-1 min-w-0 w-full"> 
+                        
+                        {/* pr-8: 우측 상단 버튼(MoreHorizontal)이 들어갈 공간 확보 */}
+                        <div className="pr-8">
+                          <p className="text-sm font-semibold text-[#81BF59]">
+                            {authorId}
+                          </p>
 
-                          {/* 2. 버튼 영역 */}
-                          {/* flex-shrink-0으로 크기를 고정하여 텍스트에 밀리지 않게 함 */}
-                          <div className="flex-shrink-0 -mt-1 -mr-1">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button className="p-1 text-gray-500 hover:text-gray-700">
-                                    <MoreHorizontal className="w-4 h-4" />
-                                  </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-40">
-                                  {isMyComment ? (
-                                    <DropdownMenuItem
-                                      onClick={() => handleDeleteComment(comment.commentId)}
-                                      className="text-red-600 focus:bg-red-50 focus:text-red-600"
-                                    >
-                                      delete comment
-                                    </DropdownMenuItem>
-                                  ) : (
-                                    <DropdownMenuItem
-                                      onClick={() => handleReportComment(comment.commentId)}
-                                      className="text-[#CA8A04] focus:bg-yellow-50 focus:text-[#CA8A04]"
-                                    >
-                                      report comment
-                                    </DropdownMenuItem>
-                                  )}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                          </div>
+                          {/* [CSS 속성 설명]
+                             1. break-all: '????' 같은 특수문자 연속도 무조건 강제 줄바꿈 (가장 강력함)
+                             2. whitespace-pre-wrap: 사용자가 입력한 엔터(줄바꿈)는 유지
+                          */}
+                          <p className="text-sm text-gray-700 break-all whitespace-pre-wrap">
+                            {comment.contents}
+                          </p>
+                        </div>
+
+                        {/* 우측 상단 버튼 고정 */}
+                        <div className="absolute top-0 right-0">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="p-1 text-gray-500 hover:text-gray-700">
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-40">
+
+                                {isMyComment ? (
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteComment(comment.commentId)}
+                                    className="text-red-600 focus:bg-red-50 focus:text-red-600"
+                                  >
+                                    delete comment
+                                  </DropdownMenuItem>
+                                ) : (
+                                  <DropdownMenuItem
+                                    onClick={() => handleReportComment(comment.commentId)}
+                                    className="text-[#CA8A04] focus:bg-yellow-50 focus:text-[#CA8A04]"
+                                  >
+                                    report comment
+                                  </DropdownMenuItem>
+                                )}
+
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </div>
                   </div>
