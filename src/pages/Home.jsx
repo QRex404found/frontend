@@ -54,7 +54,7 @@ export function Home() {
 
   return (
     <div className='w-full'>
-      
+
       {/* ====================================================== */}
       {/* SECTION 1 — 비디오 히어로 */}
       {/* ====================================================== */}
@@ -76,22 +76,28 @@ export function Home() {
           <TooltipProvider delayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <button 
+                <button
                   onClick={scrollToInfo}
                   className="
-                    p-2 bg-transparent text-white 
-                    opacity-70 hover:opacity-100
-                    transition-all duration-300
-                  "
+    p-2 bg-transparent 
+    text-white 
+    opacity-80 hover:opacity-100 
+    transition-all duration-300
+  "
                 >
-                  <ChevronDown size={40} strokeWidth={1.5} />
+                  <ChevronDown
+                    size={40}
+                    strokeWidth={1.5}
+                    className="drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
+                  />
                 </button>
+
               </TooltipTrigger>
               <TooltipContent
                 side="top"
                 className="bg-black/80 text-white border-white/10 backdrop-blur-md"
               >
-                <p>Scroll</p>
+                <p>Learn About QRex!</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -115,7 +121,7 @@ export function Home() {
             className="text-center mb-24"
           >
             <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
-              더 안전한 <span className="text-lime-600">QR 세상</span>을 만듭니다.
+              <span className="text-lime-600">QR,</span> 이제는 안전하게 사용하세요
             </h2>
             <p className="text-slate-500 text-lg mt-4">
               QRex는 QR 기반 보안 위협을 탐지하고, 데이터를 기반으로 인사이트를 제공합니다.
@@ -143,9 +149,9 @@ export function Home() {
               </h3>
 
               <p className="text-slate-600 text-lg leading-relaxed mb-6">
-                QRex는 스캔한 QR 코드의 위험도를 분석하고,  
-                사용자 보호를 위한 인사이트를 제공하는 보안 플랫폼입니다.  
-                분석 이력 관리와 커뮤니티 기반 지식 공유까지  
+                QRex는 스캔한 QR 코드의 위험도를 분석하고,
+                사용자 보호를 위한 인사이트를 제공하는 보안 플랫폼입니다.
+                분석 이력 관리와 커뮤니티 기반 지식 공유까지
                 하나의 서비스에서 제공됩니다.
               </p>
 
