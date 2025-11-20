@@ -1,4 +1,5 @@
 // src/components/chat/ChatBody.jsx
+
 import React, { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Loader2 } from "lucide-react";
@@ -105,6 +106,14 @@ export default function ChatBody({ isOpen, user }) {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
+
+      // 🚨 [추가된 핵심 로직] AI가 데이터를 수정했다고 응답하면 이벤트를 발생시킴
+      // Analysis.jsx가 이 이벤트를 듣고 목록을 새로고침합니다.
+      if (aiText.includes("변경") || aiText.includes("수정") || aiText.includes("성공")) {
+          console.log("🔔 AI 데이터 변경 감지! 새로고침 이벤트 발생");
+          window.dispatchEvent(new Event("analysis-updated"));
+      }
+
     } catch (error) {
       console.error("AI Error:", error);
       setMessages((prev) => [

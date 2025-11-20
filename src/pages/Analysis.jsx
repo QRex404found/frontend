@@ -40,6 +40,20 @@ export function Analysis() {
   const [mobileTab, setMobileTab] = useState('scan');
   const titleUpdateRef = useRef(null);
 
+  // ----------------------------------------------------------------
+  // 🚨 [추가된 핵심 로직] AI가 수정을 완료했을 때(이벤트 수신) 목록 새로고침
+  // ----------------------------------------------------------------
+  useEffect(() => {
+    const handleAiUpdate = () => {
+      console.log("🔔 AI에 의한 데이터 변경 감지 -> 목록 새로고침 실행");
+      setHistoryRefreshKey(prev => prev + 1);
+    };
+
+    window.addEventListener("analysis-updated", handleAiUpdate);
+    return () => window.removeEventListener("analysis-updated", handleAiUpdate);
+  }, []);
+  // ----------------------------------------------------------------
+
   /* ---------------------------------------------
      QR 분석 완료 시 처리
   --------------------------------------------- */
