@@ -41,21 +41,19 @@ export function Analysis() {
   const titleUpdateRef = useRef(null);
 
   // ----------------------------------------------------------------
-  // 🚨 [추가된 핵심 로직] AI가 수정을 완료했을 때(이벤트 수신) 목록 새로고침
+  // 🚨 AI 업데이트 이벤트 수신 → History 새로고침
   // ----------------------------------------------------------------
   useEffect(() => {
     const handleAiUpdate = () => {
-      console.log("🔔 AI에 의한 데이터 변경 감지 -> 목록 새로고침 실행");
       setHistoryRefreshKey(prev => prev + 1);
     };
 
     window.addEventListener("analysis-updated", handleAiUpdate);
     return () => window.removeEventListener("analysis-updated", handleAiUpdate);
   }, []);
-  // ----------------------------------------------------------------
 
   /* ---------------------------------------------
-     QR 분석 완료 시 처리
+     QR 분석 완료 처리
   --------------------------------------------- */
   const handleAnalysisResult = useCallback((result, error) => {
     if (error) {
@@ -71,20 +69,17 @@ export function Analysis() {
       return;
     }
 
-    // 분석 완료 시 LeftPanel을 result 화면으로 전환
     setAnalysisResult(result);
     setSelectedHistory(null);
 
-    // 이 경우에만 History 목록 새로 fetch
     setHistoryRefreshKey(prev => prev + 1);
 
     setMobileTab('scan');
   }, []);
 
 
-
   /* ---------------------------------------------
-     라우터 state로 전달된 분석 결과 처리
+     라우터 state 전달 결과 처리
   --------------------------------------------- */
   useEffect(() => {
     const stateResult = location.state?.analysisResult;
@@ -102,23 +97,9 @@ export function Analysis() {
     }
   }, [location.state, navigate, handleAnalysisResult, analysisResult]);
 
-  /* --------------------------------------------- 
-      URL의 refresh 파라미터가 변경될 때마다 상태 초기화 
-   --------------------------------------------- */
-useEffect(() => {
-  const params = new URLSearchParams(location.search);
-  const refresh = params.get("refresh");
-
-  if (refresh) {
-    // 왼쪽 패널 초기화 → QRScanPanel 보이게 됨
-    setAnalysisResult(null);
-    setSelectedHistory(null);
-    setMobileTab('scan');
-  }
-}, [location.search]);
 
   /* ---------------------------------------------
-     새로운 파일 분석 시작
+     새 QR 분석 시작
   --------------------------------------------- */
   const handleAnalysisStart = (file, url) => {
     navigate('/analyzing-qr', {
@@ -132,7 +113,7 @@ useEffect(() => {
 
 
   /* ---------------------------------------------
-     History 목록에서 항목 선택 → 상세 데이터 가져오기
+     History 항목 선택 → 상세 데이터 가져오기
   --------------------------------------------- */
   const handleHistorySelect = async (analysisId) => {
     setAnalysisResult(null);
@@ -157,22 +138,19 @@ useEffect(() => {
 
 
   /* ---------------------------------------------
-     제목 수정 후 상태 즉시 반영 + History만 새로고침
+     제목 수정 후 상태 및 History 갱신
   --------------------------------------------- */
   const handleTitleUpdated = (id, newTitle) => {
-    // LeftPanel 수정
     if (selectedHistory && selectedHistory.analysisId === id) {
       setSelectedHistory(prev => ({ ...prev, analysisTitle: newTitle }));
     } else if (analysisResult && analysisResult.analysisId === id) {
       setAnalysisResult(prev => ({ ...prev, analysisTitle: newTitle }));
     }
 
-    // History 목록 로컬 업데이트
     if (titleUpdateRef.current) {
       titleUpdateRef.current(id, newTitle);
     }
 
-    // 서버 최신 데이터로 History만 다시 새로고침
     setHistoryRefreshKey(prev => prev + 1);
   };
 
@@ -196,10 +174,8 @@ useEffect(() => {
   }
 
 
-  // 현재 왼쪽 패널에 표시할 데이터
   const currentResult = selectedHistory || analysisResult;
 
-  // LeftPanel 렌더링 콘텐츠
   const LeftPanelContent = isDetailLoading ? (
     <div className="flex items-center justify-center h-full">
       <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
@@ -219,7 +195,11 @@ useEffect(() => {
 
   return (
     <>
-      <div className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4">
+      {/* ⭐ 핵심: URL search가 바뀌면 이 전체가 remount됨 */}
+      <div
+        key={location.search}
+        className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4"
+      >
 
         {/* ---- 데스크탑 레이아웃 ---- */}
         <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
