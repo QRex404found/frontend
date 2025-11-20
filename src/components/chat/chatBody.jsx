@@ -109,9 +109,17 @@ export default function ChatBody({ isOpen, user }) {
 
       // 🚨 [추가된 핵심 로직] AI가 데이터를 수정했다고 응답하면 이벤트를 발생시킴
       // Analysis.jsx가 이 이벤트를 듣고 목록을 새로고침합니다.
-      if (aiText.includes("변경") || aiText.includes("수정") || aiText.includes("성공")) {
-          console.log("🔔 AI 데이터 변경 감지! 새로고침 이벤트 발생");
-          window.dispatchEvent(new Event("analysis-updated"));
+      if (
+        aiText.includes("변경") || 
+        aiText.includes("수정") || 
+        aiText.includes("바꿨") ||
+        aiText.includes("완료")
+      ) {
+          console.log("🔔 [ChatBody] 변경 감지! 화면 갱신 신호 보냄 📡");
+          // DB 반영 시간을 살짝 고려해 0.5초 뒤 실행
+          setTimeout(() => {
+            window.dispatchEvent(new Event("analysis-updated"));
+          }, 500);
       }
 
     } catch (error) {
