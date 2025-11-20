@@ -138,9 +138,9 @@ export function Home() {
             >
               <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-10">
-                QRex는 URL 패턴 분석, 도메인 신뢰도 확인,
-                파라미터 검증을 기반으로 위험성을 판단하는
-                지능형 QR 분석 플랫폼입니다.
+                QRex는 도메인 신뢰도, URL 특성 분석,<br/>
+                AI 기반 위험 해석을 결합해<br/>
+                QR 링크의 안전성을 종합적으로 평가하는 보안 플랫폼입니다.
                 <br /><br />
                 또한 커뮤니티와 분석 기록 기능으로
                 지속적이고 확장 가능한 보안 경험을 제공합니다.
@@ -207,7 +207,7 @@ export function Home() {
                 <QrCode size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">정확한 URL 분석</h4>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  URL 구조, IP, 도메인 신뢰도를 기반으로 <br/>위험도를 판단합니다.
+                  URL 구조, IP, 도메인 신뢰도를 기반으로 <br />위험도를 판단합니다.
                 </p>
               </div>
 
@@ -223,7 +223,7 @@ export function Home() {
                 <FileText size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">분석 이력 관리</h4>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  스캔한 QR 분석 결과를 한곳에서 <br/>쉽게 관리하세요.
+                  스캔한 QR 분석 결과를 한곳에서 <br />쉽게 관리하세요.
                 </p>
               </div>
 
@@ -399,7 +399,7 @@ export function Home() {
               <h4 className="text-2xl font-medium mb-3">MyPost</h4>
 
               <p className="text-slate-600 mb-6 leading-relaxed">
-                분석한 QR 기록을 저장하고  
+                분석한 QR 기록을 저장하고
                 언제든 빠르게 다시 확인할 수 있습니다.
               </p>
 
@@ -446,12 +446,12 @@ export function Home() {
             </motion.div>
 
 
-          </div> {/* END FEATURE GRID */}
+          </div>
 
 
 
-        </div>{/* END max-w */}
-      </div>{/* END ABOUT CONTAINER */}
+        </div>
+      </div>
     </div>
   );
 }
