@@ -107,159 +107,111 @@ export function Home() {
 
 
       {/* ====================================================== */}
-      {/* SECTION 2 — ABOUT (기능별 상세 안내 포함) */}
+      {/* SECTION 2 — ABOUT (Apple Style, Minimal & Typography) */}
       {/* ====================================================== */}
-      <div ref={infoSectionRef} className="w-full bg-white text-slate-900 py-40 px-6">
+      <div ref={infoSectionRef} className="w-full bg-white text-slate-900 py-48 px-6">
         <div className="max-w-6xl mx-auto">
 
-          {/* ====================================================== */}
-          {/* 1) 메인 메시지 */}
-          {/* ====================================================== */}
-          <div className="text-center mb-32">
-            <h2 className="text-5xl font-semibold tracking-tight mb-6">
-              QR 보안을 <span className="text-lime-600">더 스마트하게.</span>
+          {/* Main Header */}
+          <div className="text-center mb-40">
+            <h2 className="text-6xl font-semibold tracking-tight leading-tight mb-6">
+              QR 데이터를 <span className="text-lime-600">더 안전하게.</span><br />
+              더 정확하게.
             </h2>
             <p className="text-slate-500 text-xl max-w-3xl mx-auto leading-relaxed">
-              QRex는 QR 코드의 위험을 분석하고, 커뮤니티와 기록 관리 기능을 통해
-              사용자가 더 안전하고 편리하게 QR을 사용할 수 있도록 돕는 지능형 보안 플랫폼입니다.
+              QRex는 QR 코드에 담긴 정보를 분석하고 위험 신호를 탐지하여
+              사용자에게 더 안전한 QR 환경을 제공합니다.
             </p>
           </div>
 
 
-          {/* ====================================================== */}
-          {/* 2) QRex 소개 */}
-          {/* ====================================================== */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-20 mb-40 items-center">
-
+          {/* What is QRex */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-32 mb-48 items-center">
             <div>
-              <h3 className="text-3xl font-semibold mb-6">QRex란 무엇인가요?</h3>
+              <h3 className="text-4xl font-semibold mb-6">QRex란 무엇인가요?</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-10">
-                QRex는 단순한 QR 스캔 도구가 아닙니다.
-                QR 코드를 분석하고, 위험 요소를 발견하며,
-                다양한 사용자 활동을 편리하게 관리할 수 있는 통합 플랫폼입니다.
+                QRex는 단순한 QR 스캔 도구가 아닙니다.<br />
+                QR 코드 분석, 위험 탐지, 사용자 보호,
+                그리고 히스토리 관리까지 제공하는 통합 플랫폼입니다.
               </p>
             </div>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-14 flex justify-center">
-              <QrCode className="w-36 h-36 text-lime-600" />
+            <div className="flex justify-center">
+              <QrCode className="w-40 h-40 text-lime-600" strokeWidth={1.1} />
             </div>
           </div>
 
 
-
-          {/* ====================================================== */}
-          {/* 3) 기능 요약 카드 (Overview) */}
-          {/* ====================================================== */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-40">
-            {features.map((item) => (
-              <div
-                key={item.id}
-                className="
-            bg-white border border-slate-200 rounded-2xl p-10
-            hover:border-lime-500 
-            hover:-translate-y-1 hover:shadow-md
-            transition-all cursor-pointer
-          "
-              >
-                <div className="mb-6 p-4 bg-slate-100 text-lime-600 rounded-xl inline-block">
-                  <item.icon size={36} />
-                </div>
-
-                <h4 className="text-xl font-semibold mb-3">{item.title}</h4>
-                <p className="text-slate-500 leading-relaxed mb-6">{item.desc}</p>
-
-                <button className="text-lime-600 font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all">
-                  {item.button}
-                  <ArrowRight size={16} />
-                </button>
-              </div>
-            ))}
-          </div>
-
-
-
-          {/* ====================================================== */}
-          {/* 4) 기능별 상세 안내 섹션 */}
-          {/* ====================================================== */}
-
-          {/* === Analysis Section === */}
-          <div className="mb-40">
-            <h3 className="text-4xl font-semibold mb-6">Analysis 기능</h3>
-            <p className="text-slate-600 text-lg leading-relaxed mb-16 max-w-3xl">
-              QR 코드의 실제 URL 패턴, 도메인 신뢰도, 의심스러운 파라미터 등을 기반으로
-              위협을 탐지하고 분석합니다.
-              단순 스캔이 아닌, **보안 레이어를 더한 지능형 분석 기능**입니다.
+          {/* Analysis Detail */}
+          <div className="mb-44">
+            <h3 className="text-5xl font-semibold mb-10">Analysis</h3>
+            <p className="text-xl text-slate-600 leading-relaxed max-w-3xl mb-20">
+              QR 코드의 URL 구조, 도메인 안전성, 위험 신호를 분석하는
+              QRex의 핵심 기능입니다.
             </p>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-14 flex justify-center mb-10">
-              <QrCode size={80} className="text-lime-600" />
+            <div className="flex justify-center mb-16">
+              <QrCode className="w-32 h-32 text-lime-600" />
             </div>
 
-            <ul className="text-slate-700 text-lg leading-relaxed space-y-3 list-disc pl-6">
-              <li>URL 위험도 판단 (피싱, 악성 도메인 탐지)</li>
-              <li>QR 파라미터 분석 및 구조 파악</li>
-              <li>도메인 안전성 검증</li>
-              <li>결과 리포트 자동 생성</li>
+            <ul className="text-slate-700 text-lg space-y-4 list-disc pl-6">
+              <li>URL 위험도 평가 (피싱, 악성 사이트 탐지)</li>
+              <li>QR 파라미터 분석</li>
+              <li>도메인 신뢰도 체크</li>
+              <li>안전 리포트 제공</li>
             </ul>
           </div>
 
 
-          {/* === Community Section === */}
-          <div className="mb-40">
-            <h3 className="text-4xl font-semibold mb-6">Community 기능</h3>
-            <p className="text-slate-600 text-lg leading-relaxed mb-16 max-w-3xl">
-              QR 보안 관련 질문을 올리고, 다른 사용자들과 경험을 공유할 수 있는 공간입니다.
-              커뮤니티는 사용자가 서로 정보를 교류하며 함께 성장하는 역할을 합니다.
+          {/* Community Detail */}
+          <div className="mb-44">
+            <h3 className="text-5xl font-semibold mb-10">Community</h3>
+            <p className="text-xl text-slate-600 leading-relaxed max-w-3xl mb-20">
+              사용자끼리 보안 경험을 공유하고 질문을 통해 함께 성장하는 공간입니다.
             </p>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-14 flex justify-center mb-10">
-              <Users size={80} className="text-lime-600" />
+            <div className="flex justify-center mb-16">
+              <Users className="w-32 h-32 text-lime-600" />
             </div>
 
-            <ul className="text-slate-700 text-lg leading-relaxed space-y-3 list-disc pl-6">
-              <li>QR 관련 질문/답변 게시판</li>
-              <li>보안 사례 공유</li>
-              <li>인사이트 기반 문제 해결</li>
+            <ul className="text-slate-700 text-lg space-y-4 list-disc pl-6">
+              <li>보안 관련 Q&A 게시판</li>
+              <li>실제 사례 공유</li>
+              <li>커뮤니티 기반 문제 해결</li>
             </ul>
           </div>
 
 
-          {/* === MyPost Section === */}
-          <div className="mb-40">
-            <h3 className="text-4xl font-semibold mb-6">MyPost 기능</h3>
-            <p className="text-slate-600 text-lg leading-relaxed mb-16 max-w-3xl">
-              사용자가 분석한 QR 코드 기록을 관리하는 개인 기록 공간입니다.
-              이전 분석 결과를 한 번에 확인하고, 필요하면 제목 수정/삭제도 가능합니다.
+          {/* MyPost Detail */}
+          <div className="mb-44">
+            <h3 className="text-5xl font-semibold mb-10">MyPost</h3>
+            <p className="text-xl text-slate-600 leading-relaxed max-w-3xl mb-20">
+              사용자가 분석한 QR 기록을 관리하고, 필요 시 수정/삭제할 수 있는 개인 공간입니다.
             </p>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-14 flex justify-center mb-10">
-              <FileText size={80} className="text-lime-600" />
+            <div className="flex justify-center mb-16">
+              <FileText className="w-32 h-32 text-lime-600" />
             </div>
 
-            <ul className="text-slate-700 text-lg leading-relaxed space-y-3 list-disc pl-6">
-              <li>내가 분석한 QR 리스트 관리</li>
-              <li>각 분석 결과 상세 보기</li>
-              <li>제목 수정 & 삭제 기능</li>
-              <li>분석 이력 일괄 관리</li>
+            <ul className="text-slate-700 text-lg space-y-4 list-disc pl-6">
+              <li>내가 분석한 QR 리스트 확인</li>
+              <li>제목 수정/삭제</li>
+              <li>전체 분석 이력 관리</li>
             </ul>
           </div>
 
 
-
-          {/* ====================================================== */}
-          {/* 5) 최종 CTA */}
-          {/* ====================================================== */}
-          <div className="border border-slate-200 rounded-3xl p-16 text-center hover:border-lime-500 transition-colors">
-            <h3 className="text-3xl font-semibold mb-6">QR 분석을 더 쉽게, 더 안전하게.</h3>
-            <p className="text-slate-500 mb-10">지금 QRex를 사용해보세요.</p>
-
-            <button className="px-10 py-4 bg-lime-500 text-white font-semibold rounded-xl hover:bg-lime-600 transition-colors">
+          {/* CTA */}
+          <div className="text-center mt-32">
+            <h3 className="text-4xl font-semibold mb-6">더 안전한 QR 경험을 시작하세요.</h3>
+            <button className="px-10 py-5 bg-lime-500 text-white font-semibold rounded-xl hover:bg-lime-600 transition">
               지금 시작하기
             </button>
           </div>
 
         </div>
       </div>
+
 
 
 
