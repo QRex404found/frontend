@@ -29,6 +29,13 @@ export default function ChatBody({ isOpen, user }) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // ⭐ 추가됨 — 사용자 입력에서 URL 추출
+  const extractUserUrl = (text) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/;
+    const match = text.match(urlRegex);
+    return match ? match[0] : null;
+  };
+
   // ------------------------------------------------------------------------------------------------
   // 스크롤 항상 맨 아래 유지
   // ------------------------------------------------------------------------------------------------
@@ -75,6 +82,14 @@ export default function ChatBody({ isOpen, user }) {
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
 
+    // ⭐ 추가됨 — 사용자 입력에서 URL을 추출하고 MyPost로 보내기
+    const extractedUrl = extractUserUrl(trimmed);
+    if (extractedUrl) {
+      window.dispatchEvent(
+        new CustomEvent("qrex-user-url", { detail: { url: extractedUrl } })
+      );
+    }
+
     const userMessage = {
       id: Date.now(),
       role: "user",
@@ -108,17 +123,16 @@ export default function ChatBody({ isOpen, user }) {
 
       // 🚨 기존 조건 + 게시글 조건 모두 포함
       if (
-        // ⭐ 기존 조건 (삭제 금지!)
         aiText.includes("변경") ||
         aiText.includes("수정") ||
         aiText.includes("바꿨") ||
         aiText.includes("완료") ||
-
-        // ⭐ 새로운 게시글 작성 성공 감지 조건
         aiText.includes("작성되었습니다") ||
         aiText.includes("게시글") ||
         aiText.includes("성공적으로") ||
-        aiText.includes("등록되었습니다")
+        aiText.includes("등록되었습니다") ||
+        aiText.includes("삭제되었습니다") ||      // ← 추가!
+        aiText.includes("삭제 완료")               // ← 추가!
       ) {
         console.log("🔔 [ChatBody] 업데이트 감지 → MyPost 갱신 이벤트 발생");
 
@@ -126,7 +140,6 @@ export default function ChatBody({ isOpen, user }) {
           window.dispatchEvent(new Event("analysis-updated"));
         }, 500);
       }
-
     } catch (error) {
       console.error("AI Error:", error);
 

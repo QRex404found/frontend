@@ -7,6 +7,15 @@ import {
   QrCode,
   Users,
   FileText,
+  Flag,
+  Lightbulb,
+  MessageSquare,
+  Save,
+  Edit3,
+  Search,
+  AlertTriangle,
+  ShieldCheck,
+  Globe,
 } from 'lucide-react';
 
 import videoBg from '@/assets/background.mp4';
@@ -18,11 +27,25 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import useAuth from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+
 export function Home() {
   const infoSectionRef = useRef(null);
 
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
+
   const scrollToInfo = () => {
     infoSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleStart = () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else {
+      navigate("/analysis");
+    }
   };
 
   return (
@@ -77,7 +100,7 @@ export function Home() {
 
 
       {/* ====================================================== */}
-      {/* 2) ABOUT HEADER (fadeUp) */}
+      {/* 2) ABOUT HEADER */}
       {/* ====================================================== */}
       <div ref={infoSectionRef} className="bg-white text-slate-900 py-28 px-6">
         <div className="max-w-6xl mx-auto">
@@ -102,7 +125,7 @@ export function Home() {
 
 
           {/* ====================================================== */}
-          {/* 3) WHAT IS QREX (좌↔우 등장) */}
+          {/* 3) WHAT IS QREX */}
           {/* ====================================================== */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-20 mb-16 items-center">
 
@@ -123,11 +146,13 @@ export function Home() {
                 지속적이고 확장 가능한 보안 경험을 제공합니다.
               </p>
 
-              <button className="px-8 py-4 bg-lime-500 text-white rounded-xl font-medium hover:bg-lime-600 transition">
-                START QRex!
+              <button
+                onClick={handleStart}
+                className="px-8 py-4 bg-lime-500 text-white rounded-xl font-medium hover:bg-lime-600 transition"
+              >
+                Explore QRex
               </button>
             </motion.div>
-
 
             {/* RIGHT: Icon Box */}
             <motion.div
@@ -144,18 +169,17 @@ export function Home() {
 
 
           {/* ====================================================== */}
-          {/* 4) CTA SECTION (Brush Stroke + 1/3 여백으로 축소) */}
+          {/* 4) CTA SECTION (Brush Stroke) */}
           {/* ====================================================== */}
           <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-14 my-24 overflow-hidden">
 
-            {/* === Brush Stroke Background === */}
+            {/* Brush Stroke */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.12]">
               <motion.svg
                 width="100%"
                 height="100%"
                 viewBox="0 0 800 200"
                 preserveAspectRatio="none"
-                className="absolute inset-0"
               >
                 <motion.path
                   d="M0 120 C 150 20, 300 180, 450 60 C 600 -20, 750 150, 800 80"
@@ -183,7 +207,7 @@ export function Home() {
                 <QrCode size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">정확한 URL 분석</h4>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  URL 구조, IP, 도메인 신뢰도를 기반으로 위험도를 판단합니다.
+                  URL 구조, IP, 도메인 신뢰도를 기반으로 <br/>위험도를 판단합니다.
                 </p>
               </div>
 
@@ -199,7 +223,7 @@ export function Home() {
                 <FileText size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">분석 이력 관리</h4>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  스캔한 QR 분석 결과를 한곳에서 쉽게 관리하세요.
+                  스캔한 QR 분석 결과를 한곳에서 <br/>쉽게 관리하세요.
                 </p>
               </div>
 
@@ -209,20 +233,23 @@ export function Home() {
 
 
           {/* ====================================================== */}
-          {/* 5) FEATURE 3-COLUMN (개선된 중앙 정렬 버전) */}
+          {/* 5) FEATURE 3-COLUMN */}
           {/* ====================================================== */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
+
+            {/* =============================== */}
             {/* Analysis */}
+            {/* =============================== */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
               className="
-      p-10 rounded-3xl border shadow-sm hover:shadow-md transition
-      flex flex-col items-center text-center
-    "
+                p-10 rounded-3xl border shadow-sm hover:shadow-md transition
+                flex flex-col items-center text-center
+              "
             >
               <div className="p-4 bg-lime-100 text-lime-600 rounded-xl inline-block mb-6">
                 <QrCode size={36} />
@@ -231,29 +258,70 @@ export function Home() {
               <h4 className="text-2xl font-medium mb-3">Analysis</h4>
 
               <p className="text-slate-600 mb-6 leading-relaxed">
-                URL 위험도·도메인 신뢰도·파라미터 구조를 정밀 분석해
-                보안 위협을 판단합니다.
+                URL 위험도·도메인 신뢰도·URL 패턴을 종합 분석해
+                보안 위협 여부를 판단합니다.
               </p>
 
-              <ul className="space-y-2 text-slate-700 text-left w-full max-w-[240px]">
-                <li>• 위험도 자동 분석</li>
-                <li>• 도메인 검증</li>
-                <li>• 파라미터 구조 분석</li>
-              </ul>
+              {/* 모듈 리스트 */}
+              <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
+
+                {/* Module #1 */}
+                <div className="
+                  flex items-center gap-3 p-4 rounded-xl 
+                  bg-lime-50/70 border border-lime-200/40
+                  hover:bg-lime-100/80 hover:border-lime-300/60 
+                  transition-all hover:shadow-sm
+                ">
+                  <ShieldCheck className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">
+                    URL 위험도 분석
+                  </span>
+                </div>
+
+                {/* Module #2 */}
+                <div className="
+                  flex items-center gap-3 p-4 rounded-xl 
+                  bg-lime-50/70 border border-lime-200/40
+                  hover:bg-lime-100/80 hover:border-lime-300/60 
+                  transition-all hover:shadow-sm
+                ">
+                  <Globe className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">
+                    도메인 신뢰도 검증
+                  </span>
+                </div>
+
+                {/* Module #3 */}
+                <div className="
+                  flex items-center gap-3 p-4 rounded-xl 
+                  bg-lime-50/70 border border-lime-200/40
+                  hover:bg-lime-100/80 hover:border-lime-300/60 
+                  transition-all hover:shadow-sm
+                ">
+                  <AlertTriangle className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">
+                    URL 리스크 설명 제공
+                  </span>
+                </div>
+
+              </div>
             </motion.div>
 
 
 
+
+            {/* =============================== */}
             {/* Community */}
+            {/* =============================== */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
               viewport={{ once: true }}
               className="
-      p-10 rounded-3xl border shadow-sm hover:shadow-md transition
-      flex flex-col items-center text-center
-    "
+                p-10 rounded-3xl border shadow-sm hover:shadow-md transition
+                flex flex-col items-center text-center
+              "
             >
               <div className="p-4 bg-lime-100 text-lime-600 rounded-xl inline-block mb-6">
                 <Users size={36} />
@@ -262,28 +330,67 @@ export function Home() {
               <h4 className="text-2xl font-medium mb-3">Community</h4>
 
               <p className="text-slate-600 mb-6 leading-relaxed">
-                실제 사용자들이 남긴 경험을 통해 더 현실적인 보안 인사이트를 얻습니다.
+                사용자 경험 기반 사례로
+                실질적인 보안 인사이트를 제공합니다.
               </p>
 
-              <ul className="space-y-2 text-slate-700 text-left w-full max-w-[240px]">
-                <li>• 사용자 기반 정보 공유</li>
-                <li>• QR 사례 정보</li>
-                <li>• 최신 보안 트렌드</li>
-              </ul>
+              <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
+
+                {/* Module */}
+                <div className="
+                  flex items-center gap-3 p-4 rounded-xl
+                  bg-lime-50/70 border border-lime-200/40
+                  hover:bg-lime-100/80 hover:border-lime-300/60
+                  transition-all hover:shadow-sm
+                ">
+                  <MessageSquare className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">
+                    사용자 사례 공유
+                  </span>
+                </div>
+
+                <div className="
+                  flex items-center gap-3 p-4 rounded-xl
+                  bg-lime-50/70 border border-lime-200/40
+                  hover:bg-lime-100/80 hover:border-lime-300/60
+                  transition-all hover:shadow-sm
+                ">
+                  <Lightbulb className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">
+                    보안 인사이트 교류
+                  </span>
+                </div>
+
+                <div className="
+                  flex items-center gap-3 p-4 rounded-xl
+                  bg-lime-50/70 border border-lime-200/40
+                  hover:bg-lime-100/80 hover:border-lime-300/60
+                  transition-all hover:shadow-sm
+                ">
+                  <Flag className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">
+                    신고 & 위험 URL 제보
+                  </span>
+                </div>
+
+              </div>
             </motion.div>
 
 
 
+
+            {/* =============================== */}
             {/* MyPost */}
+            {/* =============================== */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
               viewport={{ once: true }}
               className="
-      p-10 rounded-3xl border shadow-sm hover:shadow-md transition
-      flex flex-col items-center text-center
-    "
+                p-10 rounded-3xl border shadow-sm hover:shadow-md transition
+                flex flex-col items-center text-center
+              "
             >
               <div className="p-4 bg-lime-100 text-lime-600 rounded-xl inline-block mb-6">
                 <FileText size={36} />
@@ -292,22 +399,59 @@ export function Home() {
               <h4 className="text-2xl font-medium mb-3">MyPost</h4>
 
               <p className="text-slate-600 mb-6 leading-relaxed">
-                내가 분석한 QR 기록을 저장하고 손쉽게 다시 열람할 수 있습니다.
+                분석한 QR 기록을 저장하고  
+                언제든 빠르게 다시 확인할 수 있습니다.
               </p>
 
-              <ul className="space-y-2 text-slate-700 text-left w-full max-w-[240px]">
-                <li>• 분석 데이터 저장</li>
-                <li>• 제목/내역 관리</li>
-                <li>• 상세 분석 확인</li>
-              </ul>
+              <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
+
+                <div className="
+                  flex items-center gap-3 p-4 rounded-xl
+                  bg-lime-50/70 border border-lime-200/40
+                  hover:bg-lime-100/80 hover:border-lime-300/60
+                  transition-all hover:shadow-sm
+                ">
+                  <Save className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">
+                    분석 기록 자동 저장
+                  </span>
+                </div>
+
+                <div className="
+                  flex items-center gap-3 p-4 rounded-xl
+                  bg-lime-50/70 border border-lime-200/40
+                  hover:bg-lime-100/80 hover:border-lime-300/60
+                  transition-all hover:shadow-sm
+                ">
+                  <Edit3 className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">
+                    제목 & 내용 관리
+                  </span>
+                </div>
+
+                <div className="
+                  flex items-center gap-3 p-4 rounded-xl
+                  bg-lime-50/70 border border-lime-200/40
+                  hover:bg-lime-100/80 hover:border-lime-300/60
+                  transition-all hover:shadow-sm
+                ">
+                  <Search className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">
+                    상세 분석 보기
+                  </span>
+                </div>
+
+              </div>
+
             </motion.div>
-          </div>
+
+
+          </div> {/* END FEATURE GRID */}
 
 
 
-        </div>
-      </div>
-
+        </div>{/* END max-w */}
+      </div>{/* END ABOUT CONTAINER */}
     </div>
   );
 }
