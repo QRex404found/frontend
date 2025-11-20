@@ -36,7 +36,7 @@ export default function AnalyzingQR() {
 
     // 파일 정보가 유효할 경우 LoadingBar를 렌더링.
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
+        <div className="flex flex-col items-center justify-center h-screen bg-white">
             
             <h1 className="mb-8 text-4xl font-normal">Analyzing QR</h1> 
 
