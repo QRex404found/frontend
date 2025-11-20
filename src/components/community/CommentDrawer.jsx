@@ -100,7 +100,8 @@ export const CommentDrawer = ({
           </DrawerDescription>
         </DrawerHeader>
 
-        <ScrollArea className="flex-1 min-h-0 px-4">
+        {/* overflow-x-hidden 추가: 혹시라도 모를 가로 스크롤바 방지 */}
+        <ScrollArea className="flex-1 min-h-0 px-4 overflow-x-hidden">
           <div className="space-y-6 py-4">
             {comments.length === 0 ? (
               <div className="py-10 text-center text-gray-500">
@@ -126,26 +127,29 @@ export const CommentDrawer = ({
                     {/* 아바타 */}
                     <div className="flex-shrink-0 w-8 h-8 mt-1 bg-gray-300 rounded-full" />
                     
-                    {/* [최종 해결책: w-0 테크닉]
-                        min-w-0 대신 w-0을 사용하면 브라우저가 내용물 크기를 완전히 무시하고
-                        무조건 Flex 비율(flex-1)에 맞춰서 강제로 구겨 넣습니다.
-                    */}
+                    {/* w-0와 flex-1 조합으로 부모 너비 강제 준수 */}
                     <div className="relative flex-1 w-0"> 
                         
+                        {/* 버튼 공간 확보 */}
                         <div className="pr-8">
                           <p className="text-sm font-semibold text-[#81BF59] mb-0.5">
                             {authorId}
                           </p>
 
-                          {/* break-all: 특수문자 강제 줄바꿈
-                             whitespace-pre-wrap: 줄바꿈 유지
+                          {/* [여기가 수정되었습니다] 
+                              1. break-all: 모든 글자 강제 줄바꿈
+                              2. [overflow-wrap:anywhere]: 브라우저 호환성을 위한 가장 강력한 줄바꿈 속성
+                              3. w-full: P태그 너비 100% 강제
                           */}
-                          <p className="text-sm text-gray-700 break-all whitespace-pre-wrap">
+                          <p 
+                            className="text-sm text-gray-700 whitespace-pre-wrap break-all w-full [overflow-wrap:anywhere]"
+                            style={{ wordBreak: 'break-all' }} // 확실한 적용을 위해 인라인 스타일 추가
+                          >
                             {comment.contents}
                           </p>
                         </div>
 
-                        {/* 버튼: 디자인 그대로 유지 */}
+                        {/* 버튼: 우측 상단 고정 (수정 없음) */}
                         <div className="absolute top-0 right-0">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
