@@ -37,7 +37,7 @@ export function AuthPopup({ show, isMandatory }) {
         <DialogHeader>
           <DialogTitle>로그인이 필요합니다</DialogTitle>
           <DialogDescription>
-            이 기능을 사용하려면 먼저 로그인해주세요.
+            페이지 접근 권한이 없습니다. 로그인 후 이용가능합니다.
           </DialogDescription>
         </DialogHeader>
 
