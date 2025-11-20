@@ -15,7 +15,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import EditProfileTab from "@/components/profile/EditProfileTab"; 
-import DeleteAccountTab from "@/components/profile/DeleteAccountTab"; // 아까 수정한 파일 경로
+import DeleteAccountTab from "@/components/profile/DeleteAccountTab";
 
 export function Header() {
   const navigate = useNavigate();
@@ -25,10 +25,8 @@ export function Header() {
   const [open, setOpen] = React.useState(false);
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
 
-  // [핵심] 소셜 유저 판별 (ID가 kakao_ 또는 google_ 로 시작)
   const currentUserId = user?.id || user?.userId;
 
-  // 2. 찾아낸 ID로 소셜 유저인지 판별.
   const isSocialUser = currentUserId && (
     currentUserId.startsWith('kakao_') || 
     currentUserId.startsWith('google_')
@@ -41,6 +39,13 @@ export function Header() {
   const handleLogout = () => {
     removeToken();
     logout?.();
+
+    // ⭐⭐⭐ [추가된 핵심 기능: 로그아웃 시 채팅 기록 초기화] ⭐⭐⭐
+    Object.keys(sessionStorage)
+      .filter(key => key.startsWith("qrex_chat_"))
+      .forEach(key => sessionStorage.removeItem(key));
+    // ----------------------------------------------------------------------
+
     setIsSheetOpen(false);
   };
 
@@ -62,25 +67,30 @@ export function Header() {
           <NavigationMenuList className="flex items-center justify-center gap-10">
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link to="/analysis" onClick={(e) => { 
-                  e.preventDefault();
-                  navigate(`/analysis?refresh=${Date.now()}`);
+                <Link
+                  to="/analysis"
+                  onClick={(e) => { 
+                    e.preventDefault();
+                    navigate(`/analysis?refresh=${Date.now()}`);
                   }}
                   className="text-sm font-medium md:text-lg hover:text-primary"
                 >
                   Analysis
                 </Link>
-
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link to="/community" className="text-sm font-medium md:text-lg hover:text-primary">Community</Link>
+                <Link to="/community" className="text-sm font-medium md:text-lg hover:text-primary">
+                  Community
+                </Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link to="/mypost" className="text-sm font-medium md:text-lg hover:text-primary">My post</Link>
+                <Link to="/mypost" className="text-sm font-medium md:text-lg hover:text-primary">
+                  My post
+                </Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
@@ -89,7 +99,7 @@ export function Header() {
         {/* 오른쪽 영역 */}
         <div className="flex items-center gap-3 ml-auto md:gap-4">
 
-          {/* 프로필 팝업 (로그인 상태일 때) */}
+          {/* 프로필 팝업 */}
           {isLoggedIn ? (
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
@@ -106,24 +116,18 @@ export function Header() {
                 alignOffset={-200}
                 className="w-[420px] p-4 rounded-xl bg-white shadow-lg border max-w-[100vw]"
               >
-                {/* [핵심] 소셜 유저면 'delete' 탭이 기본, 아니면 'edit'이 기본 */}
                 <Tabs defaultValue={isSocialUser ? "delete" : "edit"} className="w-full">
-
                   <TabsList className="inline-flex bg-gray-200 rounded-md p-1.5 gap-1 max-w-max">
-                    
-                    {/* 소셜 유저가 아닐 때만 수정 버튼 보이기 */}
                     {!isSocialUser && (
                       <TabsTrigger value="edit" className="px-3 py-2 rounded text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm">
                         Edit Profile
                       </TabsTrigger>
                     )}
-                    
                     <TabsTrigger value="delete" className="px-3 py-2 rounded text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm">
                       Delete Account
                     </TabsTrigger>
                   </TabsList>
 
-                  {/* 소셜 유저가 아닐 때만 수정 내용 보이기 */}
                   {!isSocialUser && (
                     <TabsContent value="edit" className="pt-4 text-sm max-h-[330px] overflow-y-auto">
                       <EditProfileTab onClose={() => setOpen(false)} />
@@ -142,7 +146,7 @@ export function Header() {
             </Link>
           )}
 
-          {/* 로그아웃 버튼 (데스크탑) */}
+          {/* 로그아웃 버튼 */}
           {isLoggedIn && (
             <Button
               onClick={handleLogout}
@@ -153,7 +157,7 @@ export function Header() {
             </Button>
           )}
 
-          {/* 햄버거 메뉴 (모바일) */}
+          {/* 모바일 메뉴 */}
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger className="p-2 rounded md:hidden hover:bg-gray-100">
               <Menu className="text-gray-800 w-7 h-7" />
