@@ -91,17 +91,26 @@ export const CommentDrawer = ({
       direction="bottom"
       disablePreventScroll
     >
+      {/* [레이아웃 수정]
+         h-[70vh]: 전체 높이 고정
+         flex flex-col: 내부 요소 세로 배치 (헤더 - 스크롤영역 - 입력창)
+      */}
       <DrawerContent className={`h-[70vh] flex flex-col rounded-t-xl ${className}`}>
         
-        <DrawerHeader>
+        <DrawerHeader className="flex-none">
           <DrawerTitle>COMMENT</DrawerTitle>
           <DrawerDescription className="sr-only">
-            Comments section for the post
+            Comments section
           </DrawerDescription>
         </DrawerHeader>
 
-        <ScrollArea className="flex-grow min-h-0 p-4 overflow-x-hidden">
-          <div className="space-y-6">
+        {/* [스크롤 영역 수정]
+           flex-1: 남은 공간을 모두 차지
+           overflow-y-auto: 세로 스크롤 허용
+           min-h-0: flex 자식 요소의 overflow 버그 방지 (필수)
+        */}
+        <ScrollArea className="flex-1 min-h-0 p-4">
+          <div className="space-y-6 pb-4">
             {comments.length === 0 ? (
               <div className="py-10 text-center text-gray-500">
                 No comments yet
@@ -126,37 +135,25 @@ export const CommentDrawer = ({
                     {/* 아바타 */}
                     <div className="flex-shrink-0 w-8 h-8 mt-1 bg-gray-300 rounded-full" />
                     
-                    {/* [문제 해결의 핵심 구간]
-                        1. min-w-0: Flex 자식 요소가 내용물보다 더 작아질 수 있게 허용 (이게 없으면 텍스트가 부모를 뚫고 나감)
-                        2. w-full: 가로폭을 꽉 채움
+                    {/* [구조 변경의 핵심] 
+                        flex-1 min-w-0: 이 div가 부모(화면) 너비를 넘지 않도록 강제함
                     */}
-                    <div className="relative flex-1 min-w-0 w-full"> 
+                    <div className="flex-1 min-w-0 grid gap-1"> 
                         
-                        {/* pr-8: 우측 상단 버튼(MoreHorizontal)이 들어갈 공간 확보 */}
-                        <div className="pr-8">
-                          <p className="text-sm font-semibold text-[#81BF59]">
-                            {authorId}
-                          </p>
+                        {/* 상단 줄: 작성자 아이디 + 더보기 버튼 */}
+                        {/* 버튼을 텍스트와 겹치지 않게 아예 같은 줄로 분리함 */}
+                        <div className="flex items-center justify-between gap-2">
+                            <span className="text-sm font-semibold text-[#81BF59] truncate">
+                              {authorId}
+                            </span>
 
-                          {/* [CSS 속성 설명]
-                             1. break-all: '????' 같은 특수문자 연속도 무조건 강제 줄바꿈 (가장 강력함)
-                             2. whitespace-pre-wrap: 사용자가 입력한 엔터(줄바꿈)는 유지
-                          */}
-                          <p className="text-sm text-gray-700 break-all whitespace-pre-wrap">
-                            {comment.contents}
-                          </p>
-                        </div>
-
-                        {/* 우측 상단 버튼 고정 */}
-                        <div className="absolute top-0 right-0">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <button className="p-1 text-gray-500 hover:text-gray-700">
+                                <button className="flex-shrink-0 p-1 text-gray-500 hover:text-gray-700 -mr-1">
                                   <MoreHorizontal className="w-4 h-4" />
                                 </button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-40">
-
                                 {isMyComment ? (
                                   <DropdownMenuItem
                                     onClick={() => handleDeleteComment(comment.commentId)}
@@ -172,10 +169,17 @@ export const CommentDrawer = ({
                                     report comment
                                   </DropdownMenuItem>
                                 )}
-
                               </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
+
+                        {/* 댓글 내용 */}
+                        {/* break-all: ???? 같은 특수문자도 무조건 줄바꿈
+                           whitespace-pre-wrap: 엔터키 적용
+                        */}
+                        <p className="text-sm text-gray-700 break-all whitespace-pre-wrap">
+                          {comment.contents}
+                        </p>
                     </div>
                   </div>
                 );
@@ -184,9 +188,10 @@ export const CommentDrawer = ({
           </div>
         </ScrollArea>
 
+        {/* 입력창 영역: 높이 고정(flex-none) */}
         <form
           onSubmit={handleSubmitComment}
-          className="flex items-end gap-2 p-4 border-t flex-shrink-0"
+          className="flex-none flex items-end gap-2 p-4 border-t bg-white"
         >
           <Textarea
             placeholder="Add a comment..."
