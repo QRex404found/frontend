@@ -20,7 +20,7 @@ export function SignIn() {
   const { login, isLoggedIn } = useAuth();
   const shown = useRef(false);
 
-  /* 🔔 토스트 처리 */
+  /* 토스트 처리 */
   useEffect(() => {
     const info = location.state?.toast;
     if (info && !shown.current) {
@@ -30,7 +30,7 @@ export function SignIn() {
     }
   }, [location.state]);
 
-  /* 🔥 로그인 상태면 자동 이동 */
+  /* 로그인 상태면 자동 이동 */
   useEffect(() => {
     if (isLoggedIn) {
       navigate("/");
@@ -45,7 +45,7 @@ export function SignIn() {
     try {
       const data = await loginApi({ userId: id, password });
 
-      // ⬇ 추가: 로그인 성공 직후 즉시 이동
+      // 로그인 성공 직후 즉시 이동
       login(data.token);
       navigate("/");
 
@@ -58,7 +58,7 @@ export function SignIn() {
     <div className="flex items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">계정에 로그인</CardTitle>
+          <CardTitle className="text-2xl !font-normal">계정 로그인</CardTitle>
         </CardHeader>
 
         <CardContent className="grid gap-4">

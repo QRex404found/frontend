@@ -41,18 +41,9 @@ export function AuthPopup({ show, isMandatory }) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex justify-end gap-2">
-          {/* 선택적 취소 버튼 (isMandatory=false인 경우에만 표시) */}
-          {!isMandatory && (
-            <Button
-              variant="outline"
-              onClick={() => navigate('/', { replace: true })}
-            >
-              취소
-            </Button>
-          )}
+        <div className="flex justify-end">
 
-          <Button onClick={handleLoginClick} className="bg-lime-500 hover:bg-lime-600">로그인</Button>
+          <Button onClick={handleLoginClick} className="bg-lime-500 hover:bg-lime-600">Login</Button>
         </div>
       </DialogContent>
     </Dialog>
