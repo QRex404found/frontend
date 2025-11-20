@@ -78,7 +78,7 @@ export function MyPost() {
 
     window.addEventListener("analysis-updated", handleRefresh);
     return () => window.removeEventListener("analysis-updated", handleRefresh);
-  }, [user]); // user 변경 시에도 정상 동작하도록 함
+  }, []); // user 변경 시에도 정상 동작하도록 함
 
   /* 삭제 모드 */
   const toggleDeleteMode = () => {

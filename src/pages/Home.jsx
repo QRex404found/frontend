@@ -79,7 +79,7 @@ export function Home() {
       {/* ====================================================== */}
       {/* 2) ABOUT HEADER (fadeUp) */}
       {/* ====================================================== */}
-      <div ref={infoSectionRef} className="bg-white text-slate-900 py-36 px-6">
+      <div ref={infoSectionRef} className="bg-white text-slate-900 py-28 px-6">
         <div className="max-w-6xl mx-auto">
 
           <motion.div
@@ -87,14 +87,14 @@ export function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
             viewport={{ once: true }}
-            className="text-center mb-32"
+            className="text-center mb-14"
           >
-            <h2 className="text-5xl font-semibold tracking-tight mb-6">
+            <h2 className="text-5xl font-medium tracking-tight mb-6">
               QR 보안을 <span className="text-lime-600">더 스마트하게.</span>
             </h2>
 
             <p className="text-slate-500 text-xl max-w-3xl mx-auto leading-relaxed">
-              QRex는 QR 분석, 위험 탐지, 커뮤니티, 이력 관리까지
+              QRex는 QR 분석, 위험 탐지, 커뮤니티, 이력 관리까지<br />
               한 번에 제공하는 지능형 QR 보안 플랫폼입니다.
             </p>
           </motion.div>
@@ -104,7 +104,7 @@ export function Home() {
           {/* ====================================================== */}
           {/* 3) WHAT IS QREX (좌↔우 등장) */}
           {/* ====================================================== */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-20 mb-40 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-20 mb-16 items-center">
 
             {/* LEFT: Text */}
             <motion.div
@@ -113,7 +113,7 @@ export function Home() {
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-3xl font-semibold mb-6">QRex란?</h3>
+              <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-10">
                 QRex는 URL 패턴 분석, 도메인 신뢰도 확인,
                 파라미터 검증을 기반으로 위험성을 판단하는
@@ -123,8 +123,8 @@ export function Home() {
                 지속적이고 확장 가능한 보안 경험을 제공합니다.
               </p>
 
-              <button className="px-8 py-4 bg-lime-500 text-white rounded-xl font-semibold hover:bg-lime-600 transition">
-                시작하기
+              <button className="px-8 py-4 bg-lime-500 text-white rounded-xl font-medium hover:bg-lime-600 transition">
+                START QRex!
               </button>
             </motion.div>
 
@@ -143,11 +143,13 @@ export function Home() {
 
 
 
-          {/* CTA SECTION */}
-          <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-16 my-32 overflow-hidden">
+          {/* ====================================================== */}
+          {/* 4) CTA SECTION (Brush Stroke + 1/3 여백으로 축소) */}
+          {/* ====================================================== */}
+          <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-14 my-24 overflow-hidden">
 
-            {/* === Brush Stroke === */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.15]">
+            {/* === Brush Stroke Background === */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.12]">
               <motion.svg
                 width="100%"
                 height="100%"
@@ -164,23 +166,22 @@ export function Home() {
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
                   transition={{
-                    duration: 2.0,
+                    duration: 1.8,
                     ease: "easeInOut",
                   }}
                 />
               </motion.svg>
             </div>
 
-
-            <h3 className="text-3xl font-semibold text-center mb-8 relative z-10">
+            <h3 className="text-3xl font-medium text-center mb-8 relative z-10">
               QRex는 당신의 안전한 QR 사용을 돕습니다
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-4 relative z-10">
 
               <div className="text-center p-6">
                 <QrCode size={44} className="text-lime-600 mx-auto mb-4" />
-                <h4 className="text-xl font-semibold mb-2">정확한 URL 분석</h4>
+                <h4 className="text-xl font-medium mb-2">정확한 URL 분석</h4>
                 <p className="text-slate-500 text-sm leading-relaxed">
                   URL 구조, IP, 도메인 신뢰도를 기반으로 위험도를 판단합니다.
                 </p>
@@ -188,7 +189,7 @@ export function Home() {
 
               <div className="text-center p-6">
                 <Users size={44} className="text-lime-600 mx-auto mb-4" />
-                <h4 className="text-xl font-semibold mb-2">보안 경험 공유</h4>
+                <h4 className="text-xl font-medium mb-2">보안 경험 공유</h4>
                 <p className="text-slate-500 text-sm leading-relaxed">
                   QR 관련 정보와 사례를 함께 나눌 수 있습니다.
                 </p>
@@ -196,7 +197,7 @@ export function Home() {
 
               <div className="text-center p-6">
                 <FileText size={44} className="text-lime-600 mx-auto mb-4" />
-                <h4 className="text-xl font-semibold mb-2">분석 이력 관리</h4>
+                <h4 className="text-xl font-medium mb-2">분석 이력 관리</h4>
                 <p className="text-slate-500 text-sm leading-relaxed">
                   스캔한 QR 분석 결과를 한곳에서 쉽게 관리하세요.
                 </p>
@@ -207,15 +208,10 @@ export function Home() {
 
 
 
-
-
-
-
-
           {/* ====================================================== */}
-          {/* 5) FEATURE 3-COLUMN (마무리 소개) */}
+          {/* 5) FEATURE 3-COLUMN (개선된 중앙 정렬 버전) */}
           {/* ====================================================== */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-40">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
             {/* Analysis */}
             <motion.div
@@ -223,22 +219,29 @@ export function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
-              className="p-10 rounded-3xl border shadow-sm hover:shadow-md transition"
+              className="
+      p-10 rounded-3xl border shadow-sm hover:shadow-md transition
+      flex flex-col items-center text-center
+    "
             >
               <div className="p-4 bg-lime-100 text-lime-600 rounded-xl inline-block mb-6">
                 <QrCode size={36} />
               </div>
-              <h4 className="text-2xl font-semibold mb-3">Analysis</h4>
+
+              <h4 className="text-2xl font-medium mb-3">Analysis</h4>
+
               <p className="text-slate-600 mb-6 leading-relaxed">
                 URL 위험도·도메인 신뢰도·파라미터 구조를 정밀 분석해
                 보안 위협을 판단합니다.
               </p>
-              <ul className="space-y-2 text-slate-700">
+
+              <ul className="space-y-2 text-slate-700 text-left w-full max-w-[240px]">
                 <li>• 위험도 자동 분석</li>
                 <li>• 도메인 검증</li>
                 <li>• 파라미터 구조 분석</li>
               </ul>
             </motion.div>
+
 
 
             {/* Community */}
@@ -247,22 +250,28 @@ export function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
               viewport={{ once: true }}
-              className="p-10 rounded-3xl border shadow-sm hover:shadow-md transition"
+              className="
+      p-10 rounded-3xl border shadow-sm hover:shadow-md transition
+      flex flex-col items-center text-center
+    "
             >
               <div className="p-4 bg-lime-100 text-lime-600 rounded-xl inline-block mb-6">
                 <Users size={36} />
               </div>
-              <h4 className="text-2xl font-semibold mb-3">Community</h4>
+
+              <h4 className="text-2xl font-medium mb-3">Community</h4>
+
               <p className="text-slate-600 mb-6 leading-relaxed">
-                실제 사용자들이 남긴 경험을 통해
-                더 현실적인 보안 인사이트를 얻습니다.
+                실제 사용자들이 남긴 경험을 통해 더 현실적인 보안 인사이트를 얻습니다.
               </p>
-              <ul className="space-y-2 text-slate-700">
+
+              <ul className="space-y-2 text-slate-700 text-left w-full max-w-[240px]">
                 <li>• 사용자 기반 정보 공유</li>
                 <li>• QR 사례 정보</li>
                 <li>• 최신 보안 트렌드</li>
               </ul>
             </motion.div>
+
 
 
             {/* MyPost */}
@@ -271,23 +280,29 @@ export function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
               viewport={{ once: true }}
-              className="p-10 rounded-3xl border shadow-sm hover:shadow-md transition"
+              className="
+      p-10 rounded-3xl border shadow-sm hover:shadow-md transition
+      flex flex-col items-center text-center
+    "
             >
               <div className="p-4 bg-lime-100 text-lime-600 rounded-xl inline-block mb-6">
                 <FileText size={36} />
               </div>
-              <h4 className="text-2xl font-semibold mb-3">MyPost</h4>
+
+              <h4 className="text-2xl font-medium mb-3">MyPost</h4>
+
               <p className="text-slate-600 mb-6 leading-relaxed">
-                내가 분석한 QR 기록을 저장하고
-                손쉽게 다시 열람할 수 있습니다.
+                내가 분석한 QR 기록을 저장하고 손쉽게 다시 열람할 수 있습니다.
               </p>
-              <ul className="space-y-2 text-slate-700">
+
+              <ul className="space-y-2 text-slate-700 text-left w-full max-w-[240px]">
                 <li>• 분석 데이터 저장</li>
                 <li>• 제목/내역 관리</li>
                 <li>• 상세 분석 확인</li>
               </ul>
             </motion.div>
           </div>
+
 
 
         </div>

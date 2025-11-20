@@ -28,7 +28,6 @@ export default function ChatBody({ isOpen, user }) {
 
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const viewportRef = useRef(null);
 
   // ------------------------------------------------------------------------------------------------
   // 스크롤 항상 맨 아래 유지
@@ -52,7 +51,7 @@ export default function ChatBody({ isOpen, user }) {
   }, [messages, storageKey]);
 
   // ------------------------------------------------------------------------------------------------
-  // 계정이 바뀌었을 때 다른 계정의 기록을 불러오도록 처리
+  // 계정 변경 시 기존 기록 로드
   // ------------------------------------------------------------------------------------------------
   useEffect(() => {
     const saved = sessionStorage.getItem(storageKey);
@@ -107,20 +106,22 @@ export default function ChatBody({ isOpen, user }) {
 
       setMessages((prev) => [...prev, aiMessage]);
 
-      // 🚨 [기존 로직 유지 + 게시글 성공 감지 추가]
+      // 🚨 기존 조건 + 게시글 조건 모두 포함
       if (
-        aiText.includes("변경") || 
-        aiText.includes("수정") || 
+        // ⭐ 기존 조건 (삭제 금지!)
+        aiText.includes("변경") ||
+        aiText.includes("수정") ||
         aiText.includes("바꿨") ||
         aiText.includes("완료") ||
 
-        // ⭐ 추가됨: 게시글 작성 성공 시 MyPost 즉시 업데이트
-        aiText.includes("게시글이 성공적으로 작성되었습니다") ||
-        aiText.includes("성공적으로 작성되었습니다")
+        // ⭐ 새로운 게시글 작성 성공 감지 조건
+        aiText.includes("작성되었습니다") ||
+        aiText.includes("게시글") ||
+        aiText.includes("성공적으로") ||
+        aiText.includes("등록되었습니다")
       ) {
-        console.log("🔔 [ChatBody] 게시글 작성 감지 → MyPost 갱신 이벤트 발생");
+        console.log("🔔 [ChatBody] 업데이트 감지 → MyPost 갱신 이벤트 발생");
 
-        // DB 반영 시간을 고려해 약간 딜레이 후 이벤트 전송
         setTimeout(() => {
           window.dispatchEvent(new Event("analysis-updated"));
         }, 500);
@@ -128,6 +129,7 @@ export default function ChatBody({ isOpen, user }) {
 
     } catch (error) {
       console.error("AI Error:", error);
+
       setMessages((prev) => [
         ...prev,
         {
