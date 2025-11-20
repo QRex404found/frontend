@@ -4,110 +4,117 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Loader2 } from "lucide-react";
 import apiClient from "@/api/index";
 
-export default function ChatBody({ isOpen }) {
+export default function ChatBody({ isOpen, user }) {
+  // ⭐ userId 결정 (비로그인 → guest)
+  const userId = user?.id || user?.userId || "guest";
+  const storageKey = `qrex_chat_${userId}`;
 
+  // ------------------------------------------------------------------------------------------------
   // 1) sessionStorage에서 메시지 불러오기
+  // ------------------------------------------------------------------------------------------------
   const [messages, setMessages] = useState(() => {
-    const saved = sessionStorage.getItem("qrex_chat_messages");
+    const saved = sessionStorage.getItem(storageKey);
     return saved
       ? JSON.parse(saved)
       : [
+          {
+            id: 1,
+            role: "assistant",
+            text: "안녕하세요! QRex 보안 에이전트입니다. 무엇을 도와드릴까요? 🛡️",
+          },
+        ];
+  });
+
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const viewportRef = useRef(null);
+
+  // ------------------------------------------------------------------------------------------------
+  // 스크롤 항상 맨 아래 유지
+  // ------------------------------------------------------------------------------------------------
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      const viewport = document.querySelector("[data-radix-scroll-area-viewport]");
+      if (viewport) viewport.scrollTop = viewport.scrollHeight;
+    }, 50);
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading, isOpen]);
+
+  // ------------------------------------------------------------------------------------------------
+  // 2) 메시지가 바뀔 때마다 sessionStorage에 저장
+  // ------------------------------------------------------------------------------------------------
+  useEffect(() => {
+    sessionStorage.setItem(storageKey, JSON.stringify(messages));
+  }, [messages, storageKey]);
+
+  // ------------------------------------------------------------------------------------------------
+  // 계정이 바뀌었을 때 다른 계정의 기록을 불러오도록 처리
+  // ------------------------------------------------------------------------------------------------
+  useEffect(() => {
+    const saved = sessionStorage.getItem(storageKey);
+    if (saved) {
+      setMessages(JSON.parse(saved));
+    } else {
+      setMessages([
         {
           id: 1,
           role: "assistant",
           text: "안녕하세요! QRex 보안 에이전트입니다. 무엇을 도와드릴까요? 🛡️",
         },
-      ];
-  });
+      ]);
+    }
+  }, [storageKey]);
 
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  const viewportRef = useRef(null);
-
-  // 스크롤을 아래로 이동시키는 함수
-  const scrollToBottom = () => {
-    // setTimeout을 사용하여 DOM 렌더링 후 실행되도록 보장
-    setTimeout(() => {
-      const viewport = document.querySelector("[data-radix-scroll-area-viewport]");
-      if (viewport) {
-        viewport.scrollTop = viewport.scrollHeight;
-      }
-    }, 100);
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isLoading, isOpen]); // isOpen이 변경될 때도 스크롤 조정
-
-  // 2) 메시지가 변할 때마다 저장
-  useEffect(() => {
-    sessionStorage.setItem("qrex_chat_messages", JSON.stringify(messages));
-  }, [messages]);
-
+  // ------------------------------------------------------------------------------------------------
+  // 메시지 전송
+  // ------------------------------------------------------------------------------------------------
   const handleSend = async () => {
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
 
-    // 1. 사용자 메시지 화면 표시
     const userMessage = {
       id: Date.now(),
       role: "user",
       text: trimmed,
     };
+
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
-      let guestId = localStorage.getItem("guestId");
-      if (!guestId) {
-        guestId = "guest-" + Date.now();
-        localStorage.setItem("guestId", guestId);
-      }
-
       const response = await apiClient.get("/ai/chat", {
-        params: {
-          message: trimmed,
-          userId: guestId
-        },
+        params: { message: trimmed, userId },
       });
 
-      console.log("Server Response:", response.data); // 디버깅용 로그
-
-      // ⭐️ [핵심 수정] 서버 응답 데이터 처리 로직
-      // 서버가 { "response": "내용" } 형태의 객체를 줄 경우를 대비
       let aiText = "";
-      
-      if (typeof response.data === 'object' && response.data !== null) {
-        // 에러 로그에 나온대로 'response' 키가 있는지 확인
-        if (response.data.response) {
-           aiText = response.data.response;
-        } else {
-           // 키를 모를 경우 안전하게 문자열로 변환 (백지 방지)
-           aiText = JSON.stringify(response.data); 
-        }
+
+      if (typeof response.data === "object" && response.data !== null) {
+        aiText = response.data.response || JSON.stringify(response.data);
       } else {
-        // 단순 문자열인 경우
         aiText = response.data;
       }
 
-      // 4. AI 응답 표시
       const aiMessage = {
         id: Date.now() + 1,
         role: "assistant",
-        text: aiText, // 여기서 이제 확실한 String이 들어갑니다.
+        text: aiText,
       };
-      setMessages((prev) => [...prev, aiMessage]);
 
+      setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error("AI Error:", error);
-      const errorMessage = {
-        id: Date.now() + 2,
-        role: "assistant",
-        text: "죄송합니다. AI 서버와 연결할 수 없습니다. 😢",
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 2,
+          role: "assistant",
+          text: "죄송합니다. AI 서버와 연결할 수 없습니다. 😢",
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -120,18 +127,18 @@ export default function ChatBody({ isOpen }) {
     }
   };
 
+  // ------------------------------------------------------------------------------------------------
   return (
     <div className="flex flex-col h-full">
-
-      {/* 메시지 리스트 */}
       <div className="flex-1 px-4 overflow-hidden">
         <ScrollArea className="h-full pr-2">
           <div className="flex flex-col justify-end min-h-full gap-5 pb-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex items-end ${msg.role === "user" ? "justify-end" : "justify-start"
-                  }`}
+                className={`flex items-end ${
+                  msg.role === "user" ? "justify-end" : "justify-start"
+                }`}
               >
                 {msg.role === "assistant" && (
                   <img
@@ -144,21 +151,20 @@ export default function ChatBody({ isOpen }) {
                 <div
                   className={`
                     max-w-[75%] px-4 py-2 text-sm rounded-2xl whitespace-pre-wrap 
-                    ${msg.role === "user"
-                      ? "bg-lime-500 text-white rounded-br-none"
-                      : "bg-[#E2E8F0] text-black rounded-bl-none"
+                    ${
+                      msg.role === "user"
+                        ? "bg-lime-500 text-white rounded-br-none"
+                        : "bg-[#E2E8F0] text-black rounded-bl-none"
                     }
                   `}
                 >
-                  {/* 혹시라도 여전히 객체가 들어올 경우를 대비한 2차 방어선 
-                      객체라면 문자열로 변환해서 출력
-                  */}
-                  {typeof msg.text === 'object' ? JSON.stringify(msg.text) : msg.text}
+                  {typeof msg.text === "object"
+                    ? JSON.stringify(msg.text)
+                    : msg.text}
                 </div>
               </div>
             ))}
 
-            {/* 로딩 메시지 */}
             {isLoading && (
               <div className="flex items-end justify-start">
                 <img
@@ -176,7 +182,6 @@ export default function ChatBody({ isOpen }) {
         </ScrollArea>
       </div>
 
-      {/* 입력창 */}
       <div className="px-4 py-3 bg-white border-t">
         <div className="flex items-center w-full bg-[#F1F5F9] rounded-full px-4 py-[6px] shadow-sm focus-within:ring-2 focus-within:ring-lime-200 transition-all">
           <input
@@ -190,16 +195,16 @@ export default function ChatBody({ isOpen }) {
           <button
             onClick={handleSend}
             disabled={isLoading || !input.trim()}
-            className={`ml-2 h-9 w-9 rounded-full flex items-center justify-center transition-colors ${isLoading || !input.trim()
+            className={`ml-2 h-9 w-9 rounded-full flex items-center justify-center transition-colors ${
+              isLoading || !input.trim()
                 ? "bg-gray-300 cursor-not-allowed"
                 : "bg-lime-500 hover:bg-lime-600"
-              }`}
+            }`}
           >
             <Send className="w-4 h-4 text-white" />
           </button>
         </div>
       </div>
-
     </div>
   );
 }

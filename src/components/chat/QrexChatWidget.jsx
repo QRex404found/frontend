@@ -1,21 +1,20 @@
 // src/components/chat/QrexChatWidget.jsx
-
 import React, { useState } from "react";
 import ChatFloatingButton from "./chatButton";
 import ChatSheet from "./chatSheet";
 import ChatBody from "./chatBody";
+import useAuth from "@/hooks/useAuth";
 
 export default function QrexChatWidget() {
   const [open, setOpen] = useState(false);
+  const { user, isLoggedIn } = useAuth();
 
   return (
     <>
-      {/* 우측 하단 버튼 */}
       <ChatFloatingButton onClick={() => setOpen(true)} />
 
-      {/* Sheet (채팅 UI 포함) */}
       <ChatSheet open={open} onOpenChange={setOpen}>
-        <ChatBody />
+        <ChatBody isOpen={open} user={isLoggedIn ? user : null} />
       </ChatSheet>
     </>
   );
