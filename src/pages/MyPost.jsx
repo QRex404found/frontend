@@ -69,6 +69,17 @@ export function MyPost() {
     }
   };
 
+  /* 🔥 ChatBody → MyPost 자동 갱신 이벤트 리스너 추가됨 */
+  useEffect(() => {
+    const handleRefresh = () => {
+      console.log("🔄 MyPost: ChatBody 이벤트 감지 → 게시글 목록 갱신");
+      fetchPosts(1); // 첫 페이지로 갱신
+    };
+
+    window.addEventListener("analysis-updated", handleRefresh);
+    return () => window.removeEventListener("analysis-updated", handleRefresh);
+  }, [user]); // user 변경 시에도 정상 동작하도록 함
+
   /* 삭제 모드 */
   const toggleDeleteMode = () => {
     if (isDeleting && selectedPosts.length > 0) {
@@ -154,7 +165,7 @@ export function MyPost() {
           <ResizablePanel minSize={30}>
             <div className="pl-4 h-full flex flex-col">
               <div className="w-full px-2 md:px-4 py-2 flex flex-col">
-                <h1 className="mb-4 text-3xl font-medium hidden lg:block">
+                <h1 className="mb-4 text-3xl font-bold hidden lg:block">
                   My Post
                 </h1>
 
