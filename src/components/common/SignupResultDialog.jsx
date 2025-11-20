@@ -10,7 +10,7 @@ const SignupResultDialog = ({ isOpen, type, onAction, onClose }) => {
     icon: CheckCircle,
     title: 'Sign Up Successful!',
     message: 'Welcome to QREX! Your account has been created successfully.',
-    // ⬇️ [수정 1] 성공 시 'feature' 속성 자체를 제거합니다.
+    //  성공 시 'feature' 속성 자체를 제거.
     // feature: 'New Feature Added: ...', 
     buttonText: 'Go to Login',
     buttonClass: 'bg-green-500 hover:bg-green-600',

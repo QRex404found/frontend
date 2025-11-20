@@ -13,7 +13,7 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
-// ✅ 체크박스 컴포넌트
+// 체크박스 컴포넌트
 function Checkbox({ className, ...props }) {
     return (
         <CheckboxPrimitive.Root
@@ -132,7 +132,7 @@ export const CommonBoard = ({
                 )}
             </CardContent>
 
-            {/* ✅ Pagination UI (복구 완료) */}
+            {/* Pagination UI */}
             {totalPages > 1 && onPageChange && (
                 <div className="flex justify-center pt-3 pb-2">
                     <Pagination>

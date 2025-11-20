@@ -11,13 +11,13 @@ import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import React from 'react';
 
 /**
- * 범용적인 경고 및 알림 다이얼로그 컴포넌트
+ * 범용적 경고 및 알림 다이얼로그 컴포넌트
  * @param {boolean} isOpen - 다이얼로그 열림/닫힘 상태
  * @param {string} type - 'success', 'failure', 'warning', 'error' 중 하나
  * @param {string} title - 다이얼로그 제목
  * @param {string} description - 다이얼로그 내용
  * @param {function} onClose - 다이얼로그 닫기 요청 시 호출
- * @param {function} onAction - 버튼 클릭 시 호출되는 액션 핸들러 (버튼 클릭 시 항상 닫힙니다)
+ * @param {function} onAction - 버튼 클릭 시 호출되는 액션 핸들러 (버튼 클릭 시 항상 닫힘)
  * @param {string} actionButtonText - 주 버튼 텍스트 (예: '확인', '홈으로')
  */
 export function CustomAlertDialog({

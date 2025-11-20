@@ -19,12 +19,6 @@ export function AuthPopup({ show, isMandatory }) {
     navigate('/login', { replace: true });
   };
 
-  /**
-   * X 버튼, 바깥 클릭 →
-   * shadcn Dialog 특성상 뒤로가기가 먼저 발생할 수 있으므로
-   * ⚠ navigate(-1) 같은 동작이 절대 일어나지 않도록
-   * 무조건 홈('/')으로 강제 이동 처리
-   */
   const handlePopupClose = (isOpen) => {
     if (!isOpen) {
       navigate('/', { replace: true });

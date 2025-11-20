@@ -33,12 +33,12 @@ const getInitialUser = () => {
     return { id: null, username: null };
   }
 
-  // [수정] 0일 수도 있는 ID를 확인합니다. (?? = nullish coalescing 연산자)
-  // decoded.sub도 없고, decoded.id도 없으면 null이 됩니다.
-  // **만약 다른 키(예: userId)라면 decoded.userId ?? null 처럼 수정하세요.**
+  // 0일 수도 있는 ID를 확인. (?? = nullish coalescing 연산자)
+  // decoded.sub도 없고, decoded.id도 없으면 null이 됨.
+  // 만약 다른 키(예: userId)라면 decoded.userId ?? null 처럼 수정ㄱ.
   const userId = decoded.sub ?? decoded.id;
 
-  // [수정] userId가 0일 경우를 대비해 null/undefined만 체크합니다.
+  // userId가 0일 경우를 대비해 null/undefined만 체크.
   if (userId == null) { 
     localStorage.removeItem('jwtToken');
     return { id: null, username: null };
@@ -79,14 +79,14 @@ export const AuthProvider = ({ children }) => {
       // (Case 2) 소셜 로그인
       const decoded = parseJwt(token);
       
-      // [디버깅 1] 브라우저 콘솔에서 이 로그를 확인하세요!
+      // 브라우저 콘솔에서 이 로그를 확인하세요!
       console.log('AuthContext: 해독된 토큰 페이로드:', decoded); 
 
-      // [수정] 0일 수도 있는 ID를 확인합니다.
-      // **만약 다른 키(예: userId)라면 decoded.userId ?? null 처럼 수정하세요.**
+      // 0일 수도 있는 ID를 확인.
+      // 만약 다른 키(예: userId)라면 decoded.userId ?? null 처럼 수정.
       const userId = decoded?.sub ?? decoded?.id;
       
-      // [수정] 0을 false로 취급하지 않도록 검사 방식을 변경합니다.
+      // 0을 false로 취급하지 않도록 검사 방식을 변경.
       if (userId != null) { // (userId !== null && userId !== undefined)와 동일
         console.log('AuthContext: 사용자 ID 설정:', userId);
         setUser({ id: userId, username: decoded.username || null });

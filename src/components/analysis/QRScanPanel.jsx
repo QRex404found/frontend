@@ -160,24 +160,6 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
           </Button>
         )}
 
-        {/*
-          만약 드롭다운 UI 자체도 유지하고 싶으면,
-          위 Button 대신 아래 블록을 쓰면 된다:
-
-        {isMobile && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button ...>
-                <Camera .../>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent ...>
-              ...
-              <DropdownMenuItem onClick={handleSelectFile}>파일 선택</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-        */}
       </div>
     </div>
   );
