@@ -1,0 +1,81 @@
+/* PillNav.css */
+.pill-nav {
+  display: inline-flex;
+  background: var(--base);
+  border-radius: 9999px;
+  padding: 0.5rem; /* p-2 */
+  position: relative;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+}
+
+.pill-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.5rem;
+}
+
+.pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  color: var(--pill-text);
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden; /* 호버 원이 밖으로 나가지 않게 */
+  transition: color 0.3s ease;
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+}
+
+/* 활성화된 탭 스타일 */
+.pill.is-active {
+  color: var(--hover-text); /* 활성 상태 텍스트 색상 */
+}
+/* 활성화된 탭의 배경 (이건 GSAP가 아니라 CSS로 고정) */
+.pill.is-active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--pill-bg);
+  border-radius: 9999px;
+  z-index: -1;
+}
+
+.label-stack {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  z-index: 10; /* 배경보다 위에 */
+}
+
+.pill-label {
+  display: block;
+  white-space: nowrap;
+}
+
+.pill-label-hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  white-space: nowrap;
+  opacity: 0;
+  color: var(--hover-text);
+}
+
+/* GSAP가 제어할 호버 원 */
+.hover-circle {
+  position: absolute;
+  background: var(--pill-bg);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  transform: translate(-50%, -50%) scale(0); /* 초기엔 숨김 */
+}
