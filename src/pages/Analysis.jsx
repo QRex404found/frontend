@@ -82,6 +82,7 @@ export function Analysis() {
   }, []);
 
 
+
   /* ---------------------------------------------
      라우터 state로 전달된 분석 결과 처리
   --------------------------------------------- */
@@ -101,6 +102,20 @@ export function Analysis() {
     }
   }, [location.state, navigate, handleAnalysisResult, analysisResult]);
 
+  /* --------------------------------------------- 
+      URL의 refresh 파라미터가 변경될 때마다 상태 초기화 
+   --------------------------------------------- */
+useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const refresh = params.get("refresh");
+
+  if (refresh) {
+    // 왼쪽 패널 초기화 → QRScanPanel 보이게 됨
+    setAnalysisResult(null);
+    setSelectedHistory(null);
+    setMobileTab('scan');
+  }
+}, [location.search]);
 
   /* ---------------------------------------------
      새로운 파일 분석 시작
