@@ -9,8 +9,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        kopub: ["KoPubWorldDotum", "sans-serif"],
+        pretendard: ["Pretendard", "sans-serif"],
       },
+
     },
   },
   plugins: [],

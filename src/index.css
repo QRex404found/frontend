@@ -1,42 +1,75 @@
-/* Tailwind v4 core import */
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* 다크모드 variant */
-@custom-variant dark (&:is(.dark *));
-
-/* ---------------- 폰트 파일 등록 */
+/* ---------------- Pretendard 폰트 등록 ---------------- */
 @font-face {
-  font-family: 'KoPubWorldDotum';
-  src: url('/fonts/KoPubWorldDotum-Light.woff2') format('woff2');
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Thin.woff2') format('woff2');
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-ExtraLight.woff2') format('woff2');
+  font-weight: 200;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Light.woff2') format('woff2');
   font-weight: 300;
   font-display: swap;
 }
-
 @font-face {
-  font-family: 'KoPubWorldDotum';
-  src: url('/fonts/KoPubWorldDotum-Medium.woff2') format('woff2');
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Medium.woff2') format('woff2');
   font-weight: 500;
   font-display: swap;
 }
-
 @font-face {
-  font-family: 'KoPubWorldDotum';
-  src: url('/fonts/KoPubWorldDotum-Bold.woff2') format('woff2');
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Bold.woff2') format('woff2');
   font-weight: 700;
   font-display: swap;
 }
-/* -------------------------------- */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-display: swap;
+}
+/* ------------------------------------------------------ */
 
 
-/* ✅ Tailwind v4 방식 폰트 유틸리티 정의 (변경 없음) */
+/* ---------------- Tailwind v4 Theme 설정 ---------------- */
 @theme inline {
-  --font-kopub: "KoPubWorldDotum", sans-serif;
+  /* 기본 폰트 유틸리티 생성 */
+  --font-pretendard: "Pretendard", sans-serif;
 
+  /* 기존 radius, color 등 유지 */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -55,11 +88,13 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -70,10 +105,14 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* ✅ 전역 설정 (변경 없음) */
+/* 다크모드 variant — @theme 아래에 위치해야 동작 */
+@custom-variant dark (&:is(.dark *));
+
+
+/* ---------------- 전역 설정 ---------------- */
 html {
-  @apply font-kopub;
-  scrollbar-gutter: stable; /*스크롤바 유무와 상관없이 레이아웃 폭을 일정하게 유지*/
+  @apply font-pretendard;
+  scrollbar-gutter: stable;
 }
 
 :root {
@@ -84,23 +123,30 @@ html {
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
+
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
+
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
+
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
+
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
+
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -118,23 +164,30 @@ html {
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
+
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
+
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
+
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
+
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
+
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
+
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
+
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -145,24 +198,8 @@ html {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-.qrex-toast {
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.14);
-  backdrop-filter: blur(12px);
-}
 
-.qrex-toast button {
-  opacity: 0.6;
-  border-radius: 6px;
-  padding: 4px;
-  transition: opacity 0.2s ease, background 0.2s ease;
-}
-
-.qrex-toast button:hover {
-  opacity: 1;
-  background: rgba(255,255,255,0.16);
-}
-
+/* ---------------- 기본 UI 스타일 ---------------- */
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -170,15 +207,9 @@ html {
   body {
     @apply bg-background text-foreground font-light;
   }
-  /* ⭐ [수정된 부분] ⭐
-     이전에 여기에 있던 input, textarea 등의 폰트 강제 적용 코드는 
-     우선순위 확보를 위해 @layer base 밖으로 이동되었습니다.
-  */
 }
 
-/* ✅ 폰트 강제 적용 (CSS 파일 맨 마지막에 배치하여 우선순위 확보) 
-   input, textarea, button, select, 그리고 Sonner(알림창)까지 모두 KoPub 폰트 강제 적용
-*/
+/* ---------------- 폰트 강제 적용 ---------------- */
 input, textarea, button, select, [data-sonner-toaster] {
-  font-family: "KoPubWorldDotum", sans-serif !important;
+  font-family: "Pretendard", sans-serif !important;
 }
