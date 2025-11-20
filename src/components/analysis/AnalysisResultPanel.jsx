@@ -80,7 +80,7 @@ export default function AnalysisResultPanel({ result, onTitleUpdated }) {
     return (
         <div className="w-full h-full flex flex-col space-y-6">
 
-            <h2 className="!text-4xl font-medium border-b pb-2 mb-4">
+            <h2 className="!text-4xl font-bold border-b pb-2 mb-4">
                 QR Analysis Result
             </h2>
 

@@ -73,7 +73,7 @@ export function Header() {
                     e.preventDefault();
                     navigate(`/analysis?refresh=${Date.now()}`);
                   }}
-                  className="text-sm font-medium md:text-lg hover:text-primary"
+                  className="text-sm font-bold md:text-lg hover:text-primary"
                 >
                   Analysis
                 </Link>
@@ -81,14 +81,14 @@ export function Header() {
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link to="/community" className="text-sm font-medium md:text-lg hover:text-primary">
+                <Link to="/community" className="text-sm font-bold md:text-lg hover:text-primary">
                   Community
                 </Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link to="/mypost" className="text-sm font-medium md:text-lg hover:text-primary">
+                <Link to="/mypost" className="text-sm font-bold md:text-lg hover:text-primary">
                   My post
                 </Link>
               </NavigationMenuLink>

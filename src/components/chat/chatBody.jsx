@@ -107,19 +107,23 @@ export default function ChatBody({ isOpen, user }) {
 
       setMessages((prev) => [...prev, aiMessage]);
 
-      // 🚨 [추가된 핵심 로직] AI가 데이터를 수정했다고 응답하면 이벤트를 발생시킴
-      // Analysis.jsx가 이 이벤트를 듣고 목록을 새로고침합니다.
+      // 🚨 [기존 로직 유지 + 게시글 성공 감지 추가]
       if (
         aiText.includes("변경") || 
         aiText.includes("수정") || 
         aiText.includes("바꿨") ||
-        aiText.includes("완료")
+        aiText.includes("완료") ||
+
+        // ⭐ 추가됨: 게시글 작성 성공 시 MyPost 즉시 업데이트
+        aiText.includes("게시글이 성공적으로 작성되었습니다") ||
+        aiText.includes("성공적으로 작성되었습니다")
       ) {
-          console.log("🔔 [ChatBody] 변경 감지! 화면 갱신 신호 보냄 📡");
-          // DB 반영 시간을 살짝 고려해 0.5초 뒤 실행
-          setTimeout(() => {
-            window.dispatchEvent(new Event("analysis-updated"));
-          }, 500);
+        console.log("🔔 [ChatBody] 게시글 작성 감지 → MyPost 갱신 이벤트 발생");
+
+        // DB 반영 시간을 고려해 약간 딜레이 후 이벤트 전송
+        setTimeout(() => {
+          window.dispatchEvent(new Event("analysis-updated"));
+        }, 500);
       }
 
     } catch (error) {

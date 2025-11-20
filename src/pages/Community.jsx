@@ -96,7 +96,7 @@ export function Community() {
   return (
     <div className="p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
-        <h1 className="mb-6 text-4xl font-medium">Community</h1>
+        <h1 className="mb-6 text-4xl font-bold">Community</h1>
 
         <CommonBoard
           posts={posts}
