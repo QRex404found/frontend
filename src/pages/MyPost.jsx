@@ -22,7 +22,9 @@ const ITEMS_PER_PAGE = 8;
 
 export function MyPost() {
   const navigate = useNavigate();
-  const { isLoggedIn, isChecked } = useAuth();
+
+  // user 정보 추가됨!!
+  const { isLoggedIn, isChecked, user } = useAuth();
 
   const [myPosts, setMyPosts] = useState([]);
   const [selectedPosts, setSelectedPosts] = useState([]);
@@ -39,15 +41,21 @@ export function MyPost() {
 
   /* 게시글 로드 */
   useEffect(() => {
-    if (isChecked && isLoggedIn) {
+    if (isChecked && isLoggedIn && user) {
       fetchPosts(currentPage);
     }
-  }, [currentPage, isChecked, isLoggedIn]);
+  }, [currentPage, isChecked, isLoggedIn, user]);
 
   const fetchPosts = async (page) => {
     setIsLoading(true);
     try {
-      const data = await getMyPostsApi(page - 1, ITEMS_PER_PAGE, 'createdAt,desc');
+      const data = await getMyPostsApi(
+        page - 1,
+        ITEMS_PER_PAGE,
+        'createdAt,desc',
+        user?.userId    // ★ writerId 추가!
+      );
+
       const mapped = data.content.map((p) => ({
         id: p.boardId,
         title: p.title,
@@ -130,11 +138,9 @@ export function MyPost() {
         />
       )}
 
-      {/* ---------------- PC 화면 ---------------- */}
+      {/* PC 화면 */}
       <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
         <ResizablePanelGroup direction="horizontal">
-
-          {/* 왼쪽: 글 작성 */}
           <ResizablePanel defaultSize={50} minSize={30}>
             <div className="max-w-[550px] mx-auto h-full flex flex-col">
               <Card className="h-full w-full p-6 flex flex-col">
@@ -145,18 +151,13 @@ export function MyPost() {
 
           <ResizableHandle />
 
-          {/* 오른쪽: 게시판 */}
           <ResizablePanel minSize={30}>
-            {/* AnalysisHistory와  동일한 구조 */}
             <div className="pl-4 h-full flex flex-col">
               <div className="w-full px-2 md:px-4 py-2 flex flex-col">
-
-                {/* 제목 (PC 전용) */}
                 <h1 className="mb-4 text-3xl font-medium hidden lg:block">
                   My Post
                 </h1>
 
-                {/* 게시판 */}
                 <MyPostBoard
                   isDeleting={isDeleting}
                   toggleDeleteMode={toggleDeleteMode}
@@ -171,7 +172,6 @@ export function MyPost() {
                   showEmpty={showEmpty}
                   rowHeightClass="h-12"
                 />
-
               </div>
             </div>
           </ResizablePanel>
@@ -179,9 +179,8 @@ export function MyPost() {
         </ResizablePanelGroup>
       </div>
 
-      {/* ---------------- 모바일 화면 ---------------- */}
+      {/* 모바일 화면 */}
       <div className="lg:hidden mt-4 w-full">
-
         <div className="mb-3 flex justify-center">
           <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
             <button
@@ -206,16 +205,13 @@ export function MyPost() {
             style={{ transform: mobileTab === "write" ? "translateX(0)" : "translateX(-50%)" }}
           >
 
-            {/* 모바일 글 작성 */}
             <div className="w-1/2 p-4">
               <Card className="w-full h-full p-4 flex flex-col">
                 <WritePostForm onPostSuccess={() => fetchPosts(1)} />
               </Card>
             </div>
 
-            {/* 모바일 게시판 */}
             <div className="w-1/2 p-4">
-              {/* 제목 없음 (Analysis와 동일 정책) */}
               <MyPostBoard
                 isDeleting={isDeleting}
                 toggleDeleteMode={toggleDeleteMode}
@@ -234,7 +230,6 @@ export function MyPost() {
 
           </div>
         </div>
-
       </div>
 
     </div>

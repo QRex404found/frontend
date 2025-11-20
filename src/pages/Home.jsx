@@ -58,20 +58,17 @@ export function Home() {
               <TooltipTrigger asChild>
                 <button 
                   onClick={scrollToInfo}
-                  className="p-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 animate-bounce cursor-pointer text-white"
+                  className="p-3 rounded-full bg-lime-500/20 backdrop-blur-sm border border-white/20 hover:bg-lime-600/20 transition-all duration-300 animate-bounce cursor-pointer text-white"
                 >
                   <ChevronDown size={32} />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="top" className="bg-black/80 text-white border-white/10 backdrop-blur-md">
-                <p>QRex에 대해 알고 싶으세요?</p>
+                <p>Discover QRex</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
-
-        {/* 비디오 위에 살짝 어두운 오버레이 (텍스트 가독성용, 필요 없으면 제거) */}
-        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
       </div>
 
       {/* ------------------------------------------ */}
@@ -80,30 +77,23 @@ export function Home() {
       {/* min-h-[calc(100vh-80px)]로 설정하여 윗 화면과 동일한 높이 확보 */}
       <div 
         ref={infoSectionRef} 
-        className="relative w-[calc(100%+2rem)] md:w-[calc(100%+4rem)] -ml-4 -mr-4 md:-ml-8 md:-mr-8 min-h-[calc(100vh-80px)] flex items-center justify-center bg-slate-950 text-white py-20"
+        className="relative w-[calc(100%+2rem)] md:w-[calc(100%+4rem)] -ml-4 -mr-4 md:-ml-8 md:-mr-8 min-h-[calc(100vh-80px)] flex items-center justify-center bg-white text-slate-900 py-20"
       >
         <div className="container mx-auto px-4 text-center max-w-4xl">
           
           {/* 애니메이션 제목 */}
           <AnimatedContent>
             <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
-              미래를 바꾸는 기술, <br /> QRex를 소개합니다.
+              ABOUT QRex
             </h2>
           </AnimatedContent>
 
           {/* 애니메이션 본문 (약간의 딜레이 추가) */}
           <AnimatedContent delay={0.2}>
-            <p className="text-lg md:text-xl text-gray-300 mb-8 leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-500 mb-8 leading-relaxed">
               우리는 단순한 서비스를 넘어 새로운 경험을 창조합니다.<br />
               아래 버튼을 눌러 QRex의 놀라운 기능들을 더 자세히 살펴보세요.
             </p>
-          </AnimatedContent>
-
-          {/* 애니메이션 버튼 (더 늦게 등장) */}
-          <AnimatedContent delay={0.4}>
-            <button className="px-8 py-3 rounded-lg bg-blue-600 hover:bg-blue-500 transition-colors font-semibold text-white shadow-lg shadow-blue-500/30">
-              더 알아보기
-            </button>
           </AnimatedContent>
 
         </div>

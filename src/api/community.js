@@ -1,3 +1,5 @@
+// src/api/community.js
+
 // 백엔드와 통신하는 모듈
 import apiClient from './index';
 
@@ -17,13 +19,19 @@ export const getCommunityPostsApi = async (page = 0, size = 10) => {
 };
 
 // 2. 내가 작성한 게시글 목록 조회 (GET /api/community/myposts)
-export const getMyPostsApi = async (page = 0, size = 10, sort = 'createdAt,desc') => {
+export const getMyPostsApi = async (
+  page = 0,
+  size = 10,
+  sort = 'createdAt,desc',
+  writerId                 // ★ 추가됨
+) => {
   try {
     const response = await apiClient.get('/community/myposts', {
       params: { 
         page, 
         size,
-        sort // 🌟 이제 이 'sort' 변수를 인식할 수 있습니다.
+        sort,
+        writerId          // ★ writerId 전달!
       },
     });
     return response.data;
@@ -47,7 +55,6 @@ export const getPostDetailApi = async (boardId) => {
 // 4. 새 게시글 작성 (POST /api/community/posts)
 export const createPostApi = async (formData) => {
   try {
-    // 1. localStorage에서 토큰을 가져옵니다.
     const token = localStorage.getItem('jwtToken');
     if (!token) {
       throw new Error("No auth token found. Please log in.");
@@ -58,9 +65,7 @@ export const createPostApi = async (formData) => {
       formData,
       {
         headers: {
-          // 2. 기존 FormData용 헤더
           'Content-Type': 'multipart/form-data',
-          // 3. (핵심) 인증 헤더를 수동으로 다시 추가합니다.
           'Authorization': `Bearer ${token}`,
         },
       }
