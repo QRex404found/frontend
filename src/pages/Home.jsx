@@ -1,9 +1,8 @@
 import React, { useState, useRef } from 'react';
-import videoBg from '@/assets/background.mp4'; // 로컬 영상 경로 유지
-import { ChevronDown, BarChart3, Users, FileText, ArrowRight, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, BarChart3, Users, FileText, ArrowRight, Sparkles } from 'lucide-react';
 
-// Shadcn UI Tooltip
+// Shadcn UI Tooltip 컴포넌트
 import {
   Tooltip,
   TooltipContent,
@@ -11,8 +10,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+// [비디오 경로] - 로컬 파일 대신 에러 방지용 온라인 URL 사용 (실제 사용 시 교체하세요)
+const videoBg = "https://cdn.pixabay.com/video/2019/04/20/22965-331768782_large.mp4";
+
 // ----------------------------------------------------------------------
-// [1] 데이터 정의 (탭 메뉴 및 설명 카드 내용)
+// [1] 데이터 정의
 // ----------------------------------------------------------------------
 const tabs = [
   {
@@ -45,31 +47,56 @@ const tabs = [
 ];
 
 // ----------------------------------------------------------------------
-// [2] PillNav 컴포넌트 (알약 탭 애니메이션)
+// [2] PillNav 컴포넌트
+// 설명: React Bits 스타일의 호버 및 액티브 애니메이션 구현
 // ----------------------------------------------------------------------
 const PillNav = ({ items, activeTabId, onTabChange }) => {
+  const [hoveredTab, setHoveredTab] = useState(null);
+
   return (
-    <div className="inline-flex bg-slate-100 p-1.5 rounded-full shadow-inner relative mb-12">
+    // [요청반영] scale-75로 전체 크기 0.7배 축소
+    <div className="inline-flex bg-slate-100 p-1.5 rounded-full shadow-inner relative mb-8 transform scale-90 md:scale-75 origin-top">
       {items.map((item) => {
         const isActive = activeTabId === item.id;
+        const isHovered = hoveredTab === item.id;
+
         return (
           <button
             key={item.id}
             onClick={() => onTabChange(item.id)}
+            onMouseEnter={() => setHoveredTab(item.id)}
+            onMouseLeave={() => setHoveredTab(null)}
             className={`
-              relative px-6 py-2.5 rounded-full text-sm md:text-base font-bold transition-colors duration-300 z-10
-              ${isActive ? 'text-white' : 'text-slate-500 hover:text-slate-900'}
+              relative px-8 py-3 rounded-full text-base font-bold overflow-hidden
+              transition-colors duration-300 z-10 cursor-pointer select-none
+              ${isActive ? 'text-white' : 'text-slate-500'}
             `}
           >
-            {/* 활성 탭 배경 애니메이션 */}
+            {/* 1. 활성 탭 배경 (쫀득하게 따라오는 효과) */}
             {isActive && (
               <motion.div
                 layoutId="activePillBackground"
-                className="absolute inset-0 bg-lime-500 rounded-full -z-10 shadow-lg shadow-lime-500/30"
+                className="absolute inset-0 bg-slate-900 rounded-full -z-10 shadow-lg"
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}
-            <span className="relative z-10">{item.label}</span>
+
+            {/* 2. 호버 효과 (React Bits 스타일 - 원형 배경 등장) */}
+            {!isActive && isHovered && (
+              <motion.div
+                layoutId="hoverPillBackground"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                className="absolute inset-0 bg-slate-200 rounded-full -z-20"
+                transition={{ duration: 0.2 }}
+              />
+            )}
+
+            {/* 텍스트 */}
+            <span className="relative z-10 block whitespace-nowrap">
+              {item.label}
+            </span>
           </button>
         );
       })}
@@ -78,7 +105,7 @@ const PillNav = ({ items, activeTabId, onTabChange }) => {
 };
 
 // ----------------------------------------------------------------------
-// [3] 등장 애니메이션 컴포넌트 (기존 유지)
+// [3] 등장 애니메이션 컴포넌트
 // ----------------------------------------------------------------------
 const AnimatedContent = ({ children, delay = 0 }) => {
   return (
@@ -98,7 +125,7 @@ const AnimatedContent = ({ children, delay = 0 }) => {
 // ----------------------------------------------------------------------
 export function Home() {
   const infoSectionRef = useRef(null);
-  const [activeTab, setActiveTab] = useState(tabs[0].id); // 탭 상태 관리
+  const [activeTab, setActiveTab] = useState(tabs[0].id);
 
   const scrollToInfo = () => {
     infoSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -106,17 +133,18 @@ export function Home() {
 
   return (
     <div className='w-full'>
-      {/* 섹션 1: 비디오 배경 (기존 코드 유지) */}
+      
+      {/* ------------------------------------------ */}
+      {/* 섹션 1: 비디오 배경 */}
+      {/* ------------------------------------------ */}
       <div className="relative w-[calc(100%+2rem)] md:w-[calc(100%+4rem)] -ml-4 -mr-4 -mt-4 md:-ml-8 md:-mr-8 md:-mt-8 h-[calc(100vh-80px)] overflow-hidden">
         <video
           src={videoBg}
-          autoPlay
-          loop
-          muted
-          playsInline
+          autoPlay loop muted playsInline
           className="absolute top-0 left-0 object-cover w-full h-full"
         />
 
+        {/* 하단 화살표 */}
         <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
           <TooltipProvider delayDuration={200}>
             <Tooltip>
@@ -136,27 +164,31 @@ export function Home() {
         </div>
       </div>
 
-      {/* 섹션 2: 소개글 + 탭 기능 추가 */}
+      {/* ------------------------------------------ */}
+      {/* 섹션 2: 소개 및 탭 컨텐츠 */}
+      {/* ------------------------------------------ */}
       <div 
         ref={infoSectionRef} 
         className="relative w-[calc(100%+2rem)] md:w-[calc(100%+4rem)] -ml-4 -mr-4 md:-ml-8 md:-mr-8 min-h-[calc(100vh-80px)] flex items-center justify-center bg-white text-slate-900 py-20"
       >
         <div className="container mx-auto px-4 text-center max-w-5xl">
           
-          {/* 기존 헤더 문구 유지 */}
+          {/* 2-1. 헤더 문구 */}
+          {/* [요청반영] mt-16으로 위쪽 여백 추가 */}
           <AnimatedContent>
-            <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
+            <h2 className="text-4xl md:text-6xl font-bold mb-2 mt-16 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
               ABOUT QRex
             </h2>
           </AnimatedContent>
 
+          {/* [요청반영] mb-8로 제목과의 거리 좁힘 */}
           <AnimatedContent delay={0.2}>
-            <p className="text-lg md:text-xl text-gray-500 mb-12 leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-500 mb-8 leading-relaxed">
               Let's Learn About QRex!
             </p>
           </AnimatedContent>
 
-          {/* [추가됨] Pill Navigation (탭 메뉴) */}
+          {/* 2-2. Pill Navigation (탭 메뉴) */}
           <AnimatedContent delay={0.3}>
             <div className="flex justify-center">
               <PillNav 
@@ -167,7 +199,7 @@ export function Home() {
             </div>
           </AnimatedContent>
 
-          {/* [추가됨] 카드 컨텐츠 (탭 클릭 시 변경) */}
+          {/* 2-3. 카드 컨텐츠 */}
           <div className="relative min-h-[400px]">
             <AnimatePresence mode="wait">
               {tabs.map((tab) => (
@@ -182,7 +214,7 @@ export function Home() {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center bg-white border border-slate-100 rounded-3xl p-8 md:p-12 shadow-2xl shadow-slate-200/50 text-left">
                       
-                      {/* 왼쪽: 텍스트 설명 */}
+                      {/* 왼쪽 텍스트 */}
                       <div className="order-2 md:order-1">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-100 text-lime-700 text-xs font-bold mb-4 uppercase tracking-wider">
                           <Sparkles size={14} />
@@ -200,7 +232,7 @@ export function Home() {
                         </button>
                       </div>
 
-                      {/* 오른쪽: 아이콘/이미지 영역 */}
+                      {/* 오른쪽 아이콘 */}
                       <div className={`order-1 md:order-2 h-64 rounded-2xl ${tab.imageColor} flex items-center justify-center relative overflow-hidden`}>
                         <motion.div
                           animate={{ y: [0, -10, 0] }}
