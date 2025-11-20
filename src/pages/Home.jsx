@@ -82,7 +82,7 @@ export function Home() {
                   <ChevronDown
                     size={42}
                     strokeWidth={1.5}
-                    className="drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]"
+                    className="filter drop-shadow-[0_3px_3px_rgba(0,0,0,0.6)]"
                   />
                 </button>
               </TooltipTrigger>
