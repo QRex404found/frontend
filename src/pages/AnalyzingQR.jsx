@@ -38,7 +38,7 @@ export default function AnalyzingQR() {
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
             
-            <h1 className="mb-8 text-4xl font-noraml">Analyzing QR</h1> 
+            <h1 className="mb-8 text-4xl font-normal">Analyzing QR</h1> 
 
             <LoadingBar 
                 file={fileToAnalyze} 
