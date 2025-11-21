@@ -144,8 +144,8 @@ export function Home() {
             >
               <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-10">
-                QRex는 도메인 신뢰도, URL 특성 분석,<br/>
-                AI 기반 위험 해석을 결합해<br/>
+                QRex는 도메인 신뢰도, URL 특성 분석,<br />
+                AI 기반 위험 해석을 결합해<br />
                 QR 링크의 안전성을 종합적으로 평가하는 보안 플랫폼입니다.
                 <br /><br />
                 또한 커뮤니티와 분석 기록 기능으로
@@ -174,9 +174,9 @@ export function Home() {
                 overflow-hidden
               "
             >
-              <img 
-                src={holdingQR} 
-                alt="QRex Illustration" 
+              <img
+                src={holdingQR}
+                alt="QRex Illustration"
                 className="w-full h-full object-contain"
               />
             </motion.div>
@@ -275,9 +275,14 @@ export function Home() {
               "
             >
               {/* ✔ 아이콘 박스 → 이미지 꽉 채우기 */}
-              <div className="p-4 bg-lime-100 rounded-xl inline-block mb-6 overflow-hidden flex items-center justify-center">
-                <img src={analysisImg} alt="Analysis" className="w-full h-full object-contain" />
+              <div className="w-16 h-16 rounded-xl inline-block mb-6 overflow-hidden">
+                <img
+                  src={analysisImg}
+                  alt="Analysis"
+                  className="w-full h-full object-cover"
+                />
               </div>
+
 
               <h4 className="text-2xl font-medium mb-3">Analysis</h4>
 
@@ -321,9 +326,14 @@ export function Home() {
               "
             >
               {/* ✔ 아이콘 박스 → 이미지 꽉 채우기 */}
-              <div className="p-4 bg-lime-100 rounded-xl inline-block mb-6 overflow-hidden flex items-center justify-center">
-                <img src={heartImg} alt="Community" className="w-full h-full object-contain" />
+              <div className="w-16 h-16 rounded-xl inline-block mb-6 overflow-hidden">
+                <img
+                  src={heartImg}
+                  alt="Community"
+                  className="w-full h-full object-cover"
+                />
               </div>
+
 
               <h4 className="text-2xl font-medium mb-3">Community</h4>
 
@@ -367,9 +377,14 @@ export function Home() {
               "
             >
               {/* ✔ 아이콘 박스 → 이미지 꽉 채우기 */}
-              <div className="p-4 bg-lime-100 rounded-xl inline-block mb-6 overflow-hidden flex items-center justify-center">
-                <img src={mypostImg} alt="MyPost" className="w-full h-full object-contain" />
+              <div className="w-16 h-16 rounded-xl inline-block mb-6 overflow-hidden">
+                <img
+                  src={mypostImg}
+                  alt="MyPost"
+                  className="w-full h-full object-cover"
+                />
               </div>
+
 
               <h4 className="text-2xl font-medium mb-3">MyPost</h4>
 
