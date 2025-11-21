@@ -191,7 +191,6 @@ export function Home() {
           {/* ====================================================== */}
           <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-14 my-24 overflow-hidden">
 
-            {/* Brush Stroke */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.12]">
               <motion.svg
                 width="100%"
@@ -219,10 +218,8 @@ export function Home() {
               QRex는 당신의 안전한 QR 사용을 돕습니다
             </h3>
 
-            {/* CTA 3개는 원래 아이콘 유지 그대로 → 수정 X */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-4 relative z-10">
 
-              {/* 정확한 URL 분석 */}
               <div className="text-center p-6">
                 <QrCode size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">정확한 URL 분석</h4>
@@ -231,7 +228,6 @@ export function Home() {
                 </p>
               </div>
 
-              {/* 보안 경험 공유 */}
               <div className="text-center p-6">
                 <Users size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">보안 경험 공유</h4>
@@ -240,7 +236,6 @@ export function Home() {
                 </p>
               </div>
 
-              {/* 분석 이력 관리 */}
               <div className="text-center p-6">
                 <FileText size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">분석 이력 관리</h4>
@@ -274,8 +269,7 @@ export function Home() {
                 flex flex-col items-center text-center
               "
             >
-              {/* ✔ 아이콘 박스 → 이미지 꽉 채우기 */}
-              <div className="w-16 h-16 rounded-xl inline-block mb-6 overflow-hidden">
+              <div className="w-30 h-30 rounded-xl inline-block mb-6 overflow-hidden">
                 <img
                   src={analysisImg}
                   alt="Analysis"
@@ -283,10 +277,9 @@ export function Home() {
                 />
               </div>
 
-
               <h4 className="text-2xl font-medium mb-3">Analysis</h4>
 
-              <p className="text-slate-600 mb-6 leading-relaxed">
+              <p className="text-slate-600 mb-6 leading-relaxed flex-grow">
                 URL 위험도·도메인 신뢰도·URL 패턴을 종합 분석해
                 보안 위협 여부를 판단합니다.
               </p>
@@ -325,8 +318,7 @@ export function Home() {
                 flex flex-col items-center text-center
               "
             >
-              {/* ✔ 아이콘 박스 → 이미지 꽉 채우기 */}
-              <div className="w-16 h-16 rounded-xl inline-block mb-6 overflow-hidden">
+              <div className="w-30 h-30 rounded-xl inline-block mb-6 overflow-hidden">
                 <img
                   src={heartImg}
                   alt="Community"
@@ -334,10 +326,9 @@ export function Home() {
                 />
               </div>
 
-
               <h4 className="text-2xl font-medium mb-3">Community</h4>
 
-              <p className="text-slate-600 mb-6 leading-relaxed">
+              <p className="text-slate-600 mb-6 leading-relaxed flex-grow">
                 사용자 경험 기반 사례로
                 실질적인 보안 인사이트를 제공합니다.
               </p>
@@ -376,8 +367,7 @@ export function Home() {
                 flex flex-col items-center text-center
               "
             >
-              {/* ✔ 아이콘 박스 → 이미지 꽉 채우기 */}
-              <div className="w-16 h-16 rounded-xl inline-block mb-6 overflow-hidden">
+              <div className="w-30 h-30 rounded-xl inline-block mb-6 overflow-hidden">
                 <img
                   src={mypostImg}
                   alt="MyPost"
@@ -385,10 +375,9 @@ export function Home() {
                 />
               </div>
 
-
               <h4 className="text-2xl font-medium mb-3">MyPost</h4>
 
-              <p className="text-slate-600 mb-6 leading-relaxed">
+              <p className="text-slate-600 mb-6 leading-relaxed flex-grow">
                 분석한 QR 기록을 저장하고
                 언제든 빠르게 다시 확인할 수 있습니다.
               </p>
@@ -415,7 +404,6 @@ export function Home() {
 
 
           </div>
-
         </div>
       </div>
     </div>
