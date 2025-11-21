@@ -26,6 +26,7 @@ export default function MyPostBoard({
         <Button
           onClick={toggleDeleteMode}
           variant={isDeleting ? "default" : "outline"}
+          disabled={!isDeleting&& (myPosts.length===0 || isLoading)} //게시물이 없으면 delete 버튼 비활성화
           className={`
             w-[80px] text-sm font-medium
             ${
@@ -33,6 +34,7 @@ export default function MyPostBoard({
                 ? "bg-[#7CCF00] text-white border-[#7CCF00] hover:bg-[#6AC600]"
                 : "text-gray-700 border-gray-300 hover:bg-gray-100"
             }
+            ${(!isDeleting && myPosts.length ===0) ? "opacity-50 cursor-not-allowed" : ""}
           `}
         >
           {isDeleting ? "Submit" : "Delete"}
