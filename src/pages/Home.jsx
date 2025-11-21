@@ -167,7 +167,7 @@ export function Home() {
               transition={{ duration: 0.7, delay: 0.1 }}
               viewport={{ once: true }}
               className="
-                bg-slate-50 border border-slate-200 rounded-3xl 
+                bg-white border border-slate-200 rounded-3xl 
                 flex items-center justify-center
                 w-[320px] h-[320px]
                 mx-auto
@@ -266,7 +266,7 @@ export function Home() {
                 flex flex-col items-center text-center
               "
             >
-              <div className="w-30 h-30 rounded-xl inline-block mb-6 overflow-hidden">
+              <div className="w-32 h-32 rounded-xl inline-block mb-6 overflow-hidden">
                 <img
                   src={analysisImg}
                   alt="Analysis"
@@ -315,7 +315,7 @@ export function Home() {
                 flex flex-col items-center text-center
               "
             >
-              <div className="w-30 h-30 rounded-xl inline-block mb-6 overflow-hidden">
+              <div className="w-32 h-32 rounded-xl inline-block mb-6 overflow-hidden">
                 <img
                   src={heartImg}
                   alt="Community"
@@ -364,7 +364,7 @@ export function Home() {
                 flex flex-col items-center text-center
               "
             >
-              <div className="w-30 h-30 rounded-xl inline-block mb-6 overflow-hidden">
+              <div className="w-32 h-32 rounded-xl inline-block mb-6 overflow-hidden">
                 <img
                   src={mypostImg}
                   alt="MyPost"
