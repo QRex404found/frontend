@@ -39,9 +39,7 @@ export function Analysis() {
   const [mobileTab, setMobileTab] = useState('scan');
   const titleUpdateRef = useRef(null);
 
-  // ----------------------------------------------------------------
-  // AI에 의한 데이터 변경 → History 새로고침
-  // ----------------------------------------------------------------
+  // AI update listener
   useEffect(() => {
     const handleAiUpdate = () => {
       setHistoryRefreshKey(prev => prev + 1);
@@ -51,9 +49,7 @@ export function Analysis() {
     return () => window.removeEventListener("analysis-updated", handleAiUpdate);
   }, []);
 
-  // ----------------------------------------------------------------
-  // ⭐ 추가된 핵심 useEffect — Header에서 reset 이벤트 받으면 초기화
-  // ----------------------------------------------------------------
+  // Header reset listener
   useEffect(() => {
     const resetHandler = () => {
       setAnalysisResult(null);
@@ -64,7 +60,16 @@ export function Analysis() {
     window.addEventListener("analysis-reset", resetHandler);
     return () => window.removeEventListener("analysis-reset", resetHandler);
   }, []);
-  // ----------------------------------------------------------------
+
+
+  /* ---------------------------------------------
+     결과 패널의 Reset 버튼 → 초기 스캔 화면으로
+  --------------------------------------------- */
+  const handleReset = () => {
+    setAnalysisResult(null);
+    setSelectedHistory(null);
+    setMobileTab('scan');
+  };
 
 
   /* ---------------------------------------------
@@ -86,9 +91,7 @@ export function Analysis() {
 
     setAnalysisResult(result);
     setSelectedHistory(null);
-
     setHistoryRefreshKey(prev => prev + 1);
-
     setMobileTab('scan');
   }, []);
 
@@ -128,7 +131,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-     History 목록에서 선택 → 상세 정보 가져오기
+     History 선택 처리
   --------------------------------------------- */
   const handleHistorySelect = async (analysisId) => {
     setAnalysisResult(null);
@@ -153,7 +156,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-     제목 수정 후 즉시 반영 + History 새로고침
+     제목 수정 반영
   --------------------------------------------- */
   const handleTitleUpdated = (id, newTitle) => {
     if (selectedHistory && selectedHistory.analysisId === id) {
@@ -199,6 +202,7 @@ export function Analysis() {
     <AnalysisResultPanel
       result={currentResult}
       onTitleUpdated={handleTitleUpdated}
+      onReset={handleReset} 
     />
   ) : (
     <QRScanPanel
@@ -214,8 +218,7 @@ export function Analysis() {
         key={location.search}
         className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4"
       >
-
-        {/* ---- 데스크탑 레이아웃 ---- */}
+        {/* 데스크탑 레이아웃 */}
         <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
           <ResizablePanelGroup direction="horizontal">
 
@@ -243,7 +246,7 @@ export function Analysis() {
         </div>
 
 
-        {/* ---- 모바일 레이아웃 ---- */}
+        {/* 모바일 레이아웃 */}
         <div className="w-full mt-4 lg:hidden">
 
           <div className="flex items-center justify-center mb-3">

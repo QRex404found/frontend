@@ -165,7 +165,7 @@ export function MyPost() {
           <ResizablePanel minSize={30}>
             <div className="pl-4 h-full flex flex-col">
               <div className="w-full px-2 md:px-4 py-2 flex flex-col">
-                <h1 className="mb-4 text-3xl font-bold hidden lg:block">
+                <h1 className="mb-4 text-3xl font-light hidden lg:block">
                   My Post
                 </h1>
 

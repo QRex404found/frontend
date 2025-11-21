@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { updateAnalysisTitleApi } from '@/api/analysis';
-import { CheckCircle, XCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Loader2, RotateCcw } from 'lucide-react';
 import { toast } from "sonner";
 
-export default function AnalysisResultPanel({ result, onTitleUpdated }) {
+export default function AnalysisResultPanel({ result, onTitleUpdated, onReset }) {
 
     const [title, setTitle] = useState(result?.analysisTitle || '');
     const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +35,6 @@ export default function AnalysisResultPanel({ result, onTitleUpdated }) {
         try {
             await updateAnalysisTitleApi(result.analysisId, title.trim());
 
-            // 상위 컴포넌트에 전달
             if (onTitleUpdated) {
                 onTitleUpdated(result.analysisId, title.trim());
             }
@@ -80,9 +79,25 @@ export default function AnalysisResultPanel({ result, onTitleUpdated }) {
     return (
         <div className="w-full h-full flex flex-col space-y-6">
 
-            <h2 className="!text-4xl font-bold border-b pb-2 mb-4">
-                QR Analysis Result
-            </h2>
+            {/* ----------------------------------------------- */}
+            {/* 🔥 Reset 아이콘 버튼 추가 (이 부분만 새로 추가됨) */}
+            {/* ----------------------------------------------- */}
+            <div className="flex items-center justify-between border-b pb-2 mb-4">
+                <h2 className="!text-4xl font-light">QR Analysis Result</h2>
+
+                <button
+                    onClick={onReset}
+                    className="
+                        p-2 rounded-full
+                        text-gray-500 hover:text-gray-700
+                        hover:bg-gray-100
+                        transition-colors
+                    "
+                    title="New Analysis"
+                >
+                    <RotateCcw className="w-5 h-5" />
+                </button>
+            </div>
 
 
             {/* ---------- 요약 ---------- */}

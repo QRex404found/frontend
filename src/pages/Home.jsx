@@ -2,23 +2,29 @@
 
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
+
+import videoBg from '@/assets/background.mp4';
+
+// ★ 이미지 import
+import holdingQR from '@/assets/holding_QR.png';
+import analysisImg from '@/assets/Analysis.jpg';
+import heartImg from '@/assets/Heart.png';
+import mypostImg from '@/assets/mypost.png';
 import {
   ChevronDown,
   QrCode,
   Users,
   FileText,
-  Flag,
-  Lightbulb,
+  ShieldCheck,
+  Globe,
+  AlertTriangle,
   MessageSquare,
+  Lightbulb,
+  Flag,
   Save,
   Edit3,
   Search,
-  AlertTriangle,
-  ShieldCheck,
-  Globe,
 } from 'lucide-react';
-
-import videoBg from '@/assets/background.mp4';
 
 import {
   Tooltip,
@@ -154,22 +160,34 @@ export function Home() {
               </button>
             </motion.div>
 
-            {/* RIGHT: Icon Box */}
+            {/* RIGHT IMAGE BOX — 옵션 A */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
               viewport={{ once: true }}
-              className="bg-slate-50 border border-slate-200 rounded-3xl p-14 flex justify-center"
+              className="
+                bg-slate-50 border border-slate-200 rounded-3xl 
+                flex items-center justify-center
+                w-[320px] h-[320px]
+                mx-auto
+                overflow-hidden
+              "
             >
-              <QrCode className="w-36 h-36 text-lime-600" />
+              <img 
+                src={holdingQR} 
+                alt="QRex Illustration" 
+                className="w-full h-full object-contain"
+              />
             </motion.div>
           </div>
 
 
 
+
+
           {/* ====================================================== */}
-          {/* 4) CTA SECTION (Brush Stroke) */}
+          {/* 4) CTA SECTION */}
           {/* ====================================================== */}
           <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-14 my-24 overflow-hidden">
 
@@ -201,8 +219,10 @@ export function Home() {
               QRex는 당신의 안전한 QR 사용을 돕습니다
             </h3>
 
+            {/* CTA 3개는 원래 아이콘 유지 그대로 → 수정 X */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-4 relative z-10">
 
+              {/* 정확한 URL 분석 */}
               <div className="text-center p-6">
                 <QrCode size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">정확한 URL 분석</h4>
@@ -211,6 +231,7 @@ export function Home() {
                 </p>
               </div>
 
+              {/* 보안 경험 공유 */}
               <div className="text-center p-6">
                 <Users size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">보안 경험 공유</h4>
@@ -219,6 +240,7 @@ export function Home() {
                 </p>
               </div>
 
+              {/* 분석 이력 관리 */}
               <div className="text-center p-6">
                 <FileText size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">분석 이력 관리</h4>
@@ -229,6 +251,7 @@ export function Home() {
 
             </div>
           </div>
+
 
 
 
@@ -251,8 +274,9 @@ export function Home() {
                 flex flex-col items-center text-center
               "
             >
-              <div className="p-4 bg-lime-100 text-lime-600 rounded-xl inline-block mb-6">
-                <QrCode size={36} />
+              {/* ✔ 아이콘 박스 → 이미지 꽉 채우기 */}
+              <div className="p-4 bg-lime-100 rounded-xl inline-block mb-6 overflow-hidden flex items-center justify-center">
+                <img src={analysisImg} alt="Analysis" className="w-full h-full object-contain" />
               </div>
 
               <h4 className="text-2xl font-medium mb-3">Analysis</h4>
@@ -262,48 +286,21 @@ export function Home() {
                 보안 위협 여부를 판단합니다.
               </p>
 
-              {/* 모듈 리스트 */}
               <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
-
-                {/* Module #1 */}
-                <div className="
-                  flex items-center gap-3 p-4 rounded-xl 
-                  bg-lime-50/70 border border-lime-200/40
-                  hover:bg-lime-100/80 hover:border-lime-300/60 
-                  transition-all hover:shadow-sm
-                ">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <ShieldCheck className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-slate-700 text-sm font-medium">
-                    URL 위험도 분석
-                  </span>
+                  <span className="text-slate-700 text-sm font-medium">URL 위험도 분석</span>
                 </div>
 
-                {/* Module #2 */}
-                <div className="
-                  flex items-center gap-3 p-4 rounded-xl 
-                  bg-lime-50/70 border border-lime-200/40
-                  hover:bg-lime-100/80 hover:border-lime-300/60 
-                  transition-all hover:shadow-sm
-                ">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Globe className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-slate-700 text-sm font-medium">
-                    도메인 신뢰도 검증
-                  </span>
+                  <span className="text-slate-700 text-sm font-medium">도메인 신뢰도 검증</span>
                 </div>
 
-                {/* Module #3 */}
-                <div className="
-                  flex items-center gap-3 p-4 rounded-xl 
-                  bg-lime-50/70 border border-lime-200/40
-                  hover:bg-lime-100/80 hover:border-lime-300/60 
-                  transition-all hover:shadow-sm
-                ">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <AlertTriangle className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-slate-700 text-sm font-medium">
-                    URL 리스크 설명 제공
-                  </span>
+                  <span className="text-slate-700 text-sm font-medium">URL 리스크 설명 제공</span>
                 </div>
-
               </div>
             </motion.div>
 
@@ -323,8 +320,9 @@ export function Home() {
                 flex flex-col items-center text-center
               "
             >
-              <div className="p-4 bg-lime-100 text-lime-600 rounded-xl inline-block mb-6">
-                <Users size={36} />
+              {/* ✔ 아이콘 박스 → 이미지 꽉 채우기 */}
+              <div className="p-4 bg-lime-100 rounded-xl inline-block mb-6 overflow-hidden flex items-center justify-center">
+                <img src={heartImg} alt="Community" className="w-full h-full object-contain" />
               </div>
 
               <h4 className="text-2xl font-medium mb-3">Community</h4>
@@ -335,44 +333,20 @@ export function Home() {
               </p>
 
               <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
-
-                {/* Module */}
-                <div className="
-                  flex items-center gap-3 p-4 rounded-xl
-                  bg-lime-50/70 border border-lime-200/40
-                  hover:bg-lime-100/80 hover:border-lime-300/60
-                  transition-all hover:shadow-sm
-                ">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <MessageSquare className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-slate-700 text-sm font-medium">
-                    사용자 사례 공유
-                  </span>
+                  <span className="text-slate-700 text-sm font-medium">사용자 사례 공유</span>
                 </div>
 
-                <div className="
-                  flex items-center gap-3 p-4 rounded-xl
-                  bg-lime-50/70 border border-lime-200/40
-                  hover:bg-lime-100/80 hover:border-lime-300/60
-                  transition-all hover:shadow-sm
-                ">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Lightbulb className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-slate-700 text-sm font-medium">
-                    보안 인사이트 교류
-                  </span>
+                  <span className="text-slate-700 text-sm font-medium">보안 인사이트 교류</span>
                 </div>
 
-                <div className="
-                  flex items-center gap-3 p-4 rounded-xl
-                  bg-lime-50/70 border border-lime-200/40
-                  hover:bg-lime-100/80 hover:border-lime-300/60
-                  transition-all hover:shadow-sm
-                ">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Flag className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-slate-700 text-sm font-medium">
-                    신고 & 위험 URL 제보
-                  </span>
+                  <span className="text-slate-700 text-sm font-medium">신고 & 위험 URL 제보</span>
                 </div>
-
               </div>
             </motion.div>
 
@@ -392,8 +366,9 @@ export function Home() {
                 flex flex-col items-center text-center
               "
             >
-              <div className="p-4 bg-lime-100 text-lime-600 rounded-xl inline-block mb-6">
-                <FileText size={36} />
+              {/* ✔ 아이콘 박스 → 이미지 꽉 채우기 */}
+              <div className="p-4 bg-lime-100 rounded-xl inline-block mb-6 overflow-hidden flex items-center justify-center">
+                <img src={mypostImg} alt="MyPost" className="w-full h-full object-contain" />
               </div>
 
               <h4 className="text-2xl font-medium mb-3">MyPost</h4>
@@ -404,51 +379,27 @@ export function Home() {
               </p>
 
               <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
-
-                <div className="
-                  flex items-center gap-3 p-4 rounded-xl
-                  bg-lime-50/70 border border-lime-200/40
-                  hover:bg-lime-100/80 hover:border-lime-300/60
-                  transition-all hover:shadow-sm
-                ">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Save className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-slate-700 text-sm font-medium">
-                    분석 기록 자동 저장
-                  </span>
+                  <span className="text-slate-700 text-sm font-medium">분석 기록 자동 저장</span>
                 </div>
 
-                <div className="
-                  flex items-center gap-3 p-4 rounded-xl
-                  bg-lime-50/70 border border-lime-200/40
-                  hover:bg-lime-100/80 hover:border-lime-300/60
-                  transition-all hover:shadow-sm
-                ">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Edit3 className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-slate-700 text-sm font-medium">
-                    제목 & 내용 관리
-                  </span>
+                  <span className="text-slate-700 text-sm font-medium">제목 & 내용 관리</span>
                 </div>
 
-                <div className="
-                  flex items-center gap-3 p-4 rounded-xl
-                  bg-lime-50/70 border border-lime-200/40
-                  hover:bg-lime-100/80 hover:border-lime-300/60
-                  transition-all hover:shadow-sm
-                ">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Search className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-slate-700 text-sm font-medium">
-                    상세 분석 보기
-                  </span>
+                  <span className="text-slate-700 text-sm font-medium">상세 분석 보기</span>
                 </div>
-
               </div>
-
             </motion.div>
 
 
+
+
           </div>
-
-
 
         </div>
       </div>
