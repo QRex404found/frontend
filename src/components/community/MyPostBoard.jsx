@@ -20,13 +20,13 @@ export default function MyPostBoard({
 }) {
   return (
     <div className="w-full px-2 md:px-4 py-2 flex flex-col">
-
-      {/* Delete / Submit */}
+      
+      {/* Delete / Submit 버튼 */}
       <div className="flex justify-end mb-3">
         <Button
           onClick={toggleDeleteMode}
           variant={isDeleting ? "default" : "outline"}
-          disabled={!isDeleting&& (myPosts.length===0 || isLoading)} //게시물이 없으면 delete 버튼 비활성화
+          disabled={!isDeleting && (myPosts.length === 0 || isLoading)}
           className={`
             w-[80px] text-sm font-medium
             ${
@@ -34,14 +34,18 @@ export default function MyPostBoard({
                 ? "bg-[#7CCF00] text-white border-[#7CCF00] hover:bg-[#6AC600]"
                 : "text-gray-700 border-gray-300 hover:bg-gray-100"
             }
-            ${(!isDeleting && myPosts.length ===0) ? "opacity-50 cursor-not-allowed" : ""}
+            ${
+              !isDeleting && myPosts.length === 0
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }
           `}
         >
           {isDeleting ? "Submit" : "Delete"}
         </Button>
       </div>
 
-      {/* 게시판 */}
+      {/* 게시판 영역 */}
       {!showEmpty ? (
         <CommonBoard
           posts={myPosts}
