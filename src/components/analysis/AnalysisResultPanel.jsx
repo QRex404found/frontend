@@ -78,12 +78,8 @@ export default function AnalysisResultPanel({ result, onTitleUpdated, onReset })
 
     return (
         <div className="w-full h-full flex flex-col space-y-6">
-
-            {/* ----------------------------------------------- */}
-            {/* 🔥 Reset 아이콘 버튼 추가 (이 부분만 새로 추가됨) */}
-            {/* ----------------------------------------------- */}
             <div className="flex items-center justify-between border-b pb-2 mb-4">
-                <h2 className="!text-4xl font-light">QR Analysis Result</h2>
+                <h2 className="!text-3xl font-light">QR Analysis Result</h2>
 
                 <button
                     onClick={onReset}
