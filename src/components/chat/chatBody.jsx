@@ -6,13 +6,9 @@ import { Send, Loader2 } from "lucide-react";
 import apiClient from "@/api/index";
 
 export default function ChatBody({ isOpen, user }) {
-  // ⭐ userId 결정 (비로그인 → guest)
   const userId = user?.id || user?.userId || "guest";
   const storageKey = `qrex_chat_${userId}`;
 
-  // ------------------------------------------------------------------------------------------------
-  // 1) sessionStorage에서 메시지 불러오기
-  // ------------------------------------------------------------------------------------------------
   const [messages, setMessages] = useState(() => {
     const saved = sessionStorage.getItem(storageKey);
     return saved
@@ -29,16 +25,12 @@ export default function ChatBody({ isOpen, user }) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // ⭐ 추가됨 — 사용자 입력에서 URL 추출
   const extractUserUrl = (text) => {
     const urlRegex = /(https?:\/\/[^\s]+)/;
     const match = text.match(urlRegex);
     return match ? match[0] : null;
   };
 
-  // ------------------------------------------------------------------------------------------------
-  // 스크롤 항상 맨 아래 유지
-  // ------------------------------------------------------------------------------------------------
   const scrollToBottom = () => {
     setTimeout(() => {
       const viewport = document.querySelector("[data-radix-scroll-area-viewport]");
@@ -50,16 +42,10 @@ export default function ChatBody({ isOpen, user }) {
     scrollToBottom();
   }, [messages, isLoading, isOpen]);
 
-  // ------------------------------------------------------------------------------------------------
-  // 2) 메시지가 바뀔 때마다 sessionStorage에 저장
-  // ------------------------------------------------------------------------------------------------
   useEffect(() => {
     sessionStorage.setItem(storageKey, JSON.stringify(messages));
   }, [messages, storageKey]);
 
-  // ------------------------------------------------------------------------------------------------
-  // 계정 변경 시 기존 기록 로드
-  // ------------------------------------------------------------------------------------------------
   useEffect(() => {
     const saved = sessionStorage.getItem(storageKey);
     if (saved) {
@@ -75,14 +61,10 @@ export default function ChatBody({ isOpen, user }) {
     }
   }, [storageKey]);
 
-  // ------------------------------------------------------------------------------------------------
-  // 메시지 전송
-  // ------------------------------------------------------------------------------------------------
   const handleSend = async () => {
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
 
-    // ⭐ 추가됨 — 사용자 입력에서 URL을 추출하고 MyPost로 보내기
     const extractedUrl = extractUserUrl(trimmed);
     if (extractedUrl) {
       window.dispatchEvent(
@@ -121,7 +103,6 @@ export default function ChatBody({ isOpen, user }) {
 
       setMessages((prev) => [...prev, aiMessage]);
 
-      // 🚨 기존 조건 + 게시글 조건 모두 포함
       if (
         aiText.includes("변경") ||
         aiText.includes("수정") ||
@@ -131,8 +112,8 @@ export default function ChatBody({ isOpen, user }) {
         aiText.includes("게시글") ||
         aiText.includes("성공적으로") ||
         aiText.includes("등록되었습니다") ||
-        aiText.includes("삭제되었습니다") ||      // ← 추가!
-        aiText.includes("삭제 완료")               // ← 추가!
+        aiText.includes("삭제되었습니다") ||
+        aiText.includes("삭제 완료")
       ) {
         console.log("🔔 [ChatBody] 업데이트 감지 → MyPost 갱신 이벤트 발생");
 
@@ -163,7 +144,6 @@ export default function ChatBody({ isOpen, user }) {
     }
   };
 
-  // ------------------------------------------------------------------------------------------------
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 px-4 overflow-hidden">
@@ -184,15 +164,20 @@ export default function ChatBody({ isOpen, user }) {
                   />
                 )}
 
+                {/*  CommentDrawer 방식 그대로 적용된 말풍선 */}
                 <div
                   className={`
-                    max-w-[75%] px-4 py-2 text-sm rounded-2xl whitespace-pre-wrap 
+                    max-w-[75%]
+                    px-4 py-2 text-sm rounded-2xl whitespace-pre-wrap 
+                    break-all
+                    [overflow-wrap:anywhere]
                     ${
                       msg.role === "user"
                         ? "bg-lime-500 text-white rounded-br-none"
                         : "bg-[#E2E8F0] text-black rounded-bl-none"
                     }
                   `}
+                  style={{ wordBreak: "break-all" }}
                 >
                   {typeof msg.text === "object"
                     ? JSON.stringify(msg.text)
@@ -208,7 +193,7 @@ export default function ChatBody({ isOpen, user }) {
                   alt="Q-Rex"
                   className="object-contain w-10 h-10 mr-2 bg-white border rounded-full shadow-sm"
                 />
-                <div className="bg-[#E2E8F0] text-gray-500 px-4 py-2 text-sm rounded-2xl rounded-bl-none flex items-center">
+                <div className="bg-[#E2E8F0] text-gray-500 px-4 py-2 text-sm rounded-2xl rounded-bl-none flex items-center break-all [overflow-wrap:anywhere]">
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   답변 생성 중...
                 </div>
