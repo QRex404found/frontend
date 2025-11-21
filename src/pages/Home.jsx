@@ -177,7 +177,7 @@ export function Home() {
               <img
                 src={holdingQR}
                 alt="QRex Illustration"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain mix-blend-multiply"
               />
             </motion.div>
           </div>
@@ -270,7 +270,7 @@ export function Home() {
                 <img
                   src={analysisImg}
                   alt="Analysis"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain mix-blend-multiply"
                 />
               </div>
 
@@ -319,7 +319,7 @@ export function Home() {
                 <img
                   src={heartImg}
                   alt="Community"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain mix-blend-multiply"
                 />
               </div>
 
@@ -368,7 +368,7 @@ export function Home() {
                 <img
                   src={mypostImg}
                   alt="MyPost"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain mix-blend-multiply"
                 />
               </div>
 
