@@ -73,7 +73,7 @@ export function Home() {
           loop
           muted
           playsInline
-          className="absolute top-0 left-0 object-cover w-full h-full"
+          className="absolute top-0 left-0 object-contain w-full h-full"
         />
 
         {/* Scroll Arrow */}
@@ -270,7 +270,7 @@ export function Home() {
                 <img
                   src={analysisImg}
                   alt="Analysis"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
 
@@ -319,7 +319,7 @@ export function Home() {
                 <img
                   src={heartImg}
                   alt="Community"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
 
@@ -368,7 +368,7 @@ export function Home() {
                 <img
                   src={mypostImg}
                   alt="MyPost"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
 
