@@ -138,7 +138,7 @@ export function Home() {
           </motion.div>
 
           {/* WHAT IS QREX */}
-          <div className="flex flex-col md:flex-row justify-between items-center md:items-stretch gap-20 mb-20">
+          <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-20 mb-20">
 
             {/* LEFT: Text */}
             <motion.div
@@ -146,11 +146,7 @@ export function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
-              /* flex flex-col justify-center: 
-                이미지 높이에 맞춰 텍스트 영역이 늘어날 때, 내용물을 수직 중앙에 정렬합니다.
-                (원하시면 justify-start로 바꿔서 상단 정렬도 가능합니다)
-              */
-              className="flex-1 md:pl-4 flex flex-col justify-center"
+              className="flex-1 md:pl-4"
             >
               <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-10">
@@ -162,14 +158,12 @@ export function Home() {
                 일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.
               </p>
 
-              <div> {/* 버튼이 너무 늘어나는 것을 방지하기 위해 div로 한번 감쌈 */}
-                <button
-                  onClick={handleStart}
-                  className="px-8 py-4 bg-lime-500 text-lg text-white rounded-xl font-medium hover:bg-lime-600 transition"
-                >
-                  Explore QRex
-                </button>
-              </div>
+              <button
+                onClick={handleStart}
+                className="px-8 py-4 bg-lime-500 text-lg text-white rounded-xl font-medium hover:bg-lime-600 transition"
+              >
+                Explore QRex
+              </button>
             </motion.div>
 
             {/* RIGHT IMAGE BOX */}
@@ -179,20 +173,15 @@ export function Home() {
               transition={{ duration: 0.7, delay: 0.1 }}
               viewport={{ once: true }}
               className="
-      /* 기본 모바일 설정 (고정 크기) */
-      w-[260px] h-[260px]
-      
-      /* 데스크탑(md) 설정: 높이를 텍스트와 맞춤 */
-      md:flex-1             /* 영역 확보 */
-      md:w-auto md:h-auto   /* 높이는 부모(items-stretch)에 의해 결정됨 */
-      md:aspect-square      /* 결정된 높이만큼 너비도 똑같이 맞춰 정사각형 유지 */
-      
-      /* 스타일링 */
-      flex items-center justify-center
-      bg-white border border-slate-200 rounded-3xl
-      overflow-hidden
-      mx-auto md:mx-0
-    "
+                flex-1
+                flex items-center justify-center
+                bg-white border border-slate-200 rounded-3xl
+                md:max-w-[420px] md:max-h-[420px]
+                w-[260px] h-[260px] md:w-full md:h-auto
+                aspect-square
+                mx-auto md:mx-0
+                overflow-hidden
+              "
             >
               <img
                 src={holdingQR}
