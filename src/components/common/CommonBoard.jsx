@@ -124,8 +124,8 @@ export const CommonBoard = ({
                                                 </TableCell>
                                             )}
 
-                                            {/* 2. Title 데이터 (수정: 모바일용 날짜 추가) */}
-                                            <TableCell className="font-medium truncate text-base md:text-lg">
+                                            {/* 2. Title 데이터 */}
+                                            <TableCell className="font-light truncate text-base md:text-lg">
                                                 <div className="flex flex-col justify-center">
                                                     <div className="truncate">
                                                         {item.title}
@@ -137,7 +137,7 @@ export const CommonBoard = ({
                                                 </div>
                                             </TableCell>
 
-                                            {/* 3. Date 데이터 (수정: 모바일 hidden, PC table-cell) */}
+                                            {/* 3. Date 데이터 */}
                                             <TableCell className="hidden md:table-cell text-right text-gray-500">
                                                 {formatPostDate(item.date)}
                                             </TableCell>
@@ -150,7 +150,7 @@ export const CommonBoard = ({
                 )}
             </CardContent>
 
-            {/* Pagination UI (원본 유지) */}
+            {/* Pagination UI */}
             {totalPages > 1 && onPageChange && (
                 <div className="flex justify-center pt-3 pb-2">
                     <Pagination>
