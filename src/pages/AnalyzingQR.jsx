@@ -44,6 +44,7 @@ export default function AnalyzingQR() {
                 file={fileToAnalyze} 
                 extractedUrl={extractedUrl}
             />
+            <p>분석 중에는 화면을 이동하지 마세요!</p>
         </div>
     );
 }
