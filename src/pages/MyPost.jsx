@@ -123,27 +123,33 @@ export function MyPost() {
       {/* PC 화면 */}
       <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
         <ResizablePanelGroup direction="horizontal">
+
           <ResizablePanel defaultSize={50} minSize={30}>
-            <div className="h-full flex flex-col">
+            <div className="max-w-[550px] mx-auto h-full flex flex-col">
               <Card className="h-full w-full p-6 flex flex-col">
                 <WritePostForm onPostSuccess={() => fetchPosts(1)} />
               </Card>
             </div>
           </ResizablePanel>
 
+          {/* ★핸들: Card border(1px)과 동일 굵기 + 길이 약 20px 축소 + hover 동일 */}
           <ResizableHandle
+            withHandle={false}
             className="
-              w-[3px] bg-transparent hover:bg-gray-300 rounded-none relative cursor-col-resize
-              fter:content-[''] after:absolute after:top-[20px] after:bottom-[20px]
-+             after:left-[calc(50%-1px)] after:-translate-x-1/2 after:w-[1px]
-              after:bg-gray-300 after:rounded-full
+              relative cursor-col-resize w-[8px] bg-transparent
+              after:content-[''] after:absolute
+              after:left-[calc(50%-0.5px)] after:-translate-x-1/2
+              after:top-[25px] after:bottom-[25px]
+              after:w-[1px] after:bg-gray-300
             "
           />
 
           <ResizablePanel minSize={30}>
             <div className="pl-4 h-full flex flex-col">
               <div className="w-full px-2 md:px-4 py-2 flex flex-col">
-                <h1 className="mb-4 text-3xl font-medium hidden lg:block">My Post</h1>
+                <h1 className="mb-4 text-3xl font-medium hidden lg:block">
+                  My Post
+                </h1>
 
                 <MyPostBoard
                   isDeleting={isDeleting}
@@ -167,8 +173,60 @@ export function MyPost() {
       </div>
 
       {/* 모바일 화면 */}
-      {/* (Mobile layout 동일, 변경 없음) */}
-      ...
+      <div className="lg:hidden mt-4 w-full">
+        <div className="mb-3 flex justify-center">
+          <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
+            <button
+              onClick={() => setMobileTab("write")}
+              className={`px-4 py-1.5 rounded-full ${mobileTab === "write" ? "bg-white shadow-sm border" : "text-gray-600"}`}
+            >
+              글 작성
+            </button>
+            <button
+              onClick={() => setMobileTab("list")}
+              className={`px-4 py-1.5 rounded-full ${mobileTab === "list" ? "bg-white shadow-sm border" : "text-gray-600"}`}
+            >
+              내가 쓴 글
+            </button>
+          </div>
+        </div>
+
+        <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+          <div
+            className="flex w-[200%] transition-transform duration-300"
+            style={{
+              transform: mobileTab === "write"
+                ? "translateX(0)"
+                : "translateX(-50%)"
+            }}
+          >
+
+            <div className="w-1/2 p-4">
+              <Card className="w-full h-full p-4 flex flex-col">
+                <WritePostForm onPostSuccess={() => fetchPosts(1)} />
+              </Card>
+            </div>
+
+            <div className="w-1/2 p-4">
+              <MyPostBoard
+                isDeleting={isDeleting}
+                toggleDeleteMode={toggleDeleteMode}
+                myPosts={myPosts}
+                isLoading={isLoading}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                setCurrentPage={setCurrentPage}
+                openDetail={openDetail}
+                selectedPosts={selectedPosts}
+                toggleSelect={toggleSelect}
+                showEmpty={showEmpty}
+                rowHeightClass="h-14"
+              />
+            </div>
+
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
