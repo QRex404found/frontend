@@ -1,6 +1,6 @@
 // src/pages/Home.jsx
 
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 import videoBg from '@/assets/background.mp4';
@@ -54,6 +54,28 @@ export function Home() {
     }
   };
 
+  useEffect(() => {
+    // viewport 메타 태그 찾기
+    const meta = document.querySelector("meta[name='viewport']");
+    const originalContent = meta ? meta.getAttribute("content") : "";
+
+    if (meta) {
+      // 확대/축소 금지 설정 적용 (user-scalable=no, scale 고정)
+      meta.setAttribute(
+        "content",
+        "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+      );
+    }
+
+    // 이 페이지를 벗어날 때(Cleanup) 원래 설정으로 복구
+    return () => {
+      if (meta) {
+        meta.setAttribute("content", originalContent);
+      }
+    };
+  }, []);
+
+  
   return (
     <div className="w-full">
 
@@ -77,7 +99,7 @@ export function Home() {
         />
 
         {/* Scroll Arrow */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
+        <div className="absolute bottom-20 md:bottom-10 left-1/2 -translate-x-1/2 z-10">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
