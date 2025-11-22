@@ -75,9 +75,9 @@ export function Home() {
     };
   }, []);
 
-  
+
   return (
-    <div className="w-full">
+    <div className="w-full overflow-x-hidden">
 
       {/* ====================================================== */}
       {/* 1) HERO SECTION */}
@@ -95,7 +95,7 @@ export function Home() {
           loop
           muted
           playsInline
-          className="absolute top-0 left-0 object-contain w-full h-full"
+          className="absolute top-0 left-0 object-cover w-full h-full"
         />
 
         {/* Scroll Arrow */}
