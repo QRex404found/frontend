@@ -111,22 +111,22 @@ const WritePostForm = ({ onPostSuccess }) => {
                 </label>
 
                 {/* 모바일 파일 선택 버그 해결 */}
-                <input
-                    id="photo-upload"
-                    type="file"
-                    accept="image/*"
-                    capture="environment" // 📌 스마트폰 카메라 직접 호출
-                    onChange={handleFileChange}
-                    style={{
-                        position: 'absolute',
-                        width: '100%',
-                        height: '100%',
-                        top: 0,
-                        left: 0,
-                        opacity: 0,
-                        cursor: 'pointer',
-                    }}
-                />
+<input
+    id="photo-upload"
+    type="file"
+    accept="image/*"
+    onChange={handleFileChange}
+    style={{
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        top: 0,
+        left: 0,
+        opacity: 0,
+        cursor: 'pointer',
+    }}
+/>
+
 
                 {previewUrl && photoFile && (
                     <span className="text-xs truncate max-w-[200px] mt-1">
