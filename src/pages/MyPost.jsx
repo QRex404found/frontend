@@ -23,6 +23,7 @@ const ITEMS_PER_PAGE = 8;
 export function MyPost() {
   const navigate = useNavigate();
 
+  // user 정보 추가됨!!
   const { isLoggedIn, isChecked, user } = useAuth();
 
   const [myPosts, setMyPosts] = useState([]);
@@ -52,7 +53,7 @@ export function MyPost() {
         page - 1,
         ITEMS_PER_PAGE,
         'createdAt,desc',
-        user?.userId
+        user?.userId    // ★ writerId 추가!
       );
 
       const mapped = data.content.map((p) => ({
@@ -68,16 +69,16 @@ export function MyPost() {
     }
   };
 
-  /* ChatBody → MyPost 자동 갱신 이벤트 리스너 */
+  /* 🔥 ChatBody → MyPost 자동 갱신 이벤트 리스너 추가됨 */
   useEffect(() => {
     const handleRefresh = () => {
       console.log("🔄 MyPost: ChatBody 이벤트 감지 → 게시글 목록 갱신");
-      fetchPosts(1);
+      fetchPosts(1); // 첫 페이지로 갱신
     };
 
     window.addEventListener("analysis-updated", handleRefresh);
     return () => window.removeEventListener("analysis-updated", handleRefresh);
-  }, []);
+  }, []); // user 변경 시에도 정상 동작하도록 함
 
   /* 삭제 모드 */
   const toggleDeleteMode = () => {
@@ -151,26 +152,15 @@ export function MyPost() {
       {/* PC 화면 */}
       <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
         <ResizablePanelGroup direction="horizontal">
-          
           <ResizablePanel defaultSize={50} minSize={30}>
-            {/* 왼쪽 패널 내용을 오른쪽(핸들)으로 밀착시킴 */}
-            <div className="max-w-[550px] ml-auto h-full flex flex-col">
+            <div className="max-w-[550px] mx-auto h-full flex flex-col">
               <Card className="h-full w-full p-6 flex flex-col">
                 <WritePostForm onPostSuccess={() => fetchPosts(1)} />
               </Card>
             </div>
           </ResizablePanel>
 
-          {/* [ResizableHandle 수정됨]
-              1. style={{ height: "calc(100% - 3rem)" }} : 띄어쓰기 주의! 위아래 둥근 모서리 제외
-              2. self-center : 세로 중앙 정렬
-              3. w-2 -ml-1 : 클릭 영역 확보 및 카드 테두리 위에 겹침
-          */}
-          <ResizableHandle 
-            withHandle={false} 
-            className="w-2 -ml-1 z-50 bg-transparent hover:bg-gray-300 transition-colors rounded-full outline-none cursor-col-resize self-center" 
-            style={{ height: "calc(100% - 3rem)" }}
-          />
+          <ResizableHandle />
 
           <ResizablePanel minSize={30}>
             <div className="pl-4 h-full flex flex-col">

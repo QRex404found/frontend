@@ -63,7 +63,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-      결과 패널의 Reset 버튼 → 초기 스캔 화면으로
+     결과 패널의 Reset 버튼 → 초기 스캔 화면으로
   --------------------------------------------- */
   const handleReset = () => {
     setAnalysisResult(null);
@@ -73,7 +73,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-      QR 분석 완료 처리
+     QR 분석 완료 처리
   --------------------------------------------- */
   const handleAnalysisResult = useCallback((result, error) => {
     if (error) {
@@ -97,7 +97,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-      라우터 state 전달 처리
+     라우터 state 전달 처리
   --------------------------------------------- */
   useEffect(() => {
     const stateResult = location.state?.analysisResult;
@@ -117,7 +117,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-      새 QR 분석 시작
+     새 QR 분석 시작
   --------------------------------------------- */
   const handleAnalysisStart = (file, url) => {
     navigate('/analyzing-qr', {
@@ -131,7 +131,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-      History 선택 처리
+     History 선택 처리
   --------------------------------------------- */
   const handleHistorySelect = async (analysisId) => {
     setAnalysisResult(null);
@@ -156,7 +156,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-      제목 수정 반영
+     제목 수정 반영
   --------------------------------------------- */
   const handleTitleUpdated = (id, newTitle) => {
     if (selectedHistory && selectedHistory.analysisId === id) {
@@ -223,24 +223,14 @@ export function Analysis() {
           <ResizablePanelGroup direction="horizontal">
 
             <ResizablePanel defaultSize={50} minSize={30}>
-              {/* 왼쪽 패널 내용을 오른쪽(핸들)으로 밀착시킴 */}
-              <div className="max-w-[550px] ml-auto h-full flex flex-col">
+              <div className="max-w-[550px] mx-auto h-full flex flex-col">
                 <Card className="flex items-center justify-center w-full h-full p-6">
                   {LeftPanelContent}
                 </Card>
               </div>
             </ResizablePanel>
 
-            {/* [ResizableHandle 수정됨]
-              1. style={{ height: "calc(100% - 3rem)" }} : 띄어쓰기 주의! 위아래 둥근 모서리 제외
-              2. self-center : 세로 중앙 정렬
-              3. w-2 -ml-1 : 클릭 영역 확보 및 카드 테두리 위에 겹침
-            */}
-            <ResizableHandle 
-                withHandle={false} 
-                className="w-2 -ml-1 z-50 bg-transparent hover:bg-gray-300 transition-colors rounded-full outline-none cursor-col-resize self-center" 
-                style={{ height: "calc(100% - 3rem)" }}
-            />
+            <ResizableHandle />
 
             <ResizablePanel minSize={30}>
               <div className="flex flex-col h-full pl-4">
