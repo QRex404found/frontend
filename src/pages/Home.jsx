@@ -138,7 +138,7 @@ export function Home() {
           </motion.div>
 
           {/* WHAT IS QREX */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-20 mb-16">
+          <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-20 mb-20">
 
             {/* LEFT: Text */}
             <motion.div
@@ -146,14 +146,15 @@ export function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
+              className="flex-1 md:pl-4"
             >
               <h3 className="text-4xl font-medium mb-6">QRex란?</h3>
               <p className="text-slate-600 text-xl leading-relaxed mb-10">
-                QRex는 URL 구조 분석, 도메인 신뢰도 판단, AI 기반 위험 해석을 결합해<br/>
-                QR 링크의 안전성을 종합적으로 평가하는 지능형 보안 플랫폼입니다.<br/><br/>
+                QRex는 URL 구조 분석, 도메인 신뢰도 판단, AI 기반 위험 해석을 결합해<br />
+                QR 링크의 안전성을 종합적으로 평가하는 지능형 보안 플랫폼입니다.<br /><br />
 
-                URL 위험 요소 탐지뿐 아니라,<br/>
-                사용자 경험 기반 보안 인사이트 공유, 분석 기록의 지속 관리를 지원하여<br/>
+                URL 위험 요소 탐지뿐 아니라,<br />
+                사용자 경험 기반 보안 인사이트 공유, 분석 기록의 지속 관리를 지원하여<br />
                 일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.
               </p>
 
@@ -172,12 +173,15 @@ export function Home() {
               transition={{ duration: 0.7, delay: 0.1 }}
               viewport={{ once: true }}
               className="
-                bg-white border border-slate-200 rounded-3xl
-                flex items-center justify-center
-                w-[320px] h-[320px]
-                md:mr-3
-                overflow-hidden
-              "
+      flex-1
+      flex items-center justify-center
+      bg-white border border-slate-200 rounded-3xl
+      md:max-w-[420px] md:max-h-[420px]
+      w-[260px] h-[260px] md:w-full md:h-auto
+      aspect-square
+      mx-auto md:mx-0
+      overflow-hidden
+    "
             >
               <img
                 src={holdingQR}
@@ -185,7 +189,9 @@ export function Home() {
                 className="w-full h-full object-contain mix-blend-multiply"
               />
             </motion.div>
+
           </div>
+
 
 
           {/* CTA SECTION */}
