@@ -131,55 +131,88 @@ export function Home() {
 
 
           {/* ====================================================== */}
-          {/* 3) WHAT IS QREX */}
+          {/* ABOUT SECTION */}
           {/* ====================================================== */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-20 mb-16 items-center">
+          <div ref={infoSectionRef} className="bg-white text-slate-900 py-28 px-6">
+            <div className="max-w-6xl mx-auto">
 
-            {/* LEFT: Text */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7 }}
-              viewport={{ once: true }}
-            >
-              <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
-              <p className="text-slate-600 text-lg leading-relaxed mb-10">
-                QRex는 URL 구조 분석, 도메인 신뢰도 판단, AI 기반 위험 해석을 결합해<br />
-                QR 링크의 안전성을 종합적으로 평가하는 지능형 보안 플랫폼입니다.<br /><br />
-
-                URL 위험 요소 탐지뿐 아니라,<br />
-                사용자 경험 기반 보안 인사이트 공유, 분석 기록의 지속 관리를 지원하여<br />
-                일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.
-              </p>
-
-              <button
-                onClick={handleStart}
-                className="px-8 py-4 bg-lime-500 text-white rounded-xl font-medium hover:bg-lime-600 transition"
+              {/* 헤더 섹션 */}
+              <motion.div
+                initial={{ opacity: 0, y: 35 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: "easeOut" }}
+                viewport={{ once: true }}
+                className="text-center mb-14"
               >
-                Explore QRex
-              </button>
-            </motion.div>
+                <h2 className="text-5xl font-medium tracking-tight mb-6">
+                  QR 보안을 <span className="text-lime-600">더 스마트하게.</span>
+                </h2>
 
-            {/* RIGHT IMAGE BOX — 옵션 A */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              viewport={{ once: true }}
-              className="
-      bg-white border border-slate-200 rounded-3xl 
-      flex items-center justify-center
-      w-[320px] h-[320px]
-      mx-auto md:ml-auto
-      overflow-hidden
-    "
-            >
-              <img
-                src={holdingQR}
-                alt="QRex Illustration"
-                className="w-full h-full object-contain mix-blend-multiply"
-              />
-            </motion.div>
+                <p className="text-slate-500 text-xl max-w-3xl mx-auto leading-relaxed">
+                  QRex는 QR 분석, 위험 탐지, 커뮤니티, 이력 관리까지<br />
+                  한 번에 제공하는 지능형 QR 보안 플랫폼입니다.
+                </p>
+              </motion.div>
+
+              {/* WHAT IS QREX */}
+              <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-20 mb-20">
+
+                {/* LEFT: Text */}
+                <motion.div
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.7 }}
+                  viewport={{ once: true }}
+                  className="flex-1 md:pl-4"
+                >
+                  <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
+                  <p className="text-slate-600 text-lg leading-relaxed mb-10">
+                    QRex는 URL 구조 분석, 도메인 신뢰도 판단, AI 기반 위험 해석을 결합해<br />
+                    QR 링크의 안전성을 종합적으로 평가하는 지능형 보안 플랫폼입니다.<br /><br />
+
+                    URL 위험 요소 탐지뿐 아니라,<br />
+                    사용자 경험 기반 보안 인사이트 공유, 분석 기록의 지속 관리를 지원하여<br />
+                    일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.
+                  </p>
+
+                  <button
+                    onClick={handleStart}
+                    className="px-8 py-4 bg-lime-500 text-lg text-white rounded-xl font-medium hover:bg-lime-600 transition"
+                  >
+                    Explore QRex
+                  </button>
+                </motion.div>
+
+                {/* RIGHT IMAGE BOX */}
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.7, delay: 0.1 }}
+                  viewport={{ once: true }}
+                  className="
+          flex-1
+          flex items-center justify-center
+          bg-white border border-slate-200 rounded-3xl
+          md:max-w-[420px] md:max-h-[420px]
+          w-[260px] h-[260px] md:w-full md:h-auto
+          aspect-square
+          mx-auto md:ml-auto
+          overflow-hidden
+        "
+                >
+                  {/* 위 className 설명:
+           - mx-auto: 모바일에서는 중앙 정렬
+           - md:ml-auto: PC에서는 왼쪽 여백을 최대로 밀어서(오른쪽 끝으로) 배치
+        */}
+                  <img
+                    src={holdingQR}
+                    alt="QRex Illustration"
+                    className="w-full h-full object-contain mix-blend-multiply"
+                  />
+                </motion.div>
+
+              </div>
+            </div>
           </div>
 
 
