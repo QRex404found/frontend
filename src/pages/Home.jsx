@@ -285,7 +285,100 @@ export function Home() {
                   </div>
                 </div>
               </motion.div>
-              {/* 나머지 Community, MyPost는 동일 — 원본 그대로 유지 */}
+               {/* =============================== */}
+            {/* Community */}
+            {/* =============================== */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="
+                p-10 rounded-3xl border shadow-sm hover:shadow-md transition
+                flex flex-col items-center text-center
+              "
+            >
+              <div className="w-32 h-32 rounded-xl inline-block mb-6 overflow-hidden">
+                <img
+                  src={heartImg}
+                  alt="Community"
+                  className="w-full h-full object-contain mix-blend-multiply"
+                />
+              </div>
+
+              <h4 className="text-2xl font-medium mb-3">Community</h4>
+
+              <p className="text-slate-600 mb-6 leading-relaxed flex-grow">
+                사용자 경험 기반 사례로
+                실질적인 보안 인사이트를 제공합니다.
+              </p>
+
+              <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
+                  <MessageSquare className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">사용자 사례 공유</span>
+                </div>
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
+                  <Lightbulb className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">보안 인사이트 교류</span>
+                </div>
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
+                  <Flag className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">신고 & 위험 URL 제보</span>
+                </div>
+              </div>
+            </motion.div>
+
+
+
+
+            {/* =============================== */}
+            {/* MyPost */}
+            {/* =============================== */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="
+                p-10 rounded-3xl border shadow-sm hover:shadow-md transition
+                flex flex-col items-center text-center
+              "
+            >
+              <div className="w-32 h-32 rounded-xl inline-block mb-6 overflow-hidden">
+                <img
+                  src={mypostImg}
+                  alt="MyPost"
+                  className="w-full h-full object-contain mix-blend-multiply"
+                />
+              </div>
+
+              <h4 className="text-2xl font-medium mb-3">My post</h4>
+
+              <p className="text-slate-600 mb-6 leading-relaxed flex-grow">
+                분석한 QR 기록을 저장하고
+                언제든 빠르게 다시 확인할 수 있습니다.
+              </p>
+
+              {/* 🔹 리스트 - 완전 복원 */}
+              <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
+                  <Save className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">분석 기록 자동 저장</span>
+                </div>
+
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
+                  <Edit3 className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">제목 & 내용 관리</span>
+                </div>
+
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
+                  <Search className="w-5 h-5 text-lime-600/80" />
+                  <span className="text-slate-700 text-sm font-medium">상세 분석 보기</span>
+                </div>
+              </div>
+
+            </motion.div>
             </div>
           </div>
         </div>
