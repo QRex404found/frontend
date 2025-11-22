@@ -13,7 +13,7 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
-// 체크박스 컴포넌트
+// 체크박스 컴포넌트 (변경 없음)
 function Checkbox({ className, ...props }) {
     return (
         <CheckboxPrimitive.Root
@@ -79,23 +79,24 @@ export const CommonBoard = ({
                                     {showIndex && (
                                         <TableHead className="w-[50px] md:w-[100px] text-center text-sm font-medium relative p-0 md:p-4">
                                             
-                                            {/* 체크박스 영역 */}
+                                            {/* [체크박스] */}
                                             {isDeleting && (
                                                 <div className={cn(
-                                                    // [모바일]: Flex로 중앙 정렬 (Num 글씨 대체)
-                                                    "flex justify-center items-center w-full h-full",
-                                                    // [데스크탑]: 원본처럼 Absolute로 띄움 (Num 글씨 안 밀어냄)
-                                                    "md:absolute md:top-1/2 md:left-1 md:-translate-y-1/2 md:w-auto md:h-auto"
+                                                    // 1. 모바일: Flex로 꽉 채워서 중앙 정렬 (숫자 덮어씀)
+                                                    "flex items-center justify-center w-full h-full",
+                                                    // 2. 데스크탑: Absolute로 띄워서 왼쪽 구석에 박음 (숫자 위치 영향 X)
+                                                    // md:block을 줘서 flex 속성을 무력화하고 absolute만 남김
+                                                    "md:absolute md:top-1/2 md:left-2 md:-translate-y-1/2 md:w-auto md:h-auto md:block"
                                                 )}>
                                                     <Checkbox className="invisible" />
                                                 </div>
                                             )}
 
-                                            {/* Num 텍스트 */}
+                                            {/* [Num 텍스트] */}
                                             <span className={cn(
-                                                // [모바일]: 삭제 시 숨김
+                                                // 모바일: 삭제 중이면 숨김
                                                 isDeleting ? "hidden" : "inline",
-                                                // [데스크탑]: 무조건 보임 (체크박스는 공중에 떠 있으니까)
+                                                // 데스크탑: 무조건 보임 (체크박스는 유령처럼 떠있음)
                                                 "md:inline"
                                             )}>
                                                 Num
@@ -106,7 +107,7 @@ export const CommonBoard = ({
                                     {/* 2. Title 컬럼 */}
                                     <TableHead className="text-sm font-medium">Title</TableHead>
 
-                                    {/* 3. Date 컬럼 (모바일 숨김) */}
+                                    {/* 3. Date 컬럼 */}
                                     <TableHead className="hidden md:table-cell text-right w-[150px] text-sm font-medium">
                                         Date
                                     </TableHead>
@@ -126,14 +127,15 @@ export const CommonBoard = ({
                                             {showIndex && (
                                                 <TableCell className="text-center relative w-[50px] md:w-[100px] p-0 md:p-4">
                                                     
-                                                    {/* 체크박스 */}
+                                                    {/* [체크박스] */}
                                                     {isDeleting && (
-                                                        <div
+                                                        <div 
                                                             className={cn(
-                                                                // [모바일]: Flex로 꽉 채워서 중앙 정렬
-                                                                "flex justify-center items-center w-full h-full",
-                                                                // [데스크탑]: Absolute로 띄움 (원본 코드 방식 복구) -> 숫자 밀림 없음
-                                                                "md:absolute md:top-1/2 md:left-4 md:-translate-y-1/2 md:w-auto md:h-auto"
+                                                                // 1. 모바일: Flex로 중앙 정렬
+                                                                "flex items-center justify-center w-full h-full",
+                                                                // 2. 데스크탑: Absolute로 공중 부양 (left-2로 위치 고정)
+                                                                // md:block을 추가하여 flex 성질 제거 -> 숫자 밀림 원천 차단
+                                                                "md:absolute md:top-1/2 md:left-2 md:-translate-y-1/2 md:w-auto md:h-auto md:block"
                                                             )}
                                                             onClick={(e) => e.stopPropagation()}
                                                         >
@@ -144,13 +146,13 @@ export const CommonBoard = ({
                                                         </div>
                                                     )}
 
-                                                    {/* 숫자 */}
+                                                    {/* [숫자] */}
                                                     <span className={cn(
                                                         "text-sm text-gray-500",
-                                                        // [모바일]: 삭제 시 숨김
-                                                        isDeleting ? "hidden" : "block",
-                                                        // [데스크탑]: 무조건 보임 (체크박스는 겹쳐 떠있음)
-                                                        "md:block"
+                                                        // 모바일: 삭제 중이면 숨김
+                                                        isDeleting ? "hidden" : "inline",
+                                                        // 데스크탑: 무조건 inline으로 보임 (block 쓰면 미세하게 밀릴 수 있어서 inline 추천)
+                                                        "md:inline"
                                                     )}>
                                                         {displayIndex}
                                                     </span>
@@ -169,7 +171,7 @@ export const CommonBoard = ({
                                                 </div>
                                             </TableCell>
 
-                                            {/* 3. Date 데이터 (PC 전용) */}
+                                            {/* 3. Date 데이터 */}
                                             <TableCell className="hidden md:table-cell text-right text-gray-500">
                                                 {formatPostDate(item.date)}
                                             </TableCell>
@@ -182,7 +184,7 @@ export const CommonBoard = ({
                 )}
             </CardContent>
 
-            {/* Pagination (기존 유지) */}
+            {/* Pagination (변경 없음) */}
             {totalPages > 1 && onPageChange && (
                 <div className="flex justify-center pt-3 pb-2">
                     <Pagination>
