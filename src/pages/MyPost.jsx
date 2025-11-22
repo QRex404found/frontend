@@ -23,7 +23,6 @@ const ITEMS_PER_PAGE = 8;
 export function MyPost() {
   const navigate = useNavigate();
 
-  // user 정보 추가됨!!
   const { isLoggedIn, isChecked, user } = useAuth();
 
   const [myPosts, setMyPosts] = useState([]);
@@ -53,7 +52,7 @@ export function MyPost() {
         page - 1,
         ITEMS_PER_PAGE,
         'createdAt,desc',
-        user?.userId    // ★ writerId 추가!
+        user?.userId
       );
 
       const mapped = data.content.map((p) => ({
@@ -69,16 +68,16 @@ export function MyPost() {
     }
   };
 
-  /* 🔥 ChatBody → MyPost 자동 갱신 이벤트 리스너 추가됨 */
+  /* ChatBody → MyPost 자동 갱신 이벤트 리스너 */
   useEffect(() => {
     const handleRefresh = () => {
       console.log("🔄 MyPost: ChatBody 이벤트 감지 → 게시글 목록 갱신");
-      fetchPosts(1); // 첫 페이지로 갱신
-      };
+      fetchPosts(1);
+    };
 
     window.addEventListener("analysis-updated", handleRefresh);
     return () => window.removeEventListener("analysis-updated", handleRefresh);
-  }, []); // user 변경 시에도 정상 동작하도록 함
+  }, []);
 
   /* 삭제 모드 */
   const toggleDeleteMode = () => {
@@ -154,22 +153,23 @@ export function MyPost() {
         <ResizablePanelGroup direction="horizontal">
           
           <ResizablePanel defaultSize={50} minSize={30}>
-            {/* ml-auto로 오른쪽 밀착 유지 */}
+            {/* ml-auto: 요소를 오른쪽(핸들 쪽)으로 밀착 */}
             <div className="max-w-[550px] ml-auto h-full flex flex-col">
-              {/* [수정 1] border-r-0, rounded-r-none 제거 -> 원래의 둥근 모서리 카드 스타일 복원 */}
+              {/* Card는 원래의 둥근 모서리 디자인 유지 */}
               <Card className="h-full w-full p-6 flex flex-col">
                 <WritePostForm onPostSuccess={() => fetchPosts(1)} />
               </Card>
             </div>
           </ResizablePanel>
 
-          {/* [수정 2] 핸들 스타일 변경
-              - -ml-[1px]: 테두리 두께만큼 왼쪽으로 이동시켜 카드 테두리와 겹치게 함
-              - z-10: 카드 위에 오도록 레이어 순서 상향 조정
+          {/* [핸들 디자인 수정] 
+              - h-[calc(100%-3rem)]: 위아래 둥근 모서리 부분을 피해서 높이 설정
+              - self-center: 수직 중앙 정렬
+              - -ml-1: 왼쪽으로 살짝 겹치게 위치
           */}
           <ResizableHandle 
             withHandle={false} 
-            className="w-[1px] -ml-[1px] z-10 bg-gray-200 h-full transition-colors hover:bg-gray-400 focus:bg-gray-400 outline-none" 
+            className="w-1.5 -ml-1 h-[calc(100%-3rem)] self-center z-50 bg-gray-200 hover:bg-gray-400 transition-colors rounded-full outline-none cursor-col-resize" 
           />
 
           <ResizablePanel minSize={30}>
@@ -200,7 +200,7 @@ export function MyPost() {
         </ResizablePanelGroup>
       </div>
 
-      {/* 모바일 화면 (변경 없음) */}
+      {/* 모바일 화면 (기존 유지) */}
       <div className="lg:hidden mt-4 w-full">
         <div className="mb-3 flex justify-center">
           <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
