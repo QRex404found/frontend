@@ -14,9 +14,8 @@ export default function ChatSheet({ open, onOpenChange, children }) {
         side="right"
         className="flex h-full flex-col p-0 w-full sm:max-w-md"
       >
-        {/* ⭐ shadcn 기본 헤더 구조 (제목 왼쪽) */}
         <SheetHeader className="h-[46px] px-4 flex justify-start">
-          <SheetTitle className="text-[16px] font-semibold text-gray-600">
+          <SheetTitle className="text-[16px] font-medium text-gray-600">
             Chat with Q-Rex
           </SheetTitle>
         </SheetHeader>

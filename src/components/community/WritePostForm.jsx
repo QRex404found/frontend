@@ -99,7 +99,7 @@ const WritePostForm = ({ onPostSuccess }) => {
                     ) : (
                         <>
                             <CameraIcon className="w-7 h-7 text-gray-500" />
-                            <span className="mt-1 text-sm text-gray-500">PHOTO</span>
+                            <span className="mt-1 text-sm text-gray-500">PHOTO(선택)</span>
                         </>
                     )}
                 </label>
@@ -121,7 +121,7 @@ const WritePostForm = ({ onPostSuccess }) => {
             <div className="flex flex-col space-y-3 mt-6 flex-grow">
 
                 <Input
-                    placeholder="TITLE"
+                    placeholder="Title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className="text-sm"
@@ -136,7 +136,7 @@ const WritePostForm = ({ onPostSuccess }) => {
 
                 {/*  스크롤 가능 Textarea (높이 고정 + 내용 많으면 스크롤) */}
                 <Textarea
-                    placeholder="CONTEXT"
+                    placeholder="Context"
                     value={context}
                     onChange={(e) => setContext(e.target.value)}
                     className="

@@ -76,7 +76,7 @@ export const CommonBoard = ({
                             <TableHeader>
                                 <TableRow className="border-b-2 border-gray-300">
                                     {showIndex && (
-                                        <TableHead className="w-[100px] text-center text-sm font-semibold relative">
+                                        <TableHead className="w-[100px] text-center text-sm font-medium relative">
                                             <div className={cn(
                                                 "absolute top-1/2 -translate-y-1/2 transition-all duration-300",
                                                 isDeleting ? "left-1 opacity-100" : "left-1 opacity-0"
@@ -86,8 +86,8 @@ export const CommonBoard = ({
                                             Num
                                         </TableHead>
                                     )}
-                                    <TableHead className="text-sm font-semibold">Title</TableHead>
-                                    <TableHead className="text-right w-[150px] text-sm font-semibold">Date</TableHead>
+                                    <TableHead className="text-sm font-medium">Title</TableHead>
+                                    <TableHead className="text-right w-[150px] text-sm font-medium">Date</TableHead>
                                 </TableRow>
                             </TableHeader>
 
@@ -117,7 +117,7 @@ export const CommonBoard = ({
                                                     {displayIndex}
                                                 </TableCell>
                                             )}
-                                            <TableCell className="font-medium truncate text-base md:text-lg">
+                                            <TableCell className="font-light truncate text-base md:text-lg">
                                                 {item.title}
                                             </TableCell>
                                             <TableCell className="text-right text-gray-500">

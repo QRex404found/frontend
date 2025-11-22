@@ -44,24 +44,30 @@ export default function DeleteAccountTab({ onClose }) {
       onClose?.();
 
       // 5) 성공 toast
-      toast.success("Your account has been successfully deleted.");
+      toast.success("계정이 성공적으로 삭제되었습니다.");
 
       // 6) 홈으로 이동
       navigate("/", { replace: true });
 
     } catch (error) {
       console.error("Delete failed:", error);
-      toast.error("An error occurred while deleting your account.");
+      toast.error("계정 삭제 중 문제가 발생했습니다.");
     }
   };
 
   return (
-    <div className="p-3 space-y-4 text-sm bg-white border rounded-md">
-      <p className="text-base font-medium text-red-600">
-        ⚠ Warning
-      </p>
+    <div className="p-3 space-y-2 text-sm bg-white border rounded-md">
+      <div className="flex items-center gap-2 text-red-600">
+        <span className="text-xl">
+          ⚠
+        </span>
 
-      <p className="leading-relaxed text-red-600">
+        <p className="text-base font-medium">
+          Warning
+        </p>
+      </div>
+
+      <p className="leading-normal text-gray-700">
         This action is irreversible.
         <br />
         Your account and associated data will be permanently deleted.

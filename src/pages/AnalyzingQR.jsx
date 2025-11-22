@@ -44,8 +44,6 @@ export default function AnalyzingQR() {
                 file={fileToAnalyze} 
                 extractedUrl={extractedUrl}
             />
-            
-            <p className="mt-8 text-3xl font-normal text-gray-800">Please Wait...</p>
         </div>
     );
 }

@@ -130,7 +130,7 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[450px]">
       <div className="flex flex-col items-center justify-center p-6 space-y-6">
-        <p className="mb-4 text-2xl font-medium text-gray-700">QR Scan</p>
+        <p className="mb-4 text-2xl font-medium text-gray-700">Scan your QR</p>
         <input
           type="file"
           ref={fileInputRef}

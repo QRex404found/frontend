@@ -129,7 +129,7 @@ export function LoadingBar({ file, extractedUrl }) {
 
   return (
     <div className="w-full max-w-xl p-6 mx-auto bg-white rounded-lg shadow-lg">
-      <h3 className="mb-4 text-xl font-bold text-center">QR 코드 분석 과정</h3>
+      <h3 className="mb-4 text-xl font-bold text-center">QR 코드 분석 중</h3>
 
       <div className="mb-4">
         {(stage === LOADING_STAGES.FAKING || stage === LOADING_STAGES.PROCESSING) && (

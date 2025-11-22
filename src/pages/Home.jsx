@@ -372,7 +372,7 @@ export function Home() {
                 />
               </div>
 
-              <h4 className="text-2xl font-medium mb-3">MyPost</h4>
+              <h4 className="text-2xl font-medium mb-3">My post</h4>
 
               <p className="text-slate-600 mb-6 leading-relaxed flex-grow">
                 분석한 QR 기록을 저장하고
