@@ -75,17 +75,21 @@ export const CommonBoard = ({
                             <TableCaption>{caption}</TableCaption>
                             <TableHeader>
                                 <TableRow className="border-b-2 border-gray-300">
-                                    {/* 1. Num 컬럼 */}
+                                    {/* 1. Num 컬럼 Header */}
                                     {showIndex && (
                                         <TableHead className="w-[50px] md:w-[100px] text-center text-sm font-medium p-0 md:p-4">
-                                            {isDeleting ? (
-                                                // 삭제 모드일 때: 체크박스 공간
-                                                <div className="flex justify-center items-center h-full">
-                                                    <Checkbox className="invisible" />
-                                                </div>
-                                            ) : (
-                                                "Num"
-                                            )}
+                                            <div className="flex items-center justify-center gap-2">
+                                                {/* [데스크탑용] 삭제 모드일 때만 보이는 공간 확보용 투명 체크박스 */}
+                                                {isDeleting && <Checkbox className="invisible hidden md:block" />}
+                                                
+                                                {/* Num 텍스트 */}
+                                                <span className={isDeleting ? "hidden md:inline" : "inline"}>
+                                                    Num
+                                                </span>
+
+                                                {/* [모바일용] 삭제 모드일 때 Num 글씨 대신 보이는 투명 체크박스 (공간확보) */}
+                                                {isDeleting && <Checkbox className="invisible md:hidden" />}
+                                            </div>
                                         </TableHead>
                                     )}
 
@@ -106,26 +110,32 @@ export const CommonBoard = ({
                                             onClick={() => onItemClick(item)}
                                             className={`cursor-pointer hover:bg-gray-50 transition-colors ${rowHeightClass}`}
                                         >
-                                            {/* 1. Num 데이터: 애니메이션 제거 */}
+                                            {/* 1. Num 데이터 Cell */}
                                             {showIndex && (
                                                 <TableCell className="text-center w-[50px] md:w-[100px] p-0 md:p-4">
-                                                    {isDeleting ? (
-                                                        // 삭제 모드일 때: 체크박스 표시
-                                                        <div 
-                                                            className="flex justify-center items-center h-full"
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        >
-                                                            <Checkbox
-                                                                checked={selectedPosts.includes(item.id)}
-                                                                onCheckedChange={() => onCheckboxChange(item.id)}
-                                                            />
-                                                        </div>
-                                                    ) : (
-                                                        // 평소: 번호 표시
-                                                        <span className="text-sm text-gray-500">
+                                                    <div className="flex items-center justify-center gap-3">
+                                                        {/* 체크박스: 삭제 모드일 때 무조건 보임 */}
+                                                        {isDeleting && (
+                                                            <div onClick={(e) => e.stopPropagation()}>
+                                                                <Checkbox
+                                                                    checked={selectedPosts.includes(item.id)}
+                                                                    onCheckedChange={() => onCheckboxChange(item.id)}
+                                                                />
+                                                            </div>
+                                                        )}
+
+                                                        {/* 번호: 
+                                                            - 기본: 보임 (block)
+                                                            - 삭제 모드 & 모바일: 숨김 (hidden)
+                                                            - 삭제 모드 & 데스크탑: 보임 (md:block) 
+                                                        */}
+                                                        <span className={cn(
+                                                            "text-sm text-gray-500",
+                                                            isDeleting ? "hidden md:block" : "block"
+                                                        )}>
                                                             {displayIndex}
                                                         </span>
-                                                    )}
+                                                    </div>
                                                 </TableCell>
                                             )}
 
@@ -154,7 +164,7 @@ export const CommonBoard = ({
                 )}
             </CardContent>
 
-            {/* Pagination */}
+            {/* Pagination (기존 유지) */}
             {totalPages > 1 && onPageChange && (
                 <div className="flex justify-center pt-3 pb-2">
                     <Pagination>
