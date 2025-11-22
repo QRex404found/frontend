@@ -13,7 +13,7 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
-// 체크박스 컴포넌트
+// 체크박스 컴포넌트 (기존 동일)
 function Checkbox({ className, ...props }) {
     return (
         <CheckboxPrimitive.Root
@@ -36,7 +36,7 @@ const formatPostDate = (dateString) => {
     try {
         const d = new Date(dateString);
         if (isNaN(d)) return dateString;
-        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     } catch {
         return dateString;
     }
@@ -53,7 +53,7 @@ export const CommonBoard = ({
     caption = "",
     isDeleting = false,
     selectedPosts = [],
-    onCheckboxChange = () => {},
+    onCheckboxChange = () => { },
     rowHeightClass = "h-16"
 }) => {
     const pageSize = 8;
@@ -75,8 +75,10 @@ export const CommonBoard = ({
                             <TableCaption>{caption}</TableCaption>
                             <TableHeader>
                                 <TableRow className="border-b-2 border-gray-300">
+                                    {/* 1. Num 컬럼: 모바일(hidden), PC(table-cell) */}
                                     {showIndex && (
-                                        <TableHead className="w-[100px] text-center text-sm font-medium relative">
+                                        <TableHead className="hidden md:table-cell w-[80px] lg:w-[100px] text-center text-sm font-medium relative">
+                                            {/* PC용 체크박스 (삭제 모드일 때) */}
                                             <div className={cn(
                                                 "absolute top-1/2 -translate-y-1/2 transition-all duration-300",
                                                 isDeleting ? "left-1 opacity-100" : "left-1 opacity-0"
@@ -86,8 +88,17 @@ export const CommonBoard = ({
                                             Num
                                         </TableHead>
                                     )}
-                                    <TableHead className="text-sm font-medium">Title</TableHead>
-                                    <TableHead className="text-right w-[150px] text-sm font-medium">Date</TableHead>
+
+                                    {/* 2. Title 컬럼: 너비 자동 (나머지 공간 차지) */}
+                                    <TableHead className="text-sm font-medium">
+                                        {/* 모바일에서 삭제 모드일 때 체크박스 공간 확보를 위해 padding-left 조정 가능 */}
+                                        <span className={isDeleting ? "pl-8 md:pl-0" : ""}>Title</span>
+                                    </TableHead>
+
+                                    {/* 3. Date 컬럼: 모바일(hidden), PC(table-cell) */}
+                                    <TableHead className="hidden md:table-cell text-right w-[120px] lg:w-[150px] text-sm font-medium">
+                                        Date
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
 
@@ -100,8 +111,9 @@ export const CommonBoard = ({
                                             onClick={() => onItemClick(item)}
                                             className={`cursor-pointer hover:bg-gray-50 transition-colors ${rowHeightClass}`}
                                         >
+                                            {/* 1. Num 데이터: PC에서만 보임 */}
                                             {showIndex && (
-                                                <TableCell className="text-center relative w-[100px]">
+                                                <TableCell className="hidden md:table-cell text-center relative w-[80px] lg:w-[100px]">
                                                     <div
                                                         className={cn(
                                                             "absolute top-1/2 -translate-y-1/2 transition-all duration-300",
@@ -117,10 +129,38 @@ export const CommonBoard = ({
                                                     {displayIndex}
                                                 </TableCell>
                                             )}
-                                            <TableCell className="font-light truncate text-base md:text-lg">
-                                                {item.title}
+
+                                            {/* 2. Title 데이터: 여기서 모바일용 레이아웃 처리 */}
+                                            <TableCell className="font-light text-base md:text-lg relative">
+                                                <div className="flex items-center gap-3">
+                                                    {/* 모바일 전용 체크박스 (Title 옆에 붙임) */}
+                                                    {isDeleting && (
+                                                        <div 
+                                                            className="md:hidden shrink-0"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            <Checkbox
+                                                                checked={selectedPosts.includes(item.id)}
+                                                                onCheckedChange={() => onCheckboxChange(item.id)}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                    
+                                                    {/* 제목과 날짜(모바일용) 컨테이너 */}
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="truncate">
+                                                            {item.title}
+                                                        </div>
+                                                        {/* 모바일에서만 보이는 날짜 */}
+                                                        <div className="text-xs text-gray-400 mt-0.5 md:hidden">
+                                                            {formatPostDate(item.date)}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </TableCell>
-                                            <TableCell className="text-right text-gray-500">
+
+                                            {/* 3. Date 데이터: PC에서만 보임 */}
+                                            <TableCell className="hidden md:table-cell text-right text-gray-500">
                                                 {formatPostDate(item.date)}
                                             </TableCell>
                                         </TableRow>
@@ -132,7 +172,7 @@ export const CommonBoard = ({
                 )}
             </CardContent>
 
-            {/* Pagination UI */}
+            {/* Pagination UI (기존 동일) */}
             {totalPages > 1 && onPageChange && (
                 <div className="flex justify-center pt-3 pb-2">
                     <Pagination>
@@ -140,7 +180,7 @@ export const CommonBoard = ({
                             <PaginationItem>
                                 <PaginationPrevious
                                     href="#"
-                                    onClick={(e)=>{ e.preventDefault(); onPageChange(prev=>Math.max(prev-1,1)); }}
+                                    onClick={(e) => { e.preventDefault(); onPageChange(prev => Math.max(prev - 1, 1)); }}
                                     aria-disabled={currentPage === 1}
                                     className={currentPage === 1 ? "opacity-50 pointer-events-none" : ""}
                                 />
@@ -155,7 +195,7 @@ export const CommonBoard = ({
                             <PaginationItem>
                                 <PaginationNext
                                     href="#"
-                                    onClick={(e)=>{ e.preventDefault(); onPageChange(prev=>Math.min(prev+1,totalPages)); }}
+                                    onClick={(e) => { e.preventDefault(); onPageChange(prev => Math.min(prev + 1, totalPages)); }}
                                     aria-disabled={currentPage === totalPages}
                                     className={currentPage === totalPages ? "opacity-50 pointer-events-none" : ""}
                                 />
