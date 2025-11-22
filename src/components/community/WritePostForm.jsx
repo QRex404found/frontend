@@ -1,3 +1,5 @@
+// src/components/community/WritePostForm.jsx
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,15 +17,19 @@ const WritePostForm = ({ onPostSuccess }) => {
     const [previewUrl, setPreviewUrl] = useState(null);
 
     const handleFileChange = (e) => {
-        const file = e.target.files?.[0];
+        const file = e.target.files && e.target.files[0];
+
         if (file) {
             setPhotoFile(file);
+
             const reader = new FileReader();
-            reader.onloadend = () => setPreviewUrl(reader.result);
+            reader.onloadend = () => {
+                setPreviewUrl(reader.result);
+            };
             reader.readAsDataURL(file);
         }
 
-        // 모바일에서 동일파일 재선택 방지 처리
+        // 동일 파일 다시 선택해도 onChange가 다시 호출되도록 초기화
         e.target.value = '';
     };
 
@@ -32,6 +38,9 @@ const WritePostForm = ({ onPostSuccess }) => {
         e.stopPropagation();
         setPhotoFile(null);
         setPreviewUrl(null);
+
+        const input = document.getElementById('photo-upload');
+        if (input) input.value = '';
     };
 
     const resetForm = () => {
@@ -40,6 +49,9 @@ const WritePostForm = ({ onPostSuccess }) => {
         setContext('');
         setPhotoFile(null);
         setPreviewUrl(null);
+
+        const input = document.getElementById('photo-upload');
+        if (input) input.value = '';
     };
 
     const handleSubmit = async (e) => {
@@ -51,11 +63,11 @@ const WritePostForm = ({ onPostSuccess }) => {
         }
 
         setIsLoading(true);
+
         const formData = new FormData();
         formData.append('postTitle', title);
         formData.append('postContents', context);
         formData.append('url', url);
-
         if (photoFile) {
             formData.append('photoFile', photoFile);
         }
@@ -65,7 +77,7 @@ const WritePostForm = ({ onPostSuccess }) => {
             toast.success("게시글이 등록되었습니다!");
             resetForm();
             onPostSuccess?.();
-        } catch {
+        } catch (err) {
             toast.error("게시글 등록 실패");
         } finally {
             setIsLoading(false);
@@ -78,13 +90,12 @@ const WritePostForm = ({ onPostSuccess }) => {
             {/* PHOTO 영역 */}
             <div className="flex flex-col items-center justify-center flex-none relative">
                 <label
-                    htmlFor="photo-upload"
                     className="
                         relative flex flex-col items-center justify-center
                         w-48 h-44 border-2 border-dashed rounded-md cursor-pointer
                         hover:bg-gray-50 transition z-10
                     "
-                    style={{ overflow: "hidden" }}
+                    style={{ overflow: 'hidden' }}
                 >
                     {previewUrl ? (
                         <>
@@ -108,25 +119,16 @@ const WritePostForm = ({ onPostSuccess }) => {
                             </span>
                         </>
                     )}
+
+                    {/* 🔥 핵심 수정: input을 label 안으로 넣고, 전체를 투명하게 덮게 함 */}
+                    <input
+                        id="photo-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
                 </label>
-
-                {/* 모바일 파일 선택 버그 해결 */}
-<input
-    id="photo-upload"
-    type="file"
-    accept="image/*"
-    onChange={handleFileChange}
-    style={{
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        top: 0,
-        left: 0,
-        opacity: 0,
-        cursor: 'pointer',
-    }}
-/>
-
 
                 {previewUrl && photoFile && (
                     <span className="text-xs truncate max-w-[200px] mt-1">
@@ -177,7 +179,6 @@ const WritePostForm = ({ onPostSuccess }) => {
                     {isLoading ? '등록 중...' : 'Write'}
                 </Button>
             </div>
-
         </div>
     );
 };
