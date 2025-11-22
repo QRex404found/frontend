@@ -138,7 +138,7 @@ export function Home() {
           </motion.div>
 
           {/* WHAT IS QREX */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-20 mb-16 items-center">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-20 mb-16">
 
             {/* LEFT: Text */}
             <motion.div
@@ -172,10 +172,10 @@ export function Home() {
               transition={{ duration: 0.7, delay: 0.1 }}
               viewport={{ once: true }}
               className="
-                bg-white border border-slate-200 rounded-3xl 
+                bg-white border border-slate-200 rounded-3xl
                 flex items-center justify-center
                 w-[320px] h-[320px]
-                mx-auto
+                md:mr-6
                 overflow-hidden
               "
             >
