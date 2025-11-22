@@ -95,7 +95,7 @@ export function Home() {
           loop
           muted
           playsInline
-          className="absolute top-0 left-0 object-cover w-full h-full"
+          className="absolute top-0 left-0 object-obtain w-full h-full"
         />
 
         {/* Scroll Arrow */}
@@ -184,6 +184,7 @@ export function Home() {
             </motion.div>
 
             {/* RIGHT IMAGE BOX — 옵션 A */}
+{/* RIGHT IMAGE BOX — 옵션 A */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -193,7 +194,12 @@ export function Home() {
                 shrink-0 
                 bg-white border border-slate-200 rounded-3xl 
                 flex items-center justify-center
-                w-[320px] h-[320px]
+                
+                
+                w-full max-w-[320px]   /* 화면이 좁으면 줄어들고, 넓으면 320px까지 커짐 */
+                aspect-square          /* 가로 사이즈에 맞춰 높이도 1:1 비율 자동 유지 (h-[320px] 제거) */
+                
+
                 mx-auto md:ml-auto
                 overflow-hidden
               "
