@@ -74,7 +74,7 @@ export function MyPost() {
     const handleRefresh = () => {
       console.log("🔄 MyPost: ChatBody 이벤트 감지 → 게시글 목록 갱신");
       fetchPosts(1); // 첫 페이지로 갱신
-    };
+      };
 
     window.addEventListener("analysis-updated", handleRefresh);
     return () => window.removeEventListener("analysis-updated", handleRefresh);
@@ -152,15 +152,25 @@ export function MyPost() {
       {/* PC 화면 */}
       <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
         <ResizablePanelGroup direction="horizontal">
+          
           <ResizablePanel defaultSize={50} minSize={30}>
-            <div className="max-w-[550px] mx-auto h-full flex flex-col">
+            {/* ml-auto로 오른쪽 밀착 유지 */}
+            <div className="max-w-[550px] ml-auto h-full flex flex-col">
+              {/* [수정 1] border-r-0, rounded-r-none 제거 -> 원래의 둥근 모서리 카드 스타일 복원 */}
               <Card className="h-full w-full p-6 flex flex-col">
                 <WritePostForm onPostSuccess={() => fetchPosts(1)} />
               </Card>
             </div>
           </ResizablePanel>
 
-          <ResizableHandle />
+          {/* [수정 2] 핸들 스타일 변경
+              - -ml-[1px]: 테두리 두께만큼 왼쪽으로 이동시켜 카드 테두리와 겹치게 함
+              - z-10: 카드 위에 오도록 레이어 순서 상향 조정
+          */}
+          <ResizableHandle 
+            withHandle={false} 
+            className="w-[1px] -ml-[1px] z-10 bg-gray-200 h-full transition-colors hover:bg-gray-400 focus:bg-gray-400 outline-none" 
+          />
 
           <ResizablePanel minSize={30}>
             <div className="pl-4 h-full flex flex-col">
@@ -190,7 +200,7 @@ export function MyPost() {
         </ResizablePanelGroup>
       </div>
 
-      {/* 모바일 화면 */}
+      {/* 모바일 화면 (변경 없음) */}
       <div className="lg:hidden mt-4 w-full">
         <div className="mb-3 flex justify-center">
           <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">

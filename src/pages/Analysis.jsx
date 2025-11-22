@@ -63,7 +63,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-     결과 패널의 Reset 버튼 → 초기 스캔 화면으로
+      결과 패널의 Reset 버튼 → 초기 스캔 화면으로
   --------------------------------------------- */
   const handleReset = () => {
     setAnalysisResult(null);
@@ -73,7 +73,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-     QR 분석 완료 처리
+      QR 분석 완료 처리
   --------------------------------------------- */
   const handleAnalysisResult = useCallback((result, error) => {
     if (error) {
@@ -97,7 +97,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-     라우터 state 전달 처리
+      라우터 state 전달 처리
   --------------------------------------------- */
   useEffect(() => {
     const stateResult = location.state?.analysisResult;
@@ -117,7 +117,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-     새 QR 분석 시작
+      새 QR 분석 시작
   --------------------------------------------- */
   const handleAnalysisStart = (file, url) => {
     navigate('/analyzing-qr', {
@@ -131,7 +131,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-     History 선택 처리
+      History 선택 처리
   --------------------------------------------- */
   const handleHistorySelect = async (analysisId) => {
     setAnalysisResult(null);
@@ -156,7 +156,7 @@ export function Analysis() {
 
 
   /* ---------------------------------------------
-     제목 수정 반영
+      제목 수정 반영
   --------------------------------------------- */
   const handleTitleUpdated = (id, newTitle) => {
     if (selectedHistory && selectedHistory.analysisId === id) {
@@ -223,14 +223,23 @@ export function Analysis() {
           <ResizablePanelGroup direction="horizontal">
 
             <ResizablePanel defaultSize={50} minSize={30}>
-              <div className="max-w-[550px] mx-auto h-full flex flex-col">
+              {/* ml-auto로 오른쪽 밀착 유지 */}
+              <div className="max-w-[550px] ml-auto h-full flex flex-col">
+                {/* [수정 1] border-r-0, rounded-r-none 제거 -> 원래의 둥근 모서리 카드 스타일 복원 */}
                 <Card className="flex items-center justify-center w-full h-full p-6">
                   {LeftPanelContent}
                 </Card>
               </div>
             </ResizablePanel>
 
-            <ResizableHandle />
+            {/* [수정 2] 핸들 스타일 변경
+                - -ml-[1px]: 테두리 두께만큼 왼쪽으로 이동시켜 카드 테두리와 겹치게 함
+                - z-10: 카드 위에 오도록 레이어 순서 상향 조정
+            */}
+            <ResizableHandle 
+                withHandle={false} 
+                className="w-[1px] -ml-[1px] z-10 bg-gray-200 h-full transition-colors hover:bg-gray-400 focus:bg-gray-400 outline-none" 
+            />
 
             <ResizablePanel minSize={30}>
               <div className="flex flex-col h-full pl-4">
@@ -246,7 +255,7 @@ export function Analysis() {
         </div>
 
 
-        {/* 모바일 레이아웃 */}
+        {/* 모바일 레이아웃 (변경 없음) */}
         <div className="w-full mt-4 lg:hidden">
 
           <div className="flex items-center justify-center mb-3">
