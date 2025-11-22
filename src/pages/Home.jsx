@@ -167,12 +167,12 @@ export function Home() {
               transition={{ duration: 0.7, delay: 0.1 }}
               viewport={{ once: true }}
               className="
-                bg-white border border-slate-200 rounded-3xl 
-                flex items-center justify-center
-                w-[320px] h-[320px]
-                mx-auto
-                overflow-hidden
-              "
+      bg-white border border-slate-200 rounded-3xl 
+      flex items-center justify-center
+      w-[320px] h-[320px]
+      mx-auto md:ml-auto
+      overflow-hidden
+    "
             >
               <img
                 src={holdingQR}
@@ -183,18 +183,13 @@ export function Home() {
           </div>
 
 
-          {/* ====================================================== */}
-          {/* 4) CTA SECTION */}
-          {/* ====================================================== */}
-          <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-14 my-24 overflow-hidden">
+          {/* CTA SECTION */}
+          {/* p-14를 -> px-14 pt-14 pb-8 로 변경 (아래쪽 여백만 14에서 8로 줄임) */}
+          <div className="relative bg-slate-50 border border-slate-200 rounded-3xl px-14 pt-14 pb-8 my-24 overflow-hidden">
 
+            {/* 배경 애니메이션 유지 */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.12]">
-              <motion.svg
-                width="100%"
-                height="100%"
-                viewBox="0 0 800 200"
-                preserveAspectRatio="none"
-              >
+              <motion.svg width="100%" height="100%" viewBox="0 0 800 200">
                 <motion.path
                   d="M0 120 C 150 20, 300 180, 450 60 C 600 -20, 750 150, 800 80"
                   stroke="#7CCF00"
@@ -203,19 +198,18 @@ export function Home() {
                   fill="none"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{
-                    duration: 1.8,
-                    ease: "easeInOut",
-                  }}
+                  transition={{ duration: 1.8, ease: "easeInOut" }}
                 />
               </motion.svg>
             </div>
 
-            <h3 className="text-3xl font-medium text-center mb-8 relative z-10">
+            {/* 제목 (유지) */}
+            <h3 className="text-3xl font-medium text-center mb-14 relative z-10">
               QRex는 당신의 안전한 QR 사용을 돕습니다
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-4 relative z-10">
+            {/* 그리드 (유지) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
 
               <div className="text-center p-6">
                 <QrCode size={44} className="text-lime-600 mx-auto mb-4" />
