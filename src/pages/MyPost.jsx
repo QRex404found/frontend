@@ -117,6 +117,7 @@ export function MyPost() {
           onOpenChange={() => setShowDetail(false)}
           boardId={selectedBoardId}
           showComments={true}
+          onDeleteSuccess={() => fetchPosts(currentPage)}
         />
       )}
 

@@ -22,33 +22,31 @@ export function Community() {
   const [error, setError] = useState(null);
   const [selectedBoardId, setSelectedBoardId] = useState(null);
 
+  // 1. 함수를 useEffect 밖으로 정의
+  const fetchPosts = async (page) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const data = await getCommunityPostsApi(page - 1, PAGE_SIZE);
+      const transformedPosts = data.content.slice().map((post) => ({
+        id: post.boardId,
+        title: post.title,
+        date: post.createdAt,
+      }));
+
+      setPosts(transformedPosts);
+      setTotalPages(data.totalPages || 1);
+    } catch (error) {
+      console.error('게시글 목록 로드 실패:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 2. useEffect에서는 호출만 함
   useEffect(() => {
-    const fetchPosts = async (page) => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await getCommunityPostsApi(page - 1, PAGE_SIZE);
-
-        const transformedPosts = data.content
-          .slice()
-          .map((post) => ({
-            id: post.boardId,
-            title: post.title,
-            date: post.createdAt,
-          }));
-
-
-        setPosts(transformedPosts);
-        setTotalPages(data.totalPages || 1);
-      } catch (error) {
-        console.error('게시글 목록 로드 실패:', error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (isLoggedIn) {
       fetchPosts(currentPage);
     }
@@ -114,6 +112,7 @@ export function Community() {
         isOpen={!!selectedBoardId}
         onOpenChange={handleCloseModal}
         boardId={selectedBoardId}
+        onDeleteSuccess={() => fetchPosts(currentPage)}
       />
     </div>
   );
