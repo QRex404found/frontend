@@ -136,65 +136,62 @@ export function MyPost() {
         />
       )}
 
-      {/* ===================== PC Layout ===================== */}
-      <div className="hidden lg:flex justify-center gap-0 min-h-[350px]">
+      {/* ================== PC Layout ================== */}
+      <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
         <ResizablePanelGroup direction="horizontal">
-
-          {/* Left Panel*/}
+          
+          {/* Left Panel */}
           <ResizablePanel defaultSize={50} minSize={30}>
-            <div className="h-full w-full flex flex-col p-0 m-0">
-              <Card className="h-full w-full p-6 flex flex-col rounded-r-none">
+            <div className="max-w-[550px] mx-auto h-full flex flex-col">
+              <Card className="h-full w-full p-6 flex flex-col">
                 <WritePostForm onPostSuccess={() => fetchPosts(1)} />
               </Card>
             </div>
           </ResizablePanel>
 
-          {/* Resizable Handle */}
+          {/* ★핸들만 길이 살짝 더 줄인 버전 */}
           <ResizableHandle
-            withHandle={false}
             className="
-              w-[4px] cursor-col-resize relative bg-transparent
-              after:content-[''] after:absolute after:top-[18px] after:bottom-[18px]
-              after:left-1/2 after:-translate-x-1/2
-              after:w-[2px] after:bg-gray-300 after:rounded-full
+              relative w-[6px] cursor-col-resize bg-gray-300 opacity-70 hover:opacity-100
+              after:content-[''] after:absolute after:left-0 after:right-0
+              after:top-[min(30px,15%)] after:bottom-[min(30px,15%)]
+              after:bg-gray-400 after:rounded-full
             "
           />
 
           {/* Right Panel */}
           <ResizablePanel minSize={30}>
-            <div className="h-full w-full flex flex-col p-0 m-0">
-              <Card className="h-full w-full p-0 flex flex-col rounded-l-none">
-                <div className="w-full px-4 py-2 flex flex-col">
-                  <h1 className="mb-4 text-3xl font-medium hidden lg:block">
-                    My Post
-                  </h1>
+            <div className="pl-4 h-full flex flex-col">
+              <div className="w-full px-2 md:px-4 py-2 flex flex-col">
+                <h1 className="mb-4 text-3xl font-medium hidden lg:block">
+                  My Post
+                </h1>
 
-                  <MyPostBoard
-                    isDeleting={isDeleting}
-                    toggleDeleteMode={toggleDeleteMode}
-                    myPosts={myPosts}
-                    isLoading={isLoading}
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    setCurrentPage={setCurrentPage}
-                    openDetail={openDetail}
-                    selectedPosts={selectedPosts}
-                    toggleSelect={toggleSelect}
-                    showEmpty={showEmpty}
-                    rowHeightClass="h-12"
-                  />
-                </div>
-              </Card>
+                <MyPostBoard
+                  isDeleting={isDeleting}
+                  toggleDeleteMode={toggleDeleteMode}
+                  myPosts={myPosts}
+                  isLoading={isLoading}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  setCurrentPage={setCurrentPage}
+                  openDetail={openDetail}
+                  selectedPosts={selectedPosts}
+                  toggleSelect={toggleSelect}
+                  showEmpty={showEmpty}
+                  rowHeightClass="h-12"
+                />
+              </div>
             </div>
           </ResizablePanel>
 
         </ResizablePanelGroup>
       </div>
 
-      {/* ===================== Mobile Layout (변경 없음) ===================== */}
+      {/* ================== Mobile Layout ================== */}
       <div className="lg:hidden mt-4 w-full">
-        {/* 기존 모바일 코드 그대로 */}
-        {/* ... 생략 ... */}
+        {/* 기존 그대로 유지 */}
+        {/* ... */}
       </div>
 
     </div>
