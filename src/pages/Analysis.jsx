@@ -41,10 +41,7 @@ export function Analysis() {
 
 
   useEffect(() => {
-    const handleAiUpdate = () => {
-      setHistoryRefreshKey(prev => prev + 1);
-    };
-
+    const handleAiUpdate = () => setHistoryRefreshKey(prev => prev + 1);
     window.addEventListener("analysis-updated", handleAiUpdate);
     return () => window.removeEventListener("analysis-updated", handleAiUpdate);
   }, []);
@@ -76,9 +73,7 @@ export function Analysis() {
         type: 'error',
         title: '오류 발생',
         description:
-          typeof error === 'string'
-            ? error
-            : error.message || '분석 중 오류가 발생했습니다.'
+          typeof error === 'string' ? error : error.message || '분석 중 오류가 발생했습니다.'
       });
       return;
     }
@@ -94,16 +89,16 @@ export function Analysis() {
     const stateResult = location.state?.analysisResult;
     const stateError = location.state?.analysisError;
 
-    if (stateResult || stateError) {
-      if (
-        analysisResult &&
-        stateResult &&
-        analysisResult.analysisId === stateResult.analysisId
-      ) return;
+    if (!stateResult && !stateError) return;
 
-      navigate('.', { replace: true, state: null });
-      handleAnalysisResult(stateResult, stateError);
-    }
+    if (
+      analysisResult &&
+      stateResult &&
+      analysisResult.analysisId === stateResult.analysisId
+    ) return;
+
+    navigate('.', { replace: true, state: null });
+    handleAnalysisResult(stateResult, stateError);
   }, [location.state, navigate, handleAnalysisResult, analysisResult]);
 
 
@@ -127,7 +122,7 @@ export function Analysis() {
       const response = await getAnalysisResultApi(analysisId);
       setSelectedHistory(response);
       setMobileTab('history');
-    } catch (error) {
+    } catch {
       setAlertDialogState({
         isOpen: true,
         type: 'error',
@@ -147,23 +142,20 @@ export function Analysis() {
       setAnalysisResult(prev => ({ ...prev, analysisTitle: newTitle }));
     }
 
-    if (titleUpdateRef.current) {
-      titleUpdateRef.current(id, newTitle);
-    }
+    if (titleUpdateRef.current) titleUpdateRef.current(id, newTitle);
 
     setHistoryRefreshKey(prev => prev + 1);
   };
 
 
-  if (!isChecked) {
+  if (!isChecked)
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
       </div>
     );
-  }
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn)
     return (
       <AuthPopup
         show={true}
@@ -171,7 +163,6 @@ export function Analysis() {
         onClose={() => navigate('/')}
       />
     );
-  }
 
 
   const currentResult = selectedHistory || analysisResult;
@@ -184,7 +175,7 @@ export function Analysis() {
     <AnalysisResultPanel
       result={currentResult}
       onTitleUpdated={handleTitleUpdated}
-      onReset={handleReset} 
+      onReset={handleReset}
     />
   ) : (
     <QRScanPanel
@@ -200,26 +191,28 @@ export function Analysis() {
         key={location.search}
         className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4"
       >
+        {/* 데스크탑: MyPost 구조 동일 적용 */}
         <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
           <ResizablePanelGroup direction="horizontal">
 
             <ResizablePanel defaultSize={50} minSize={30}>
-              <div className="max-w-[550px] mx-auto h-full flex flex-col">
-                <Card className="flex items-center justify-center w-full h-full p-6">
+              <div className="h-full flex flex-col">
+                <Card className="h-full w-full p-6 flex items-center justify-center">
                   {LeftPanelContent}
                 </Card>
               </div>
             </ResizablePanel>
 
-            {/* 🔥 핸들 수정: 색 고정 + 길이 조정 */}
+            {/* 🔥 핸들: MyPost 완전 동일 */}
             <ResizableHandle
               className="
                 w-[0.5px] bg-transparent rounded-none relative cursor-col-resize
                 after:content-[''] after:absolute
-                after:top-[24px] after:bottom-[24px]
-                after:left-[calc(100% - 1px)] after:w-[1px]
+                after:top-[20px] after:bottom-[20px]
+                after:left-[calc(50%-1px)] after:-translate-x-1/2 after:w-[1px]
                 after:bg-[#E5E5E5] after:rounded-full
-                hover:bg-transparent hover:after:bg-[#E5E5E5]
+                hover:bg-transparent
+                hover:after:bg-[#E5E5E5]
               "
             />
 
@@ -237,27 +230,26 @@ export function Analysis() {
         </div>
 
 
-        {/* 모바일 */}
+        {/* 모바일 레이아웃: 변경 없음 */}
         <div className="w-full mt-4 lg:hidden">
           <div className="flex items-center justify-center mb-3">
             <div className="inline-flex p-1 bg-gray-100 border border-gray-200 rounded-full shadow-sm">
               <button
                 onClick={() => setMobileTab('scan')}
-                className={`px-4 py-1.5 text-sm rounded-full transition-colors ${
+                className={`px-4 py-1.5 text-sm rounded-full ${
                   mobileTab === 'scan'
                     ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600'
                 }`}
               >
                 QR 분석
               </button>
-
               <button
                 onClick={() => setMobileTab('history')}
-                className={`px-4 py-1.5 text-sm rounded-full transition-colors ${
+                className={`px-4 py-1.5 text-sm rounded-full ${
                   mobileTab === 'history'
                     ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600'
                 }`}
               >
                 분석 기록
@@ -268,7 +260,10 @@ export function Analysis() {
           <div className="relative overflow-hidden border rounded-lg">
             <div
               className="flex w-[200%] transition-transform duration-300 ease-out"
-              style={{ transform: mobileTab === 'scan' ? 'translateX(0)' : 'translateX(-50%)' }}
+              style={{
+                transform:
+                  mobileTab === 'scan' ? 'translateX(0)' : 'translateX(-50%)'
+              }}
             >
               <div className="w-full">
                 <Card className="min-h-[520px] p-4 sm:p-6">
@@ -285,7 +280,6 @@ export function Analysis() {
                   />
                 </div>
               </div>
-
             </div>
           </div>
 
