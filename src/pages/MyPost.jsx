@@ -133,9 +133,9 @@ export function MyPost() {
 
           <ResizableHandle
             className="
-              w-[6px] bg-transparent hover:bg-gray-300 rounded-none relative cursor-col-resize
-              after:content-[''] after:absolute after:top-[20px] after:bottom-[20px]
-              after:left-1/2 after:-translate-x-1/2 after:w-[3px]
+              w-[3px] bg-transparent hover:bg-gray-300 rounded-none relative cursor-col-resize
+              fter:content-[''] after:absolute after:top-[20px] after:bottom-[20px]
++             after:left-[calc(50%-1px)] after:-translate-x-1/2 after:w-[1px]
               after:bg-gray-300 after:rounded-full
             "
           />
