@@ -147,8 +147,8 @@ export function Home() {
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
-              <p className="text-slate-600 text-lg leading-relaxed mb-10">
+              <h3 className="text-4xl font-medium mb-6">QRex란?</h3>
+              <p className="text-slate-600 text-xl leading-relaxed mb-10">
                 QRex는 URL 구조 분석, 도메인 신뢰도 판단, AI 기반 위험 해석을 결합해<br/>
                 QR 링크의 안전성을 종합적으로 평가하는 지능형 보안 플랫폼입니다.<br/><br/>
 
@@ -175,7 +175,7 @@ export function Home() {
                 bg-white border border-slate-200 rounded-3xl
                 flex items-center justify-center
                 w-[320px] h-[320px]
-                md:mr-5
+                md:mr-3
                 overflow-hidden
               "
             >
