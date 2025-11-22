@@ -89,7 +89,7 @@ export function Home() {
         />
 
         {/* Scroll Arrow */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
+        <div className="absolute bottom-10 md:bottom-10 left-1/2 -translate-x-1/2 z-10">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
