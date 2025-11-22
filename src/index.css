@@ -215,11 +215,11 @@ input, textarea, button, select, [data-sonner-toaster] {
 }
 
 
-#scale-wrapper {
+/* #scale-wrapper {
   transform-origin: top center !important;
 }
 
 #content-fixed-width {
   width: 1280px !important;
   margin: 0 auto;
-}
+} */
