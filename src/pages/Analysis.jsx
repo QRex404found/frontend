@@ -223,23 +223,23 @@ export function Analysis() {
           <ResizablePanelGroup direction="horizontal">
 
             <ResizablePanel defaultSize={50} minSize={30}>
-              {/* ml-auto: 요소를 오른쪽(핸들 쪽)으로 밀착 */}
+              {/* 왼쪽 패널 내용을 오른쪽(핸들)으로 밀착시킴 */}
               <div className="max-w-[550px] ml-auto h-full flex flex-col">
-                {/* Card는 원래의 둥근 모서리 디자인 유지 */}
                 <Card className="flex items-center justify-center w-full h-full p-6">
                   {LeftPanelContent}
                 </Card>
               </div>
             </ResizablePanel>
 
-            {/* [핸들 디자인 수정] 
-              - h-[calc(100%-3rem)]: 직선 구간만 커버하도록 높이 제한
-              - self-center: 수직 중앙 배치
-              - -ml-1: 카드 테두리에 오버랩
+            {/* [ResizableHandle 수정됨]
+              1. style={{ height: "calc(100% - 3rem)" }} : 띄어쓰기 주의! 위아래 둥근 모서리 제외
+              2. self-center : 세로 중앙 정렬
+              3. w-2 -ml-1 : 클릭 영역 확보 및 카드 테두리 위에 겹침
             */}
             <ResizableHandle 
                 withHandle={false} 
-                className="w-1.5 -ml-1 h-[calc(100%-3rem)] self-center z-50 bg-gray-200 hover:bg-gray-400 transition-colors rounded-full outline-none cursor-col-resize" 
+                className="w-2 -ml-1 z-50 bg-transparent hover:bg-gray-300 transition-colors rounded-full outline-none cursor-col-resize self-center" 
+                style={{ height: "calc(100% - 3rem)" }}
             />
 
             <ResizablePanel minSize={30}>
@@ -256,7 +256,7 @@ export function Analysis() {
         </div>
 
 
-        {/* 모바일 레이아웃 (기존 유지) */}
+        {/* 모바일 레이아웃 */}
         <div className="w-full mt-4 lg:hidden">
 
           <div className="flex items-center justify-center mb-3">
