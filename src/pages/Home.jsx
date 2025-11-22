@@ -1,6 +1,6 @@
 // src/pages/Home.jsx
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 import videoBg from '@/assets/background.mp4';
@@ -42,29 +42,41 @@ export function Home() {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
+  // 🧲 홈 화면에서만 확대/축소 완전 차단 + 나가면 복구
+  useEffect(() => {
+    const meta = document.querySelector('meta[name=viewport]');
+    if (meta) {
+      meta.setAttribute(
+        "content",
+        "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      );
+    }
+    return () => {
+      if (meta) {
+        meta.setAttribute("content", "width=device-width, initial-scale=1.0");
+      }
+    };
+  }, []);
+
   const scrollToInfo = () => {
     infoSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleStart = () => {
-    if (!isLoggedIn) {
-      navigate("/login");
-    } else {
-      navigate("/analysis");
-    }
+    if (!isLoggedIn) navigate("/login");
+    else navigate("/analysis");
   };
 
   return (
     <div className="w-full">
 
-      {/* ====================================================== */}
-      {/* 1) HERO SECTION */}
-      {/* ====================================================== */}
+      {/* HERO SECTION */}
       <div
         className="
           relative w-[calc(100%+2rem)] md:w-[calc(100%+4rem)]
           -ml-4 -mr-4 -mt-4 md:-ml-8 md:-mr-8 md:-mt-8
-          h-[100dvh] md:h-[calc(100vh-80px)] overflow-hidden
+          h-[100dvh] md:h-[calc(100vh-80px)]
+          overflow-hidden
         "
       >
         <video
@@ -104,10 +116,7 @@ export function Home() {
       </div>
 
 
-
-      {/* ====================================================== */}
-      {/* 2) ABOUT HEADER */}
-      {/* ====================================================== */}
+      {/* ABOUT SECTION */}
       <div ref={infoSectionRef} className="bg-white text-slate-900 py-28 px-6">
         <div className="max-w-6xl mx-auto">
 
@@ -128,11 +137,7 @@ export function Home() {
             </p>
           </motion.div>
 
-
-
-          {/* ====================================================== */}
-          {/* 3) WHAT IS QREX */}
-          {/* ====================================================== */}
+          {/* WHAT IS QREX */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-20 mb-16 items-center">
 
             {/* LEFT: Text */}
@@ -144,7 +149,7 @@ export function Home() {
             >
               <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-10">
-                QRex는 도메인 신뢰도, URL 특성 분석,<br />
+                QRex는 도메인 신뢰도, URL 특성 분석,
                 AI 기반 위험 해석을 결합해<br />
                 QR 링크의 안전성을 종합적으로 평가하는 보안 플랫폼입니다.
                 <br /><br />
@@ -160,7 +165,7 @@ export function Home() {
               </button>
             </motion.div>
 
-            {/* RIGHT IMAGE BOX — 옵션 A */}
+            {/* RIGHT IMAGE BOX */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -183,18 +188,11 @@ export function Home() {
           </div>
 
 
-          {/* ====================================================== */}
-          {/* 4) CTA SECTION */}
-          {/* ====================================================== */}
+          {/* CTA SECTION */}
           <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-14 my-24 overflow-hidden">
 
             <div className="absolute inset-0 pointer-events-none opacity-[0.12]">
-              <motion.svg
-                width="100%"
-                height="100%"
-                viewBox="0 0 800 200"
-                preserveAspectRatio="none"
-              >
+              <motion.svg width="100%" height="100%" viewBox="0 0 800 200">
                 <motion.path
                   d="M0 120 C 150 20, 300 180, 450 60 C 600 -20, 750 150, 800 80"
                   stroke="#7CCF00"
@@ -203,10 +201,7 @@ export function Home() {
                   fill="none"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{
-                    duration: 1.8,
-                    ease: "easeInOut",
-                  }}
+                  transition={{ duration: 1.8, ease: "easeInOut" }}
                 />
               </motion.svg>
             </div>
@@ -243,15 +238,8 @@ export function Home() {
 
             </div>
           </div>
-
-
-
-
-          {/* ====================================================== */}
-          {/* 5) FEATURE 3-COLUMN */}
-          {/* ====================================================== */}
+          {/* FEATURE 3-COLUMN */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-
 
             {/* =============================== */}
             {/* Analysis */}
@@ -281,17 +269,16 @@ export function Home() {
                 보안 위협 여부를 판단합니다.
               </p>
 
+              {/* 🔹 리스트 - 완전 복원 */}
               <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <ShieldCheck className="w-5 h-5 text-lime-600/80" />
                   <span className="text-slate-700 text-sm font-medium">URL 위험도 분석</span>
                 </div>
-
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Globe className="w-5 h-5 text-lime-600/80" />
                   <span className="text-slate-700 text-sm font-medium">도메인 신뢰도 검증</span>
                 </div>
-
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <AlertTriangle className="w-5 h-5 text-lime-600/80" />
                   <span className="text-slate-700 text-sm font-medium">URL 리스크 설명 제공</span>
@@ -335,12 +322,10 @@ export function Home() {
                   <MessageSquare className="w-5 h-5 text-lime-600/80" />
                   <span className="text-slate-700 text-sm font-medium">사용자 사례 공유</span>
                 </div>
-
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Lightbulb className="w-5 h-5 text-lime-600/80" />
                   <span className="text-slate-700 text-sm font-medium">보안 인사이트 교류</span>
                 </div>
-
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Flag className="w-5 h-5 text-lime-600/80" />
                   <span className="text-slate-700 text-sm font-medium">신고 & 위험 URL 제보</span>
@@ -379,6 +364,7 @@ export function Home() {
                 언제든 빠르게 다시 확인할 수 있습니다.
               </p>
 
+              {/* 🔹 리스트 - 완전 복원 */}
               <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Save className="w-5 h-5 text-lime-600/80" />
@@ -395,14 +381,13 @@ export function Home() {
                   <span className="text-slate-700 text-sm font-medium">상세 분석 보기</span>
                 </div>
               </div>
+
             </motion.div>
-
-
-
 
           </div>
         </div>
       </div>
+
     </div>
   );
 }
