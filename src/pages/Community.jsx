@@ -7,12 +7,12 @@ import { PostDetailModal } from '@/components/community/PostDetailModal';
 import { getCommunityPostsApi } from '@/api/community';
 import { Loader2 } from 'lucide-react';
 import { CommonBoard } from '@/components/common/CommonBoard';
-import { useNavigate } from 'react-router-dom';   // 추가됨
+import { useNavigate } from 'react-router-dom';
 
 const PAGE_SIZE = 8;
 
 export function Community() {
-  const navigate = useNavigate();  // 추가됨
+  const navigate = useNavigate();
   const { isLoggedIn, isChecked } = useAuth();
 
   const [posts, setPosts] = useState([]);
@@ -67,7 +67,7 @@ export function Community() {
       <AuthPopup
         show={true}
         isMandatory={true}
-        onClose={() => navigate('/')}   // Analysis와 동일한 안정 구조
+        onClose={() => navigate('/')}
       />
     );
   }
@@ -81,6 +81,20 @@ export function Community() {
     setSelectedBoardId(null);
   };
 
+  // ✅ 삭제 완료 핸들러 (수정됨)
+  const handleDeleteComplete = () => {
+    // 1. 모달 상태를 닫음 (스크롤 잠금 해제 및 오버레이 제거)
+    setSelectedBoardId(null);
+    
+    // 2. 화면 리스트에서 즉시 제거 (Optimistic Update)
+    setPosts((prev) => prev.filter((post) => post.id !== selectedBoardId));
+    
+    // 3. 서버 데이터 확실한 동기화를 위해 약간 뒤에 재요청
+    setTimeout(() => {
+      fetchPosts(currentPage);
+    }, 100);
+  };
+
   /* 3. 에러 화면 */
   if (error) {
     return (
@@ -89,7 +103,6 @@ export function Community() {
       </div>
     );
   }
-  
 
   /* 4. 실제 렌더링 */
   return (
@@ -113,7 +126,7 @@ export function Community() {
         isOpen={!!selectedBoardId}
         onOpenChange={handleCloseModal}
         boardId={selectedBoardId}
-        onDeleteSuccess={() => fetchPosts(currentPage)}
+        onDeleteSuccess={handleDeleteComplete}
       />
     </div>
   );

@@ -100,6 +100,21 @@ export function MyPost() {
     setShowDetail(true);
   };
 
+  // ✅ 삭제 완료 핸들러 (수정됨)
+  const handleDeleteComplete = () => {
+    // 1. 모달 상태를 닫음 (스크롤 잠금 해제 및 오버레이 제거)
+    setShowDetail(false);
+    setSelectedBoardId(null);
+
+    // 2. 화면 리스트에서 즉시 제거 (Optimistic Update)
+    setMyPosts((prev) => prev.filter((post) => post.id !== selectedBoardId));
+
+    // 3. 서버 데이터 확실한 동기화를 위해 약간 뒤에 재요청
+    setTimeout(() => {
+      fetchPosts(currentPage);
+    }, 100);
+  };
+
   const showEmpty = !isLoading && myPosts.length === 0;
 
   if (!isChecked)
@@ -117,7 +132,7 @@ export function MyPost() {
           onOpenChange={() => setShowDetail(false)}
           boardId={selectedBoardId}
           showComments={true}
-          onDeleteSuccess={() => fetchPosts(currentPage)}
+          onDeleteSuccess={handleDeleteComplete}
         />
       )}
 
