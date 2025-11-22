@@ -155,7 +155,9 @@ export function Home() {
 
                 URL 위험 요소 탐지뿐 아니라,<br />
                 사용자 경험 기반 보안 인사이트 공유, 분석 기록의 지속 관리를 지원하여<br />
-                일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.
+                일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.<br/><br/>
+                저희와 함께 직접 탐색하며 QR 속 위험을 더 똑똑하게 이해하고,<br/>
+                당신의 QR 사용 습관을 한 단계 더 안전하게 바꿔보세요.
               </p>
 
               <button
@@ -196,33 +198,21 @@ export function Home() {
 
           {/* CTA SECTION */}
           <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-14 my-24 overflow-hidden">
+            {/* 배경 애니메이션 생략... */}
 
-            <div className="absolute inset-0 pointer-events-none opacity-[0.12]">
-              <motion.svg width="100%" height="100%" viewBox="0 0 800 200">
-                <motion.path
-                  d="M0 120 C 150 20, 300 180, 450 60 C 600 -20, 750 150, 800 80"
-                  stroke="#7CCF00"
-                  strokeWidth="45"
-                  strokeLinecap="round"
-                  fill="none"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.8, ease: "easeInOut" }}
-                />
-              </motion.svg>
-            </div>
-
-            <h3 className="text-3xl font-medium text-center mb-8 relative z-10">
+            {/* 1. 제목 마진을 mb-8에서 mb-14로 변경하여 아래 간격을 넓힘 */}
+            <h3 className="text-3xl font-medium text-center mb-14 relative z-10">
               QRex는 당신의 안전한 QR 사용을 돕습니다
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-4 relative z-10">
-
+            {/* 2. 그리드 컨테이너에서 mb-4를 제거하여 하단 패딩(p-14)만 남김 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
               <div className="text-center p-6">
                 <QrCode size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">정확한 URL 분석</h4>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  URL 구조, IP, 도메인 신뢰도를 기반으로 <br />위험도를 판단합니다.
+                  URL 구조, IP, 도메인 신뢰도를 기반으로 <br />
+                  위험도를 판단합니다.
                 </p>
               </div>
 
@@ -238,10 +228,10 @@ export function Home() {
                 <FileText size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">분석 이력 관리</h4>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  스캔한 QR 분석 결과를 한곳에서 <br />쉽게 관리하세요.
+                  스캔한 QR 분석 결과를 한곳에서 <br />
+                  쉽게 관리하세요.
                 </p>
               </div>
-
             </div>
           </div>
           {/* FEATURE 3-COLUMN */}
@@ -275,7 +265,7 @@ export function Home() {
                 보안 위협 여부를 판단합니다.
               </p>
 
-              {/* 🔹 리스트 - 완전 복원 */}
+              {/* 리스트 - 완전 복원 */}
               <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <ShieldCheck className="w-5 h-5 text-lime-600/80" />
