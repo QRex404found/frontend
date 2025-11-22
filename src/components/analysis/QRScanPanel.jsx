@@ -1,14 +1,7 @@
-// src/components/analysis/QRScanPanel.jsx
-
 import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { Camera, Image, FileText } from 'lucide-react';
+// Dropdown 관련 컴포넌트는 사용하지 않더라도 모바일 로직 등 확장을 위해 유지
+import { Camera } from 'lucide-react';
 import jsQR from 'jsqr';
 
 /* ---------------- QR 이미지에서 URL 추출 ---------------- */
@@ -31,6 +24,7 @@ const scanFileForQrUrl = async (file) => {
   let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const data = imageData.data;
 
+  // 1차 시도: 밝기 조절 후 이진화
   let total = 0;
   for (let i = 0; i < data.length; i += 4) {
     total += (data[i] + data[i + 1] + data[i + 2]) / 3;
@@ -49,6 +43,7 @@ const scanFileForQrUrl = async (file) => {
     inversionAttempts: "dontInvert",
   });
 
+  // 2차 시도: 실패 시 색상 반전 후 재시도
   if (!code) {
     for (let i = 0; i < data.length; i += 4) {
       data[i] = 255 - data[i];
@@ -94,41 +89,23 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
   /* ---------------- 데스크탑 전용: 카메라 버튼 = 파일 탐색기 ---------------- */
   const handleDesktopClick = () => {
     if (!fileInputRef.current) return;
-
-    fileInputRef.current.accept = "image/*"; // 필요하면 "*/*" 로 변경
+    fileInputRef.current.accept = "image/*"; 
     fileInputRef.current.removeAttribute("capture");
     fileInputRef.current.click();
   };
 
-  /* ---------------- 모바일 전용: 드롭다운 메뉴용 핸들러 ---------------- */
-
-  // 사진 촬영 → 카메라 강제 실행
-  const handleTakePhoto = () => {
-    if (!fileInputRef.current) return;
-    fileInputRef.current.accept = "image/*";
-    fileInputRef.current.setAttribute("capture", "environment");
-    fileInputRef.current.click();
-  };
-
-  // 갤러리에서 선택
-  const handleSelectFromGallery = () => {
-    if (!fileInputRef.current) return;
-    fileInputRef.current.accept = "image/*";
-    fileInputRef.current.removeAttribute("capture");
-    fileInputRef.current.click();
-  };
-
-  // 파일 앱 / OS 앱 선택 UI
+  /* ---------------- 모바일 전용: 버튼 핸들러 ---------------- */
+  // (현재 UI에서는 모바일 버튼 하나만 사용 중이나 로직 유지)
   const handleSelectFile = () => {
     if (!fileInputRef.current) return;
-    // ★ 여기 설정은 네가 예전에 "파일 선택" 썼을 때 쓰던 그대로 두면 된다
     fileInputRef.current.accept = "*/*";
     fileInputRef.current.removeAttribute("capture");
     fileInputRef.current.click();
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[450px]">
+    // [수정] min-h 대신 h-full을 사용하여 부모(Card) 높이를 꽉 채우고 중앙 정렬 유지
+    <div className="flex flex-col items-center justify-center h-full">
       <div className="flex flex-col items-center justify-center p-6 space-y-6">
         <p className="mb-4 text-2xl font-medium text-gray-700">Scan your QR</p>
         <input
@@ -149,7 +126,7 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
           </Button>
         )}
 
-        {/*  모바일: 카메라 아이콘 클릭 시 */}
+        {/* 모바일: 카메라 아이콘 클릭 시 */}
         {isMobile && (
           <Button
             className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"

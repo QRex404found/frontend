@@ -89,6 +89,7 @@ export function Community() {
       </div>
     );
   }
+  
 
   /* 4. 실제 렌더링 */
   return (

@@ -1,5 +1,3 @@
-// --- Analysis.jsx ---
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
@@ -191,19 +189,21 @@ export function Analysis() {
         key={location.search}
         className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4"
       >
-        {/* 데스크탑: MyPost 구조 동일 적용 */}
-        <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
+        {/* [수정] 데스크탑 높이 고정 (h-[850px])
+            기존 min-h-[350px] 대신, 리스트가 꽉 찼을 때를 가정한 높이(850px)를 지정합니다.
+        */}
+        <div className="hidden lg:flex justify-center gap-8 h-[850px]">
           <ResizablePanelGroup direction="horizontal">
 
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className="h-full flex flex-col">
+                {/* Card에 h-full을 주어 위에서 정한 850px를 꽉 채우게 함 */}
                 <Card className="h-full w-full p-6 flex items-center justify-center">
                   {LeftPanelContent}
                 </Card>
               </div>
             </ResizablePanel>
 
-            {/* 🔥 핸들: MyPost 완전 동일 */}
             <ResizableHandle
               className="
                 w-[0.5px] bg-transparent rounded-none relative cursor-col-resize
@@ -230,7 +230,7 @@ export function Analysis() {
         </div>
 
 
-        {/* 모바일 레이아웃: 변경 없음 */}
+        {/* 모바일 레이아웃 */}
         <div className="w-full mt-4 lg:hidden">
           <div className="flex items-center justify-center mb-3">
             <div className="inline-flex p-1 bg-gray-100 border border-gray-200 rounded-full shadow-sm">
