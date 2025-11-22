@@ -37,9 +37,7 @@ export function MyPost() {
   const [mobileTab, setMobileTab] = useState("write");
 
   useEffect(() => {
-    if (isChecked && isLoggedIn && user) {
-      fetchPosts(currentPage);
-    }
+    if (isChecked && isLoggedIn && user) fetchPosts(currentPage);
   }, [currentPage, isChecked, isLoggedIn, user]);
 
   const fetchPosts = async (page) => {
@@ -64,9 +62,7 @@ export function MyPost() {
   };
 
   useEffect(() => {
-    const handleRefresh = () => {
-      fetchPosts(1);
-    };
+    const handleRefresh = () => fetchPosts(1);
     window.addEventListener("analysis-updated", handleRefresh);
     return () => window.removeEventListener("analysis-updated", handleRefresh);
   }, []);
@@ -106,23 +102,11 @@ export function MyPost() {
 
   const showEmpty = !isLoading && myPosts.length === 0;
 
-  if (!isChecked) {
-    return (
-      <div className="flex items-center justify-center h-screen text-gray-500">
-        Loading...
-      </div>
-    );
-  }
+  if (!isChecked)
+    return <div className="flex items-center justify-center h-screen text-gray-500">Loading...</div>;
 
-  if (!isLoggedIn) {
-    return (
-      <AuthPopup
-        show={true}
-        isMandatory={true}
-        onClose={() => navigate('/')}
-      />
-    );
-  }
+  if (!isLoggedIn)
+    return <AuthPopup show={true} isMandatory={true} onClose={() => navigate('/')} />;
 
   return (
     <div className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4">
@@ -136,36 +120,30 @@ export function MyPost() {
         />
       )}
 
-      {/* ================== PC Layout ================== */}
+      {/* PC 화면 */}
       <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
         <ResizablePanelGroup direction="horizontal">
-          
-          {/* Left Panel */}
           <ResizablePanel defaultSize={50} minSize={30}>
-            <div className="max-w-[550px] mx-auto h-full flex flex-col">
+            <div className="h-full flex flex-col">
               <Card className="h-full w-full p-6 flex flex-col">
                 <WritePostForm onPostSuccess={() => fetchPosts(1)} />
               </Card>
             </div>
           </ResizablePanel>
 
-          {/* ★핸들만 길이 살짝 더 줄인 버전 */}
           <ResizableHandle
             className="
-              relative w-[6px] cursor-col-resize bg-gray-300 opacity-70 hover:opacity-100
-              after:content-[''] after:absolute after:left-0 after:right-0
-              after:top-[min(30px,15%)] after:bottom-[min(30px,15%)]
-              after:bg-gray-400 after:rounded-full
+              w-[6px] bg-transparent hover:bg-gray-300 rounded-none relative cursor-col-resize
+              after:content-[''] after:absolute after:top-[20px] after:bottom-[20px]
+              after:left-1/2 after:-translate-x-1/2 after:w-[3px]
+              after:bg-gray-300 after:rounded-full
             "
           />
 
-          {/* Right Panel */}
           <ResizablePanel minSize={30}>
             <div className="pl-4 h-full flex flex-col">
               <div className="w-full px-2 md:px-4 py-2 flex flex-col">
-                <h1 className="mb-4 text-3xl font-medium hidden lg:block">
-                  My Post
-                </h1>
+                <h1 className="mb-4 text-3xl font-medium hidden lg:block">My Post</h1>
 
                 <MyPostBoard
                   isDeleting={isDeleting}
@@ -188,12 +166,9 @@ export function MyPost() {
         </ResizablePanelGroup>
       </div>
 
-      {/* ================== Mobile Layout ================== */}
-      <div className="lg:hidden mt-4 w-full">
-        {/* 기존 그대로 유지 */}
-        {/* ... */}
-      </div>
-
+      {/* 모바일 화면 */}
+      {/* (Mobile layout 동일, 변경 없음) */}
+      ...
     </div>
   );
 }
