@@ -127,7 +127,7 @@ export function Home() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <h2 className="text-5xl font-medium tracking-tight mb-6">
+            <h2 className="text-5xl font-medium tracking-tight mb-8">
               QR 보안을 <span className="text-lime-600">더 스마트하게.</span>
             </h2>
 
