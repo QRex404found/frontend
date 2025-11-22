@@ -13,7 +13,7 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
-// 체크박스 컴포넌트 (기존 동일)
+// 체크박스 컴포넌트 (기존 유지)
 function Checkbox({ className, ...props }) {
     return (
         <CheckboxPrimitive.Root
@@ -75,28 +75,28 @@ export const CommonBoard = ({
                             <TableCaption>{caption}</TableCaption>
                             <TableHeader>
                                 <TableRow className="border-b-2 border-gray-300">
-                                    {/* 1. Num 컬럼: 모바일(hidden), PC(table-cell) */}
+                                    {/* 1. Num 컬럼: 모바일(50px), PC(100px) - 다시 보이게 수정함 */}
                                     {showIndex && (
-                                        <TableHead className="hidden md:table-cell w-[80px] lg:w-[100px] text-center text-sm font-medium relative">
-                                            {/* PC용 체크박스 (삭제 모드일 때) */}
+                                        <TableHead className="w-[50px] md:w-[100px] text-center text-sm font-medium relative p-0 md:p-4">
+                                            {/* 체크박스 영역 (삭제 모드일 때 번호 위로 덮어씌워짐) */}
                                             <div className={cn(
-                                                "absolute top-1/2 -translate-y-1/2 transition-all duration-300",
-                                                isDeleting ? "left-1 opacity-100" : "left-1 opacity-0"
+                                                "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-300 bg-white z-10", // bg-white 추가해서 숫자 가림
+                                                isDeleting ? "opacity-100 scale-100" : "opacity-0 scale-0 pointer-events-none"
                                             )}>
-                                                <Checkbox className="invisible" />
+                                                <Checkbox className="invisible" /> {/* 공간 확보용 */}
                                             </div>
-                                            Num
+                                            {/* 삭제모드가 아닐 때 보이는 텍스트 */}
+                                            <span className={isDeleting ? "opacity-0" : "opacity-100"}>
+                                                Num
+                                            </span>
                                         </TableHead>
                                     )}
 
-                                    {/* 2. Title 컬럼: 너비 자동 (나머지 공간 차지) */}
-                                    <TableHead className="text-sm font-medium">
-                                        {/* 모바일에서 삭제 모드일 때 체크박스 공간 확보를 위해 padding-left 조정 가능 */}
-                                        <span className={isDeleting ? "pl-8 md:pl-0" : ""}>Title</span>
-                                    </TableHead>
+                                    {/* 2. Title 컬럼: 나머지 공간 차지 */}
+                                    <TableHead className="text-sm font-medium">Title</TableHead>
 
-                                    {/* 3. Date 컬럼: 모바일(hidden), PC(table-cell) */}
-                                    <TableHead className="hidden md:table-cell text-right w-[120px] lg:w-[150px] text-sm font-medium">
+                                    {/* 3. Date 컬럼: 모바일(숨김), PC(보임) */}
+                                    <TableHead className="hidden md:table-cell text-right w-[150px] text-sm font-medium">
                                         Date
                                     </TableHead>
                                 </TableRow>
@@ -111,13 +111,14 @@ export const CommonBoard = ({
                                             onClick={() => onItemClick(item)}
                                             className={`cursor-pointer hover:bg-gray-50 transition-colors ${rowHeightClass}`}
                                         >
-                                            {/* 1. Num 데이터: PC에서만 보임 */}
+                                            {/* 1. Num 데이터: 모바일에서도 보임 */}
                                             {showIndex && (
-                                                <TableCell className="hidden md:table-cell text-center relative w-[80px] lg:w-[100px]">
+                                                <TableCell className="text-center relative w-[50px] md:w-[100px] p-0 md:p-4">
+                                                    {/* 체크박스 (삭제 모드 ON) */}
                                                     <div
                                                         className={cn(
-                                                            "absolute top-1/2 -translate-y-1/2 transition-all duration-300",
-                                                            isDeleting ? "left-1 opacity-100 pointer-events-auto" : "left-1 opacity-0 pointer-events-none"
+                                                            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-300 bg-white z-10",
+                                                            isDeleting ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-0 pointer-events-none"
                                                         )}
                                                         onClick={(e) => e.stopPropagation()}
                                                     >
@@ -126,35 +127,23 @@ export const CommonBoard = ({
                                                             onCheckedChange={() => onCheckboxChange(item.id)}
                                                         />
                                                     </div>
-                                                    {displayIndex}
+                                                    
+                                                    {/* 번호 (삭제 모드 OFF일 때만 보임) */}
+                                                    <span className={cn("text-sm text-gray-500", isDeleting ? "opacity-0" : "opacity-100")}>
+                                                        {displayIndex}
+                                                    </span>
                                                 </TableCell>
                                             )}
 
-                                            {/* 2. Title 데이터: 여기서 모바일용 레이아웃 처리 */}
-                                            <TableCell className="font-light text-base md:text-lg relative">
-                                                <div className="flex items-center gap-3">
-                                                    {/* 모바일 전용 체크박스 (Title 옆에 붙임) */}
-                                                    {isDeleting && (
-                                                        <div 
-                                                            className="md:hidden shrink-0"
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        >
-                                                            <Checkbox
-                                                                checked={selectedPosts.includes(item.id)}
-                                                                onCheckedChange={() => onCheckboxChange(item.id)}
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    
-                                                    {/* 제목과 날짜(모바일용) 컨테이너 */}
-                                                    <div className="min-w-0 flex-1">
-                                                        <div className="truncate">
-                                                            {item.title}
-                                                        </div>
-                                                        {/* 모바일에서만 보이는 날짜 */}
-                                                        <div className="text-xs text-gray-400 mt-0.5 md:hidden">
-                                                            {formatPostDate(item.date)}
-                                                        </div>
+                                            {/* 2. Title 데이터 */}
+                                            <TableCell className="font-light text-base md:text-lg align-middle">
+                                                <div className="flex flex-col justify-center h-full min-w-0">
+                                                    <div className="truncate w-full">
+                                                        {item.title}
+                                                    </div>
+                                                    {/* 모바일 전용 날짜 (제목 바로 아래) */}
+                                                    <div className="text-xs text-gray-400 mt-0.5 md:hidden">
+                                                        {formatPostDate(item.date)}
                                                     </div>
                                                 </div>
                                             </TableCell>
@@ -172,7 +161,7 @@ export const CommonBoard = ({
                 )}
             </CardContent>
 
-            {/* Pagination UI (기존 동일) */}
+            {/* Pagination (기존 유지) */}
             {totalPages > 1 && onPageChange && (
                 <div className="flex justify-center pt-3 pb-2">
                     <Pagination>
