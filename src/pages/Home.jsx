@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 
 import videoBg from '@/assets/background.mp4';
 
+// 이미지 import
 import holdingQR from '@/assets/holding_QR.jpg';
 import analysisImg from '@/assets/Analysis.jpg';
 import heartImg from '@/assets/Heart.png';
@@ -42,7 +43,8 @@ export function Home() {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
-  // 모바일에서 확대 금지 (홈 전용)
+
+  /* 🔒 홈에서만 확대/축소 차단 */
   useEffect(() => {
     const meta = document.querySelector('meta[name=viewport]');
     if (meta) {
@@ -52,32 +54,25 @@ export function Home() {
       );
     }
     return () => {
-      if (meta) {
-        meta.setAttribute("content", "width=device-width, initial-scale=1.0");
-      }
+      if (meta) meta.setAttribute("content", "width=device-width, initial-scale=1.0");
     };
   }, []);
 
-  // 레이아웃 스케일 조정
+
+  /* 🎯 390px 기준 스케일 적용 */
   useEffect(() => {
-    const baseWidth = 1280;
-
-    const applyScale = () => {
-      const screenWidth = window.innerWidth;
-      const scale = Math.min(screenWidth / baseWidth, 1);
-      const root = document.getElementById("home-scale-root");
-      if (!root) return;
-
-      root.style.transform = `scale(${scale})`;
-
-      const offsetX = (screenWidth - baseWidth * scale) / 2;
-      root.style.left = `${offsetX}px`;
+    const handleScale = () => {
+      const baseWidth = 1280; // 레이아웃 고정 기준
+      const scale = Math.min(window.innerWidth / baseWidth, 1);
+      const wrapper = document.getElementById("scale-wrapper");
+      if (wrapper) wrapper.style.transform = `scale(${scale})`;
     };
 
-    applyScale();
-    window.addEventListener("resize", applyScale);
-    return () => window.removeEventListener("resize", applyScale);
+    handleScale();
+    window.addEventListener("resize", handleScale);
+    return () => window.removeEventListener("resize", handleScale);
   }, []);
+
 
   const scrollToInfo = () => {
     infoSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -89,24 +84,15 @@ export function Home() {
   };
 
   return (
-    <div className="w-full min-h-screen overflow-x-hidden bg-white flex justify-center">
-      
-      {/* 스케일 적용 루트 */}
-      <div
-        id="home-scale-root"
-        style={{
-          width: "1280px",
-          position: "relative",
-          transformOrigin: "top center",
-        }}
-      >
-        {/* HERO SECTION */}
+    <div id="scale-wrapper" style={{ width: "100%", transformOrigin: "top center" }}>
+      <div id="content-fixed-width">
+
+        {/* ====================== HERO ====================== */}
         <div
           className="
-            relative w-full
-            h-[100vh]
-            overflow-hidden
-          "
+          relative h-[100dvh]
+          overflow-hidden
+        "
         >
           <video
             src={videoBg}
@@ -118,7 +104,7 @@ export function Home() {
           />
 
           {/* Scroll Arrow */}
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -129,14 +115,11 @@ export function Home() {
                     <ChevronDown
                       size={42}
                       strokeWidth={1.5}
-                      className="filter drop-shadow-[0_3px_3px_rgba(0,0,0,0.6)]"
+                      className="drop-shadow-[0_3px_3px_rgba(0,0,0,0.6)]"
                     />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  className="bg-black/80 text-white border-white/10 backdrop-blur-md rounded-md"
-                >
+                <TooltipContent className="bg-black/80 text-white border-white/10 backdrop-blur-md">
                   Learn More
                 </TooltipContent>
               </Tooltip>
@@ -145,14 +128,14 @@ export function Home() {
         </div>
 
 
-        {/* ABOUT SECTION */}
+        {/* ====================== ABOUT ====================== */}
         <div ref={infoSectionRef} className="bg-white text-slate-900 py-28 px-6">
           <div className="max-w-6xl mx-auto">
 
             <motion.div
               initial={{ opacity: 0, y: 35 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
+              transition={{ duration: 0.7 }}
               viewport={{ once: true }}
               className="text-center mb-14"
             >
@@ -168,9 +151,9 @@ export function Home() {
 
 
             {/* WHAT IS QREX */}
-            <div className="flex flex-row justify-between items-center gap-10 mb-20">
+            <div className="flex justify-between items-center gap-20 mb-20">
 
-              {/* LEFT: Text */}
+              {/* LEFT: TEXT */}
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -179,11 +162,11 @@ export function Home() {
                 className="flex-1"
               >
                 <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
+
                 <p className="text-slate-600 text-lg leading-relaxed mb-10">
                   QRex는 URL 구조 분석, 도메인 신뢰도 판단, AI 기반 위험 해석을 결합해<br />
                   QR 링크의 안전성을 종합적으로 평가하는 지능형 보안 플랫폼입니다.<br /><br />
-                  URL 위험 요소 탐지뿐 아니라,<br />
-                  사용자 경험 기반 보안 인사이트 공유, 분석 기록의 지속 관리를 지원하여<br />
+                  사용자 기반 보안 인사이트 공유, 분석 기록의 지속 관리를 지원하여<br />
                   일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.
                 </p>
 
@@ -195,193 +178,180 @@ export function Home() {
                 </button>
               </motion.div>
 
-              {/* RIGHT IMAGE BOX */}
+              {/* RIGHT: IMAGE */}
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.7, delay: 0.1 }}
                 viewport={{ once: true }}
                 className="
-                  flex-1 flex items-center justify-center
-                  bg-white border border-slate-200 rounded-3xl
-                  max-w-[420px] max-h-[420px]
-                  aspect-square
-                  overflow-hidden
-                "
+                flex-1 flex items-center justify-center
+                bg-white border border-slate-200 rounded-3xl
+                max-w-[420px] aspect-square
+                mx-auto md:mx-0
+                overflow-hidden
+              "
               >
                 <img
                   src={holdingQR}
                   alt="QRex Illustration"
-                  className="w-full h-full object-contain mix-blend-multiply"
+                  className="w-full h-full object-contain"
                 />
               </motion.div>
 
             </div>
-            {/* CTA SECTION */}
-            <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-14 my-24 overflow-hidden">
-              <div className="absolute inset-0 pointer-events-none opacity-[0.12]">
-                <motion.svg width="100%" height="100%" viewBox="0 0 800 200">
-                  <motion.path
-                    d="M0 120 C 150 20, 300 180, 450 60 C 600 -20, 750 150, 800 80"
-                    stroke="#7CCF00"
-                    strokeWidth="45"
-                    strokeLinecap="round"
-                    fill="none"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 1.8, ease: "easeInOut" }}
-                  />
-                </motion.svg>
-              </div>
+          </div>
 
-              <h3 className="text-3xl font-medium text-center mb-8 relative z-10">
-                QRex는 당신의 안전한 QR 사용을 돕습니다
-              </h3>
 
-              <div className="grid grid-cols-3 gap-10 mb-4 relative z-10">
-
-                <div className="text-center p-6">
-                  <QrCode size={44} className="text-lime-600 mx-auto mb-4" />
-                  <h4 className="text-xl font-medium mb-2">정확한 URL 분석</h4>
-                  <p className="text-slate-500 text-sm leading-relaxed">
-                    URL 구조, IP, 도메인 신뢰도를 기반으로 <br />위험도를 판단합니다.
-                  </p>
-                </div>
-
-                <div className="text-center p-6">
-                  <Users size={44} className="text-lime-600 mx-auto mb-4" />
-                  <h4 className="text-xl font-medium mb-2">보안 경험 공유</h4>
-                  <p className="text-slate-500 text-sm leading-relaxed">
-                    QR 관련 정보와 사례를 함께 나눌 수 있습니다.
-                  </p>
-                </div>
-
-                <div className="text-center p-6">
-                  <FileText size={44} className="text-lime-600 mx-auto mb-4" />
-                  <h4 className="text-xl font-medium mb-2">분석 이력 관리</h4>
-                  <p className="text-slate-500 text-sm leading-relaxed">
-                    스캔한 QR 분석 결과를 한곳에서 <br />쉽게 관리하세요.
-                  </p>
-                </div>
-
-              </div>
+          {/* ====================== FEATURES + CTA ====================== */}
+          <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-14 my-24 overflow-hidden">
+            <div className="absolute inset-0 opacity-[0.12]">
+              <motion.svg width="100%" height="100%" viewBox="0 0 800 200">
+                <motion.path
+                  d="M0 120 C 150 20, 300 180, 450 60 C 600 -20, 750 150, 800 80"
+                  stroke="#7CCF00"
+                  strokeWidth="45"
+                  strokeLinecap="round"
+                  fill="none"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 1.8, ease: "easeInOut" }}
+                />
+              </motion.svg>
             </div>
 
+            <h3 className="text-3xl font-medium text-center mb-8 relative z-10">
+              QRex는 당신의 안전한 QR 사용을 돕습니다
+            </h3>
 
-            {/* FEATURE SECTION */}
-            <div className="grid grid-cols-3 gap-10">
+            <div className="grid grid-cols-3 gap-10 mb-4 relative z-10">
 
-              {/* Analysis */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7 }}
-                viewport={{ once: true }}
-                className="p-10 rounded-3xl border shadow-sm hover:shadow-md transition flex flex-col items-center text-center"
-              >
-                <div className="w-32 h-32 rounded-xl inline-block mb-6 overflow-hidden">
-                  <img src={analysisImg} alt="Analysis" className="w-full h-full object-contain mix-blend-multiply" />
-                </div>
-
-                <h4 className="text-2xl font-medium mb-3">Analysis</h4>
-
-                <p className="text-slate-600 mb-6 leading-relaxed flex-grow">
-                  URL 위험도·도메인 신뢰도·URL 패턴을 종합 분석해 보안 위협 여부를 판단합니다.
+              <div className="text-center p-6">
+                <QrCode size={44} className="text-lime-600 mx-auto mb-4" />
+                <h4 className="text-xl font-medium mb-2">정확한 URL 분석</h4>
+                <p className="text-slate-500 text-sm leading-relaxed">
+                  URL 구조, IP, 도메인 신뢰도를 기반으로 <br />위험 판단
                 </p>
+              </div>
 
-                <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
-                  <div className="mini-feature-badge">
-                    <ShieldCheck className="badge-icon" />
-                    <span className="badge-text">URL 위험도 분석</span>
-                  </div>
-                  <div className="mini-feature-badge">
-                    <Globe className="badge-icon" />
-                    <span className="badge-text">도메인 신뢰도 검증</span>
-                  </div>
-                  <div className="mini-feature-badge">
-                    <AlertTriangle className="badge-icon" />
-                    <span className="badge-text">URL 리스크 설명 제공</span>
-                  </div>
-                </div>
-              </motion.div>
-
-
-              {/* Community */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.1 }}
-                viewport={{ once: true }}
-                className="p-10 rounded-3xl border shadow-sm hover:shadow-md transition flex flex-col items-center text-center"
-              >
-                <div className="w-32 h-32 rounded-xl inline-block mb-6 overflow-hidden">
-                  <img src={heartImg} alt="Community" className="w-full h-full object-contain mix-blend-multiply" />
-                </div>
-
-                <h4 className="text-2xl font-medium mb-3">Community</h4>
-
-                <p className="text-slate-600 mb-6 leading-relaxed flex-grow">
-                  사용자 경험 기반 사례로 실질적인 보안 인사이트를 제공합니다.
+              <div className="text-center p-6">
+                <Users size={44} className="text-lime-600 mx-auto mb-4" />
+                <h4 className="text-xl font-medium mb-2">보안 경험 공유</h4>
+                <p className="text-slate-500 text-sm leading-relaxed">
+                  사용자 사례로 실질적 보안 인사이트 제공
                 </p>
+              </div>
 
-                <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
-                  <div className="mini-feature-badge">
-                    <MessageSquare className="badge-icon" />
-                    <span className="badge-text">사용자 사례 공유</span>
-                  </div>
-
-                  <div className="mini-feature-badge">
-                    <Lightbulb className="badge-icon" />
-                    <span className="badge-text">보안 인사이트 교류</span>
-                  </div>
-
-                  <div className="mini-feature-badge">
-                    <Flag className="badge-icon" />
-                    <span className="badge-text">신고 & 위험 URL 제보</span>
-                  </div>
-                </div>
-              </motion.div>
-
-
-              {/* My Post */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.2 }}
-                viewport={{ once: true }}
-                className="p-10 rounded-3xl border shadow-sm hover:shadow-md transition flex flex-col items-center text-center"
-              >
-                <div className="w-32 h-32 rounded-xl inline-block mb-6 overflow-hidden">
-                  <img src={mypostImg} alt="My Post" className="w-full h-full object-contain mix-blend-multiply" />
-                </div>
-
-                <h4 className="text-2xl font-medium mb-3">My post</h4>
-
-                <p className="text-slate-600 mb-6 leading-relaxed flex-grow">
-                  분석한 QR 기록을 저장하고 언제든 빠르게 다시 확인할 수 있습니다.
+              <div className="text-center p-6">
+                <FileText size={44} className="text-lime-600 mx-auto mb-4" />
+                <h4 className="text-xl font-medium mb-2">분석 이력 관리</h4>
+                <p className="text-slate-500 text-sm leading-relaxed">
+                  스캔한 QR 기록을 한눈에
                 </p>
-
-                <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
-                  <div className="mini-feature-badge">
-                    <Save className="badge-icon" />
-                    <span className="badge-text">분석 기록 자동 저장</span>
-                  </div>
-
-                  <div className="mini-feature-badge">
-                    <Edit3 className="badge-icon" />
-                    <span className="badge-text">제목 & 내용 관리</span>
-                  </div>
-
-                  <div className="mini-feature-badge">
-                    <Search className="badge-icon" />
-                    <span className="badge-text">상세 분석 보기</span>
-                  </div>
-                </div>
-
-              </motion.div>
-
+              </div>
 
             </div>
+          </div>
+
+
+          {/* ====================== GRID FEATURES ====================== */}
+          <div className="grid grid-cols-3 gap-10">
+
+            {/* Analysis */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true }}
+              className="p-10 rounded-3xl border shadow-sm hover:shadow-md transition flex flex-col items-center text-center"
+            >
+              <div className="w-32 h-32 rounded-xl inline-block mb-6 overflow-hidden">
+                <img src={analysisImg} alt="Analysis" className="w-full h-full object-contain" />
+              </div>
+              <h4 className="text-2xl font-medium mb-3">Analysis</h4>
+              <p className="text-slate-600 mb-6 leading-relaxed flex-grow">
+                URL 위험 요소 종합 분석
+              </p>
+              <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50 border border-lime-200">
+                  <ShieldCheck className="w-5 h-5 text-lime-600" />
+                  <span className="text-slate-700 text-sm font-medium">위험도 분석</span>
+                </div>
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50 border border-lime-200">
+                  <Globe className="w-5 h-5 text-lime-600" />
+                  <span className="text-slate-700 text-sm font-medium">도메인 검증</span>
+                </div>
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50 border border-lime-200">
+                  <AlertTriangle className="w-5 h-5 text-lime-600" />
+                  <span className="text-slate-700 text-sm font-medium">리스크 설명</span>
+                </div>
+              </div>
+            </motion.div>
+
+
+            {/* Community */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="p-10 rounded-3xl border shadow-sm hover:shadow-md transition flex flex-col items-center text-center"
+            >
+              <div className="w-32 h-32 rounded-xl inline-block mb-6 overflow-hidden">
+                <img src={heartImg} alt="Community" className="w-full h-full object-contain" />
+              </div>
+              <h4 className="text-2xl font-medium mb-3">Community</h4>
+              <p className="text-slate-600 mb-6 leading-relaxed flex-grow">
+                사용자 기반 보안 지식 확산
+              </p>
+              <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50 border border-lime-200">
+                  <MessageSquare className="w-5 h-5 text-lime-600" />
+                  <span className="text-slate-700 text-sm font-medium">사례 공유</span>
+                </div>
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50 border border-lime-200">
+                  <Lightbulb className="w-5 h-5 text-lime-600" />
+                  <span className="text-slate-700 text-sm font-medium">인사이트 교류</span>
+                </div>
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50 border border-lime-200">
+                  <Flag className="w-5 h-5 text-lime-600" />
+                  <span className="text-slate-700 text-sm font-medium">신고 / 제보</span>
+                </div>
+              </div>
+            </motion.div>
+
+
+            {/* MyPost */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="p-10 rounded-3xl border shadow-sm hover:shadow-md transition flex flex-col items-center text-center"
+            >
+              <div className="w-32 h-32 rounded-xl inline-block mb-6 overflow-hidden">
+                <img src={mypostImg} alt="MyPost" className="w-full h-full object-contain" />
+              </div>
+              <h4 className="text-2xl font-medium mb-3">My post</h4>
+              <p className="text-slate-600 mb-6 leading-relaxed flex-grow">
+                분석 기록 관리 및 탐색
+              </p>
+              <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50 border border-lime-200">
+                  <Save className="w-5 h-5 text-lime-600" />
+                  <span className="text-slate-700 text-sm font-medium">자동 저장</span>
+                </div>
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50 border border-lime-200">
+                  <Edit3 className="w-5 h-5 text-lime-600" />
+                  <span className="text-slate-700 text-sm font-medium">제목 관리</span>
+                </div>
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50 border border-lime-200">
+                  <Search className="w-5 h-5 text-lime-600" />
+                  <span className="text-slate-700 text-sm font-medium">상세 분석</span>
+                </div>
+              </div>
+            </motion.div>
+
           </div>
         </div>
       </div>
