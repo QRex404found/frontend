@@ -197,7 +197,7 @@ export function Home() {
 
 
           {/* CTA SECTION */}
-          <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-14 my-24 overflow-hidden">
+          <div className="relative bg-slate-50 border border-slate-200 rounded-3xl px-14 pt-14 pb-8 my-24 overflow-hidden">
 
             {/* 배경 애니메이션 (원본 유지) */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.12]">

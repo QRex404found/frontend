@@ -124,8 +124,8 @@ export function MyPost() {
       <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={50} minSize={30}>
-            <div className="h-full flex flex-col">
-              <Card className="h-full w-full p-6 flex flex-col">
+            <div className="flex flex-col h-full">
+              <Card className="flex flex-col w-full h-full p-6">
                 <WritePostForm onPostSuccess={() => fetchPosts(1)} />
               </Card>
             </div>
@@ -147,9 +147,9 @@ export function MyPost() {
 
 
           <ResizablePanel minSize={30}>
-            <div className="pl-4 h-full flex flex-col">
-              <div className="w-full px-2 md:px-4 py-2 flex flex-col">
-                <h1 className="mb-4 text-3xl font-medium hidden lg:block">My Post</h1>
+            <div className="flex flex-col h-full pl-4">
+              <div className="flex flex-col w-full px-2 py-2 md:px-4">
+                <h1 className="hidden mb-4 text-3xl font-medium lg:block">My Post</h1>
 
                 <MyPostBoard
                   isDeleting={isDeleting}
@@ -172,9 +172,9 @@ export function MyPost() {
         </ResizablePanelGroup>
       </div>
 
-      <div className="lg:hidden mt-4 w-full">
-        <div className="mb-3 flex justify-center">
-          <div className="inline-flex rounded-full bg-gray-100 p-1 border border-gray-200 shadow-sm">
+      <div className="w-full mt-4 lg:hidden">
+        <div className="flex justify-center mb-3">
+          <div className="inline-flex p-1 bg-gray-100 border border-gray-200 rounded-full shadow-sm">
             <button
               onClick={() => setMobileTab("write")}
               className={`px-4 py-1.5 rounded-full ${mobileTab === "write" ? "bg-white shadow-sm border" : "text-gray-600"}`}
@@ -190,7 +190,7 @@ export function MyPost() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+        <div className="overflow-hidden bg-white border rounded-lg shadow-sm">
           <div
             className="flex w-[200%] transition-transform duration-300"
             style={{
@@ -201,7 +201,7 @@ export function MyPost() {
           >
 
             <div className="w-1/2 p-4">
-              <Card className="w-full h-full p-4 flex flex-col">
+              <Card className="flex flex-col w-full h-full p-4">
                 <WritePostForm onPostSuccess={() => fetchPosts(1)} />
               </Card>
             </div>
