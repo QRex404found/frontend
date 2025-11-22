@@ -33,6 +33,13 @@
   }
 }
 
+/* 모바일에서만 input, textarea 폰트 크기를 16px로 고정 */
+@media screen and (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
 .card {
   padding: 2em;
 }
