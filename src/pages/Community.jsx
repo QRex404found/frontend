@@ -81,19 +81,22 @@ export function Community() {
     setSelectedBoardId(null);
   };
 
-  // ✅ 삭제 완료 핸들러 (수정됨: 스크롤 잠금 강제 해제 추가)
+  // ✅ 삭제 완료 핸들러 (Community용 강력 수정버전)
   const handleDeleteComplete = () => {
-    // 1. 모달 닫기 (State 초기화)
+    // 1. 모달 닫기 (ID 초기화)
     setSelectedBoardId(null);
 
-    // 2. [핵심] 스크롤 잠금 강제 해제 (화면 먹통 해결)
-    // 모달 라이브러리가 꼬여서 style이 남아있을 경우를 대비해 강제로 풉니다.
-    document.body.style.overflow = 'unset';
-
-    // 3. 화면 리스트에서 즉시 제거 (Optimistic Update)
+    // 2. 화면 리스트에서 즉시 제거 (Optimistic Update)
     setPosts((prev) => prev.filter((post) => post.id !== selectedBoardId));
 
-    // 4. 서버 데이터 확실한 동기화를 위해 약간 뒤에 재요청
+    // 3. [핵심 해결책] 약간의 지연(0ms)을 주고 강제로 스타일 복구
+    // setTimeout을 써야 리렌더링 사이클 뒤에 실행되어 확실하게 적용됩니다.
+    setTimeout(() => {
+      document.body.style.overflow = 'unset';       // 스크롤 잠금 해제
+      document.body.style.pointerEvents = 'auto';   // 클릭 방지 해제 (이게 중요)
+    }, 0);
+
+    // 4. 서버 데이터 동기화
     setTimeout(() => {
       fetchPosts(currentPage);
     }, 100);
