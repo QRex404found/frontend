@@ -106,7 +106,8 @@ const WritePostForm = ({ onPostSuccess }) => {
                             />
                             <button
                                 onClick={handleCancelPreview}
-                                className="absolute top-1 right-1 p-0.5 bg-gray-900 bg-opacity-50 text-white rounded-full hover:bg-opacity-75"
+                                // 수정됨: z-20 클래스 추가 (투명 input보다 위로 올림)
+                                className="absolute top-1 right-1 p-0.5 bg-gray-900 bg-opacity-50 text-white rounded-full hover:bg-opacity-75 z-20"
                             >
                                 <X size={14} />
                             </button>
@@ -120,7 +121,7 @@ const WritePostForm = ({ onPostSuccess }) => {
                         </>
                     )}
 
-                    {/* 🔥 핵심 수정: input을 label 안으로 넣고, 전체를 투명하게 덮게 함 */}
+                    {/* input을 label 안으로 넣고, 전체를 투명하게 덮게 함 */}
                     <input
                         id="photo-upload"
                         type="file"
