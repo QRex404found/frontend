@@ -100,7 +100,6 @@ export const CommentDrawer = ({
           </DrawerDescription>
         </DrawerHeader>
 
-        {/* overflow-x-hidden 추가: 혹시라도 모를 가로 스크롤바 방지 */}
         <ScrollArea className="flex-1 min-h-0 px-4 overflow-x-hidden">
           <div className="space-y-6 py-4">
             {comments.length === 0 ? (
@@ -115,6 +114,8 @@ export const CommentDrawer = ({
                   comment?.writerId ??
                   comment?.writer?.id;
 
+                const authorName = comment?.userName ?? authorId; // ⭐ 이름 우선 표시
+
                 const currentUserId = user?.id ?? user?.userId;
 
                 const isMyComment =
@@ -124,32 +125,22 @@ export const CommentDrawer = ({
 
                 return (
                   <div key={comment.commentId} className="flex items-start gap-3 w-full">
-                    {/* 아바타 */}
                     <div className="flex-shrink-0 w-8 h-8 mt-1 bg-gray-300 rounded-full" />
                     
-                    {/* w-0와 flex-1 조합으로 부모 너비 강제 준수 */}
                     <div className="relative flex-1 w-0"> 
-                        
-                        {/* 버튼 공간 확보 */}
                         <div className="pr-8">
                           <p className="text-sm font-semibold text-[#81BF59] mb-0.5">
-                            {authorId}
+                            {authorName} {/* ⭐ 수정 완료 */}
                           </p>
 
-                          {/* [여기가 수정되었습니다] 
-                              1. break-all: 모든 글자 강제 줄바꿈
-                              2. [overflow-wrap:anywhere]: 브라우저 호환성을 위한 가장 강력한 줄바꿈 속성
-                              3. w-full: P태그 너비 100% 강제
-                          */}
                           <p 
                             className="text-sm text-gray-700 whitespace-pre-wrap break-all w-full [overflow-wrap:anywhere]"
-                            style={{ wordBreak: 'break-all' }} // 확실한 적용을 위해 인라인 스타일 추가
+                            style={{ wordBreak: 'break-all' }}
                           >
                             {comment.contents}
                           </p>
                         </div>
 
-                        {/* 버튼: 우측 상단 고정 (수정 없음) */}
                         <div className="absolute top-0 right-0">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
