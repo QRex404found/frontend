@@ -99,7 +99,7 @@ const WritePostForm = ({ onPostSuccess }) => {
                     ) : (
                         <>
                             <CameraIcon className="w-7 h-7 text-gray-500" />
-                            <span className="mt-1 text-sm text-gray-500">PHOTO(선택)</span>
+                            <span className="mt-1 text-sm text-gray-500">Photo(선택)</span>
                         </>
                     )}
                 </label>

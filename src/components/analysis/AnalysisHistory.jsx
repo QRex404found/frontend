@@ -69,7 +69,7 @@ export function AnalysisHistory({ onSelectResult, refreshKey, titleUpdateRef }) 
 
     return (
         <div className="w-full px-2 md:px-4 py-2 flex flex-col">
-            <h1 className="mb-6 text-3xl font-light hidden lg:block">
+            <h1 className="mb-6 text-3xl font-medium hidden lg:block">
                 QR Analysis History
             </h1>
 

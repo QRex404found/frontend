@@ -25,10 +25,11 @@ export const LatestCommentPreview = ({ comments }) => {
               <div className="flex-shrink-0 w-8 h-8 mt-1 bg-gray-300 rounded-full"></div>
 
               <div className="flex flex-col min-w-0">
-                {/* 사용자 ID */}
+                {/* 사용자 이름 */}
                 <p className="text-sm font-medium text-gray-800 truncate">
-                  {latestComment.userId || '익명'}
+                  {latestComment.userName}
                 </p>
+
                 {/* 댓글 내용 */}
                 <p className="text-xs text-gray-500 truncate">
                   {latestComment.contents}
