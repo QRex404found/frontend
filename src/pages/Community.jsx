@@ -81,15 +81,13 @@ export function Community() {
     setSelectedBoardId(null);
   };
 
-  // ✅ 삭제 완료 핸들러 (수정됨)
+  // ✅ 삭제 완료 핸들러 (수정됨: 모달 닫기 코드 제거)
   const handleDeleteComplete = () => {
-    // 1. 모달 상태를 닫음 (스크롤 잠금 해제 및 오버레이 제거)
-    setSelectedBoardId(null);
-    
-    // 2. 화면 리스트에서 즉시 제거 (Optimistic Update)
+    // 1. 화면 리스트에서 즉시 제거 (Optimistic Update)
+    // 화면 업데이트만 먼저 수행하고, 모달 닫기는 자식 컴포넌트 흐름에 맡깁니다.
     setPosts((prev) => prev.filter((post) => post.id !== selectedBoardId));
-    
-    // 3. 서버 데이터 확실한 동기화를 위해 약간 뒤에 재요청
+
+    // 2. 서버 데이터 확실한 동기화를 위해 약간 뒤에 재요청
     setTimeout(() => {
       fetchPosts(currentPage);
     }, 100);

@@ -138,16 +138,14 @@ export function Home() {
           </motion.div>
 
           {/* WHAT IS QREX */}
-          {/* 1. 부모에 md:items-stretch 적용: "자식들아 높이 똑같이 맞춰라" */}
           <div className="flex flex-col md:flex-row justify-between items-center md:items-stretch gap-20 mb-20">
 
-            {/* LEFT: Text */}
+            {/* LEFT: Text (이 녀석이 높이의 기준이 됩니다) */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
-              /* 텍스트가 세로 중앙에 오게 하려면 flex, justify-center 추가 (선택사항) */
               className="flex-1 md:pl-4 flex flex-col justify-center"
             >
               <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
@@ -178,28 +176,31 @@ export function Home() {
               viewport={{ once: true }}
               className="
       flex-1
-      flex items-center justify-center
       bg-white border border-slate-200 rounded-3xl
-      
-      w-[260px] h-[260px] 
-      md:w-auto md:h-auto 
-      
-      aspect-square md:aspect-auto
-      
       mx-auto md:mx-0
       overflow-hidden
+      
+      /* 모바일: 고정 크기 */
+      w-[260px] h-[260px] 
+      
+      /* 데스크탑 핵심 설정 */
+      md:w-auto md:h-auto      /* 높이 자동 (부모 stretch 따름) */
+      relative                 /* 내부 이미지 배치를 위한 기준점 */
     "
             >
               <img
                 src={holdingQR}
                 alt="QRex Illustration"
-                /* h-full로 박스 높이를 꽉 채우되, object-contain으로 비율 유지하며 쏙 들어가게 함 */
-                className="w-full h-full object-contain mix-blend-multiply p-6"
+                className="
+        w-full h-full object-contain mix-blend-multiply p-6
+        
+        /* 데스크탑 핵심 설정: 이미지를 공중에 띄워서 박스 높이에 강제로 맞춤 */
+        md:absolute md:inset-0 
+      "
               />
             </motion.div>
 
           </div>
-
 
 
           {/* CTA SECTION */}
