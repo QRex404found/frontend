@@ -144,12 +144,12 @@ export function Home() {
             >
               <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-10">
-                QRex는 도메인 신뢰도, URL 특성 분석,<br />
-                AI 기반 위험 해석을 결합해<br />
-                QR 링크의 안전성을 종합적으로 평가하는 보안 플랫폼입니다.
-                <br /><br />
-                또한 커뮤니티와 분석 기록 기능으로
-                지속적이고 확장 가능한 보안 경험을 제공합니다.
+                QRex는 URL 구조 분석, 도메인 신뢰도 판단, AI 기반 위험 해석을 결합해<br />
+                QR 링크의 안전성을 종합적으로 평가하는 지능형 보안 플랫폼입니다.<br /><br />
+
+                URL 위험 요소 탐지뿐 아니라,<br />
+                사용자 경험 기반 보안 인사이트 공유, 분석 기록의 지속 관리를 지원하여<br />
+                일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.
               </p>
 
               <button
