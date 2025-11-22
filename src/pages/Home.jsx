@@ -138,7 +138,8 @@ export function Home() {
           </motion.div>
 
           {/* WHAT IS QREX */}
-          <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-20 mb-20">
+          {/* 1. 부모에 md:items-stretch 적용: "자식들아 높이 똑같이 맞춰라" */}
+          <div className="flex flex-col md:flex-row justify-between items-center md:items-stretch gap-20 mb-20">
 
             {/* LEFT: Text */}
             <motion.div
@@ -146,7 +147,8 @@ export function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
-              className="flex-1 md:pl-4"
+              /* 텍스트가 세로 중앙에 오게 하려면 flex, justify-center 추가 (선택사항) */
+              className="flex-1 md:pl-4 flex flex-col justify-center"
             >
               <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-10">
@@ -158,12 +160,14 @@ export function Home() {
                 일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.
               </p>
 
-              <button
-                onClick={handleStart}
-                className="px-8 py-4 bg-lime-500 text-lg text-white rounded-xl font-medium hover:bg-lime-600 transition"
-              >
-                Explore QRex
-              </button>
+              <div>
+                <button
+                  onClick={handleStart}
+                  className="px-8 py-4 bg-lime-500 text-lg text-white rounded-xl font-medium hover:bg-lime-600 transition"
+                >
+                  Explore QRex
+                </button>
+              </div>
             </motion.div>
 
             {/* RIGHT IMAGE BOX */}
@@ -173,20 +177,24 @@ export function Home() {
               transition={{ duration: 0.7, delay: 0.1 }}
               viewport={{ once: true }}
               className="
-                flex-1
-                flex items-center justify-center
-                bg-white border border-slate-200 rounded-3xl
-                md:max-w-[420px] md:max-h-[420px]
-                w-[260px] h-[260px] md:w-full md:h-auto
-                aspect-square
-                mx-auto md:mx-0
-                overflow-hidden
-              "
+      flex-1
+      flex items-center justify-center
+      bg-white border border-slate-200 rounded-3xl
+      
+      w-[260px] h-[260px] 
+      md:w-auto md:h-auto 
+      
+      aspect-square md:aspect-auto
+      
+      mx-auto md:mx-0
+      overflow-hidden
+    "
             >
               <img
                 src={holdingQR}
                 alt="QRex Illustration"
-                className="w-full h-full object-contain mix-blend-multiply"
+                /* h-full로 박스 높이를 꽉 채우되, object-contain으로 비율 유지하며 쏙 들어가게 함 */
+                className="w-full h-full object-contain mix-blend-multiply p-6"
               />
             </motion.div>
 
