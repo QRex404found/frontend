@@ -13,7 +13,6 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
-// 체크박스 컴포넌트
 function Checkbox({ className, ...props }) {
     return (
         <CheckboxPrimitive.Root
@@ -80,24 +79,25 @@ export const CommonBoard = ({
                                         <TableHead className="w-[50px] md:w-[100px] text-center text-sm font-medium p-0 md:p-4 relative">
                                             
                                             {/* [체크박스] */}
+                                            {/* 데스크탑: absolute로 띄워서 문서 흐름에서 제거 -> Num 위치 영향 0% */}
+                                            {/* 모바일: flex로 중앙 정렬 -> Num 자리 차지 */}
                                             {isDeleting && (
                                                 <div className={cn(
-                                                    // 모바일: Flex로 중앙 정렬 (숫자 대체)
-                                                    "flex justify-center items-center",
-                                                    // 데스크탑: Absolute로 왼쪽에 띄움 (숫자 밀림 방지)
-                                                    "md:absolute md:top-1/2 md:left-4 md:-translate-y-1/2"
+                                                    "flex justify-center items-center z-10", // 기본 Flex
+                                                    "md:absolute md:top-1/2 md:left-4 md:-translate-y-1/2" // 데스크탑 Absolute
                                                 )}>
-                                                    <Checkbox className="invisible" /> 
-                                                    {/* 헤더 체크박스는 모양만 잡거나 invisible 처리 */}
+                                                    <Checkbox className={cn(
+                                                        "invisible", // 헤더 체크박스는 모양만 잡음
+                                                        "md:block"   // 데스크탑에선 보이고
+                                                    )} />
+                                                    {/* 모바일 헤더에선 체크박스 안보여주고 Num을 숨기는 식으로 처리 */}
                                                 </div>
                                             )}
 
                                             {/* [Num 텍스트] */}
                                             <span className={cn(
-                                                // 모바일: 삭제 중이면 숨김
-                                                isDeleting ? "hidden" : "inline",
-                                                // 데스크탑: 삭제 중이어도 무조건 보임 (밀리지 않음)
-                                                "md:inline"
+                                                isDeleting ? "hidden" : "inline", // 모바일: 삭제 중이면 숨김
+                                                "md:inline"                       // 데스크탑: 무조건 보임 (움직임 X)
                                             )}>
                                                 Num
                                             </span>
@@ -126,13 +126,12 @@ export const CommonBoard = ({
                                                 <TableCell className="text-center w-[50px] md:w-[100px] p-0 md:p-4 relative">
                                                     
                                                     {/* [체크박스] */}
+                                                    {/* 데스크탑: absolute 사용 (가장 중요!!) */}
                                                     {isDeleting && (
                                                         <div 
                                                             className={cn(
-                                                                // 모바일: 중앙 정렬 (숫자 대체)
-                                                                "flex justify-center items-center h-full",
-                                                                // 데스크탑: 왼쪽에 둥둥 띄움 (숫자 위치 영향 X)
-                                                                "md:absolute md:top-1/2 md:left-4 md:-translate-y-1/2"
+                                                                "flex justify-center items-center h-full z-10", // 모바일용
+                                                                "md:absolute md:top-1/2 md:left-6 md:-translate-y-1/2" // 데스크탑용 (왼쪽 24px 위치 고정)
                                                             )}
                                                             onClick={(e) => e.stopPropagation()}
                                                         >
@@ -144,12 +143,11 @@ export const CommonBoard = ({
                                                     )}
 
                                                     {/* [숫자] */}
+                                                    {/* 데스크탑: 그냥 text-center의 흐름을 그대로 따름 (방해꾼 없음) */}
                                                     <span className={cn(
                                                         "text-sm text-gray-500",
-                                                        // 모바일: 삭제 중이면 숨김
-                                                        isDeleting ? "hidden" : "block",
-                                                        // 데스크탑: 무조건 보임 (제자리 유지)
-                                                        "md:block"
+                                                        isDeleting ? "hidden" : "block", // 모바일: 삭제시 숨김
+                                                        "md:block"                       // 데스크탑: 무조건 보임
                                                     )}>
                                                         {displayIndex}
                                                     </span>
