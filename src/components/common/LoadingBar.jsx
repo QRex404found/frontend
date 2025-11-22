@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useNavigate } from 'react-router-dom';
 import { Progress } from "@/components/ui/progress";
-import apiClient from '@/api/index'; 
+import apiClient from '@/api/index';
 
 const LOADING_STAGES = {
   FAKING: 'FAKING',
@@ -32,9 +32,7 @@ export function LoadingBar({ file, extractedUrl }) {
       const response = await apiClient.post(
         '/analysis/analyze',
         null,
-        {
-          params: { url: extractedUrl },
-        }
+        { params: { url: extractedUrl } }
       );
 
       stopFakeProgress();
@@ -144,12 +142,13 @@ export function LoadingBar({ file, extractedUrl }) {
       </div>
 
       <p
-        className={`mt-3 text-sm text-center font-medium 
+        className={`mt-3 text-sm text-center font-medium
         ${stage === LOADING_STAGES.COMPLETE
           ? 'text-lime-500 font-bold'
           : stage === LOADING_STAGES.ERROR
             ? 'text-red-600 font-bold'
-            : 'text-gray-700'}`}
+            : 'text-gray-700'
+        }`}
       >
         {statusMessage}
       </p>

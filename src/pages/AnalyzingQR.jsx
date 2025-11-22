@@ -18,32 +18,35 @@ export default function AnalyzingQR() {
     // 2. 파일 정보가 없는 경우 오류 처리 및 리디렉션
     useEffect(() => {
         if (!fileToAnalyze) {
-            // 분석 메인 페이지로 즉시 돌려보냄
-            navigate('/analysis', { replace: true }); 
+            navigate('/analysis', { replace: true });
         }
     }, [fileToAnalyze, navigate]);
 
 
-    // 3. 렌더링
+    // 파일이 없을 때 — redirect 직전 잠깐 표시
     if (!fileToAnalyze) {
-        // 파일이 없어서 리디렉션되기 전까지 잠시 로딩 스피너를 보여줌.
         return (
-            <div className="w-full h-screen flex items-center justify-center bg-white overflow-hidden">
+            <div
+                className="w-full flex items-center justify-center bg-white overflow-hidden"
+                style={{ minHeight: 'calc(100vh - 80px)' }} // 80px = Header height
+            >
                 <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
             </div>
         );
     }
 
-    // 파일 정보가 유효할 경우 LoadingBar를 렌더링.
     return (
-        <div className="w-full h-screen flex flex-col items-center justify-center bg-white overflow-hidden">
-            <h1 className="mb-8 text-4xl font-normal">Analyzing QR</h1> 
+        <div
+            className="w-full flex flex-col items-center justify-center bg-white overflow-hidden"
+            style={{ minHeight: 'calc(100vh - 80px)' }} // Header 제외 전체 중 정확한 중앙
+        >
+            <h1 className="mb-8 text-4xl font-normal">Analyzing QR</h1>
 
-            <LoadingBar 
-                file={fileToAnalyze} 
+            <LoadingBar
+                file={fileToAnalyze}
                 extractedUrl={extractedUrl}
             />
-            
+
             <p className="mt-4 text-gray-600">
                 분석 중에는 화면을 이동하지 마세요!
             </p>
