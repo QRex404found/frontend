@@ -189,15 +189,13 @@ export function Analysis() {
         key={location.search}
         className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4"
       >
-        {/* [수정] 데스크탑 높이 고정 (h-[850px])
-            기존 min-h-[350px] 대신, 리스트가 꽉 찼을 때를 가정한 높이(850px)를 지정합니다.
-        */}
-        <div className="hidden lg:flex justify-center gap-8 h-[850px]">
+        {/* [변경됨] 게시글 8개 기준 높이인 h-[600px]로 고정 */}
+        <div className="hidden lg:flex justify-center gap-8 h-[600px]">
           <ResizablePanelGroup direction="horizontal">
 
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className="h-full flex flex-col">
-                {/* Card에 h-full을 주어 위에서 정한 850px를 꽉 채우게 함 */}
+                {/* 부모 높이(600px)를 꽉 채우도록 h-full 설정 */}
                 <Card className="h-full w-full p-6 flex items-center justify-center">
                   {LeftPanelContent}
                 </Card>
