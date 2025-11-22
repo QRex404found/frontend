@@ -13,7 +13,7 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
-// 체크박스 컴포넌트 (기존 유지)
+// 체크박스 컴포넌트
 function Checkbox({ className, ...props }) {
     return (
         <CheckboxPrimitive.Root
@@ -77,19 +77,30 @@ export const CommonBoard = ({
                                 <TableRow className="border-b-2 border-gray-300">
                                     {/* 1. Num 컬럼 Header */}
                                     {showIndex && (
-                                        <TableHead className="w-[50px] md:w-[100px] text-center text-sm font-medium p-0 md:p-4">
-                                            <div className="flex items-center justify-center gap-2">
-                                                {/* [데스크탑용] 삭제 모드일 때만 보이는 공간 확보용 투명 체크박스 */}
-                                                {isDeleting && <Checkbox className="invisible hidden md:block" />}
-                                                
-                                                {/* Num 텍스트 */}
-                                                <span className={isDeleting ? "hidden md:inline" : "inline"}>
-                                                    Num
-                                                </span>
+                                        <TableHead className="w-[50px] md:w-[100px] text-center text-sm font-medium p-0 md:p-4 relative">
+                                            
+                                            {/* [체크박스] */}
+                                            {isDeleting && (
+                                                <div className={cn(
+                                                    // 모바일: Flex로 중앙 정렬 (숫자 대체)
+                                                    "flex justify-center items-center",
+                                                    // 데스크탑: Absolute로 왼쪽에 띄움 (숫자 밀림 방지)
+                                                    "md:absolute md:top-1/2 md:left-4 md:-translate-y-1/2"
+                                                )}>
+                                                    <Checkbox className="invisible" /> 
+                                                    {/* 헤더 체크박스는 모양만 잡거나 invisible 처리 */}
+                                                </div>
+                                            )}
 
-                                                {/* [모바일용] 삭제 모드일 때 Num 글씨 대신 보이는 투명 체크박스 (공간확보) */}
-                                                {isDeleting && <Checkbox className="invisible md:hidden" />}
-                                            </div>
+                                            {/* [Num 텍스트] */}
+                                            <span className={cn(
+                                                // 모바일: 삭제 중이면 숨김
+                                                isDeleting ? "hidden" : "inline",
+                                                // 데스크탑: 삭제 중이어도 무조건 보임 (밀리지 않음)
+                                                "md:inline"
+                                            )}>
+                                                Num
+                                            </span>
                                         </TableHead>
                                     )}
 
@@ -112,30 +123,36 @@ export const CommonBoard = ({
                                         >
                                             {/* 1. Num 데이터 Cell */}
                                             {showIndex && (
-                                                <TableCell className="text-center w-[50px] md:w-[100px] p-0 md:p-4">
-                                                    <div className="flex items-center justify-center gap-3">
-                                                        {/* 체크박스: 삭제 모드일 때 무조건 보임 */}
-                                                        {isDeleting && (
-                                                            <div onClick={(e) => e.stopPropagation()}>
-                                                                <Checkbox
-                                                                    checked={selectedPosts.includes(item.id)}
-                                                                    onCheckedChange={() => onCheckboxChange(item.id)}
-                                                                />
-                                                            </div>
-                                                        )}
+                                                <TableCell className="text-center w-[50px] md:w-[100px] p-0 md:p-4 relative">
+                                                    
+                                                    {/* [체크박스] */}
+                                                    {isDeleting && (
+                                                        <div 
+                                                            className={cn(
+                                                                // 모바일: 중앙 정렬 (숫자 대체)
+                                                                "flex justify-center items-center h-full",
+                                                                // 데스크탑: 왼쪽에 둥둥 띄움 (숫자 위치 영향 X)
+                                                                "md:absolute md:top-1/2 md:left-4 md:-translate-y-1/2"
+                                                            )}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            <Checkbox
+                                                                checked={selectedPosts.includes(item.id)}
+                                                                onCheckedChange={() => onCheckboxChange(item.id)}
+                                                            />
+                                                        </div>
+                                                    )}
 
-                                                        {/* 번호: 
-                                                            - 기본: 보임 (block)
-                                                            - 삭제 모드 & 모바일: 숨김 (hidden)
-                                                            - 삭제 모드 & 데스크탑: 보임 (md:block) 
-                                                        */}
-                                                        <span className={cn(
-                                                            "text-sm text-gray-500",
-                                                            isDeleting ? "hidden md:block" : "block"
-                                                        )}>
-                                                            {displayIndex}
-                                                        </span>
-                                                    </div>
+                                                    {/* [숫자] */}
+                                                    <span className={cn(
+                                                        "text-sm text-gray-500",
+                                                        // 모바일: 삭제 중이면 숨김
+                                                        isDeleting ? "hidden" : "block",
+                                                        // 데스크탑: 무조건 보임 (제자리 유지)
+                                                        "md:block"
+                                                    )}>
+                                                        {displayIndex}
+                                                    </span>
                                                 </TableCell>
                                             )}
 
