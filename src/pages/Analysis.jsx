@@ -39,7 +39,7 @@ export function Analysis() {
   const [mobileTab, setMobileTab] = useState('scan');
   const titleUpdateRef = useRef(null);
 
-  // AI update listener
+
   useEffect(() => {
     const handleAiUpdate = () => {
       setHistoryRefreshKey(prev => prev + 1);
@@ -49,7 +49,7 @@ export function Analysis() {
     return () => window.removeEventListener("analysis-updated", handleAiUpdate);
   }, []);
 
-  // Header reset listener
+
   useEffect(() => {
     const resetHandler = () => {
       setAnalysisResult(null);
@@ -62,9 +62,6 @@ export function Analysis() {
   }, []);
 
 
-  /* ---------------------------------------------
-     결과 패널의 Reset 버튼 → 초기 스캔 화면으로
-  --------------------------------------------- */
   const handleReset = () => {
     setAnalysisResult(null);
     setSelectedHistory(null);
@@ -72,9 +69,6 @@ export function Analysis() {
   };
 
 
-  /* ---------------------------------------------
-     QR 분석 완료 처리
-  --------------------------------------------- */
   const handleAnalysisResult = useCallback((result, error) => {
     if (error) {
       setAlertDialogState({
@@ -96,9 +90,6 @@ export function Analysis() {
   }, []);
 
 
-  /* ---------------------------------------------
-     라우터 state 전달 처리
-  --------------------------------------------- */
   useEffect(() => {
     const stateResult = location.state?.analysisResult;
     const stateError = location.state?.analysisError;
@@ -116,9 +107,6 @@ export function Analysis() {
   }, [location.state, navigate, handleAnalysisResult, analysisResult]);
 
 
-  /* ---------------------------------------------
-     새 QR 분석 시작
-  --------------------------------------------- */
   const handleAnalysisStart = (file, url) => {
     navigate('/analyzing-qr', {
       state: { fileToAnalyze: file, extractedUrl: url }
@@ -130,9 +118,6 @@ export function Analysis() {
   };
 
 
-  /* ---------------------------------------------
-     History 선택 처리
-  --------------------------------------------- */
   const handleHistorySelect = async (analysisId) => {
     setAnalysisResult(null);
     setSelectedHistory(null);
@@ -155,9 +140,6 @@ export function Analysis() {
   };
 
 
-  /* ---------------------------------------------
-     제목 수정 반영
-  --------------------------------------------- */
   const handleTitleUpdated = (id, newTitle) => {
     if (selectedHistory && selectedHistory.analysisId === id) {
       setSelectedHistory(prev => ({ ...prev, analysisTitle: newTitle }));
@@ -218,7 +200,6 @@ export function Analysis() {
         key={location.search}
         className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4"
       >
-        {/* 데스크탑 레이아웃 */}
         <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
           <ResizablePanelGroup direction="horizontal">
 
@@ -230,7 +211,17 @@ export function Analysis() {
               </div>
             </ResizablePanel>
 
-            <ResizableHandle />
+            {/* 🔥 핸들 수정: 색 고정 + 길이 조정 */}
+            <ResizableHandle
+              className="
+                w-[0.5px] bg-transparent rounded-none relative cursor-col-resize
+                after:content-[''] after:absolute
+                after:top-[24px] after:bottom-[24px]
+                after:left-[calc(50%-1px)] after:-translate-x-1/2 after:w-[1px]
+                after:bg-[#E5E5E5] after:rounded-full
+                hover:bg-transparent hover:after:bg-[#E5E5E5]
+              "
+            />
 
             <ResizablePanel minSize={30}>
               <div className="flex flex-col h-full pl-4">
@@ -246,9 +237,8 @@ export function Analysis() {
         </div>
 
 
-        {/* 모바일 레이아웃 */}
+        {/* 모바일 */}
         <div className="w-full mt-4 lg:hidden">
-
           <div className="flex items-center justify-center mb-3">
             <div className="inline-flex p-1 bg-gray-100 border border-gray-200 rounded-full shadow-sm">
               <button
@@ -275,14 +265,10 @@ export function Analysis() {
             </div>
           </div>
 
-
           <div className="relative overflow-hidden border rounded-lg">
             <div
               className="flex w-[200%] transition-transform duration-300 ease-out"
-              style={{
-                transform:
-                  mobileTab === 'scan' ? 'translateX(0)' : 'translateX(-50%)'
-              }}
+              style={{ transform: mobileTab === 'scan' ? 'translateX(0)' : 'translateX(-50%)' }}
             >
               <div className="w-full">
                 <Card className="min-h-[520px] p-4 sm:p-6">
