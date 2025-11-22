@@ -100,16 +100,14 @@ export function MyPost() {
     setShowDetail(true);
   };
 
-  // ✅ 삭제 완료 핸들러 (수정됨)
+  // ✅ 삭제 완료 핸들러 (수정됨: 모달 닫기 코드 제거)
   const handleDeleteComplete = () => {
-    // 1. 모달 상태를 닫음 (스크롤 잠금 해제 및 오버레이 제거)
-    setShowDetail(false);
-    setSelectedBoardId(null);
-
-    // 2. 화면 리스트에서 즉시 제거 (Optimistic Update)
+    // 1. 화면 리스트에서 즉시 제거 (Optimistic Update)
+    // 여기서 모달을 강제로 닫지 않아도, PostDetailModal 내부에서 삭제 후 닫기를 실행합니다.
+    // 그래야 스크롤 잠금이 정상적으로 풀립니다.
     setMyPosts((prev) => prev.filter((post) => post.id !== selectedBoardId));
 
-    // 3. 서버 데이터 확실한 동기화를 위해 약간 뒤에 재요청
+    // 2. 서버 데이터 확실한 동기화를 위해 약간 뒤에 재요청
     setTimeout(() => {
       fetchPosts(currentPage);
     }, 100);

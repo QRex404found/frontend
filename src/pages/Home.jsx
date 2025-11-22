@@ -1,6 +1,6 @@
 // src/pages/Home.jsx
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 
 import videoBg from '@/assets/background.mp4';
@@ -42,41 +42,29 @@ export function Home() {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
-  // 🧲 홈 화면에서만 확대/축소 완전 차단 + 나가면 복구
-  useEffect(() => {
-    const meta = document.querySelector('meta[name=viewport]');
-    if (meta) {
-      meta.setAttribute(
-        "content",
-        "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-      );
-    }
-    return () => {
-      if (meta) {
-        meta.setAttribute("content", "width=device-width, initial-scale=1.0");
-      }
-    };
-  }, []);
-
   const scrollToInfo = () => {
     infoSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleStart = () => {
-    if (!isLoggedIn) navigate("/login");
-    else navigate("/analysis");
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else {
+      navigate("/analysis");
+    }
   };
 
   return (
     <div className="w-full">
 
-      {/* HERO SECTION */}
+      {/* ====================================================== */}
+      {/* 1) HERO SECTION */}
+      {/* ====================================================== */}
       <div
         className="
           relative w-[calc(100%+2rem)] md:w-[calc(100%+4rem)]
           -ml-4 -mr-4 -mt-4 md:-ml-8 md:-mr-8 md:-mt-8
-          h-[100dvh] md:h-[calc(100vh-80px)]
-          overflow-hidden
+          h-[calc(100vh-80px)] overflow-hidden
         "
       >
         <video
@@ -89,7 +77,7 @@ export function Home() {
         />
 
         {/* Scroll Arrow */}
-        <div className="absolute bottom-20 md:bottom-10 left-1/2 -translate-x-1/2 z-10">
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -116,7 +104,10 @@ export function Home() {
       </div>
 
 
-      {/* ABOUT SECTION */}
+
+      {/* ====================================================== */}
+      {/* 2) ABOUT HEADER */}
+      {/* ====================================================== */}
       <div ref={infoSectionRef} className="bg-white text-slate-900 py-28 px-6">
         <div className="max-w-6xl mx-auto">
 
@@ -125,7 +116,7 @@ export function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
             viewport={{ once: true }}
-            className="text-center mb-20"
+            className="text-center mb-14"
           >
             <h2 className="text-5xl font-medium tracking-tight mb-6">
               QR 보안을 <span className="text-lime-600">더 스마트하게.</span>
@@ -137,78 +128,73 @@ export function Home() {
             </p>
           </motion.div>
 
-          {/* WHAT IS QREX */}
-          <div className="flex flex-col md:flex-row justify-between items-center md:items-stretch gap-20 mb-20">
 
-            {/* LEFT: Text (이 녀석이 높이의 기준이 됩니다) */}
+
+          {/* ====================================================== */}
+          {/* 3) WHAT IS QREX */}
+          {/* ====================================================== */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-20 mb-16 items-center">
+
+            {/* LEFT: Text */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
-              className="flex-1 md:pl-4 flex flex-col justify-center"
             >
               <h3 className="text-3xl font-medium mb-6">QRex란?</h3>
               <p className="text-slate-600 text-lg leading-relaxed mb-10">
-                QRex는 URL 구조 분석, 도메인 신뢰도 판단, AI 기반 위험 해석을 결합해<br />
-                QR 링크의 안전성을 종합적으로 평가하는 지능형 보안 플랫폼입니다.<br /><br />
-
-                URL 위험 요소 탐지뿐 아니라,<br />
-                사용자 경험 기반 보안 인사이트 공유, 분석 기록의 지속 관리를 지원하여<br />
-                일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.
+                QRex는 도메인 신뢰도, URL 특성 분석,<br />
+                AI 기반 위험 해석을 결합해<br />
+                QR 링크의 안전성을 종합적으로 평가하는 보안 플랫폼입니다.
+                <br /><br />
+                또한 커뮤니티와 분석 기록 기능으로
+                지속적이고 확장 가능한 보안 경험을 제공합니다.
               </p>
 
-              <div>
-                <button
-                  onClick={handleStart}
-                  className="px-8 py-4 bg-lime-500 text-lg text-white rounded-xl font-medium hover:bg-lime-600 transition"
-                >
-                  Explore QRex
-                </button>
-              </div>
+              <button
+                onClick={handleStart}
+                className="px-8 py-4 bg-lime-500 text-white rounded-xl font-medium hover:bg-lime-600 transition"
+              >
+                Explore QRex
+              </button>
             </motion.div>
 
-            {/* RIGHT IMAGE BOX */}
+            {/* RIGHT IMAGE BOX — 옵션 A */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
               viewport={{ once: true }}
               className="
-      flex-1
-      bg-white border border-slate-200 rounded-3xl
-      mx-auto md:mx-0
-      overflow-hidden
-      
-      /* 모바일: 고정 크기 */
-      w-[260px] h-[260px] 
-      
-      /* 데스크탑 핵심 설정 */
-      md:w-auto md:h-auto      /* 높이 자동 (부모 stretch 따름) */
-      relative                 /* 내부 이미지 배치를 위한 기준점 */
-    "
+                bg-white border border-slate-200 rounded-3xl 
+                flex items-center justify-center
+                w-[320px] h-[320px]
+                mx-auto
+                overflow-hidden
+              "
             >
               <img
                 src={holdingQR}
                 alt="QRex Illustration"
-                className="
-        w-full h-full object-contain mix-blend-multiply p-6
-        
-        /* 데스크탑 핵심 설정: 이미지를 공중에 띄워서 박스 높이에 강제로 맞춤 */
-        md:absolute md:inset-0 
-      "
+                className="w-full h-full object-contain mix-blend-multiply"
               />
             </motion.div>
-
           </div>
 
 
-          {/* CTA SECTION */}
-          <div className="relative bg-slate-50 border border-slate-200 rounded-3xl px-14 pt-14 pb-8 my-24 overflow-hidden">
+          {/* ====================================================== */}
+          {/* 4) CTA SECTION */}
+          {/* ====================================================== */}
+          <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-14 my-24 overflow-hidden">
 
-            {/* 배경 애니메이션 (원본 유지) */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.12]">
-              <motion.svg width="100%" height="100%" viewBox="0 0 800 200">
+              <motion.svg
+                width="100%"
+                height="100%"
+                viewBox="0 0 800 200"
+                preserveAspectRatio="none"
+              >
                 <motion.path
                   d="M0 120 C 150 20, 300 180, 450 60 C 600 -20, 750 150, 800 80"
                   stroke="#7CCF00"
@@ -217,18 +203,19 @@ export function Home() {
                   fill="none"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.8, ease: "easeInOut" }}
+                  transition={{
+                    duration: 1.8,
+                    ease: "easeInOut",
+                  }}
                 />
               </motion.svg>
             </div>
 
-            {/* 제목: mb-8 -> mb-14로 변경 (컨테이너 패딩 p-14와 간격 맞춤) */}
-            <h3 className="text-3xl font-medium text-center mb-14 relative z-10">
+            <h3 className="text-3xl font-medium text-center mb-8 relative z-10">
               QRex는 당신의 안전한 QR 사용을 돕습니다
             </h3>
 
-            {/* 그리드 박스: mb-4 제거 (하단은 이미 부모의 p-14가 담당함) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-4 relative z-10">
 
               <div className="text-center p-6">
                 <QrCode size={44} className="text-lime-600 mx-auto mb-4" />
@@ -242,7 +229,7 @@ export function Home() {
                 <Users size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">보안 경험 공유</h4>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  QR 관련 정보와 사례를 함께 나눌 수 있습니다.<br />의견을 공유하세요!
+                  QR 관련 정보와 사례를 함께 나눌 수 있습니다.
                 </p>
               </div>
 
@@ -256,8 +243,15 @@ export function Home() {
 
             </div>
           </div>
-          {/* FEATURE 3-COLUMN */}
+
+
+
+
+          {/* ====================================================== */}
+          {/* 5) FEATURE 3-COLUMN */}
+          {/* ====================================================== */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+
 
             {/* =============================== */}
             {/* Analysis */}
@@ -287,16 +281,17 @@ export function Home() {
                 보안 위협 여부를 판단합니다.
               </p>
 
-              {/* 리스트 - 완전 복원 */}
               <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <ShieldCheck className="w-5 h-5 text-lime-600/80" />
                   <span className="text-slate-700 text-sm font-medium">URL 위험도 분석</span>
                 </div>
+
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Globe className="w-5 h-5 text-lime-600/80" />
                   <span className="text-slate-700 text-sm font-medium">도메인 신뢰도 검증</span>
                 </div>
+
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <AlertTriangle className="w-5 h-5 text-lime-600/80" />
                   <span className="text-slate-700 text-sm font-medium">URL 리스크 설명 제공</span>
@@ -340,10 +335,12 @@ export function Home() {
                   <MessageSquare className="w-5 h-5 text-lime-600/80" />
                   <span className="text-slate-700 text-sm font-medium">사용자 사례 공유</span>
                 </div>
+
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Lightbulb className="w-5 h-5 text-lime-600/80" />
                   <span className="text-slate-700 text-sm font-medium">보안 인사이트 교류</span>
                 </div>
+
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Flag className="w-5 h-5 text-lime-600/80" />
                   <span className="text-slate-700 text-sm font-medium">신고 & 위험 URL 제보</span>
@@ -382,7 +379,6 @@ export function Home() {
                 언제든 빠르게 다시 확인할 수 있습니다.
               </p>
 
-              {/* 🔹 리스트 - 완전 복원 */}
               <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-lime-50/70 border border-lime-200/40 hover:bg-lime-100/80 transition-all">
                   <Save className="w-5 h-5 text-lime-600/80" />
@@ -399,13 +395,14 @@ export function Home() {
                   <span className="text-slate-700 text-sm font-medium">상세 분석 보기</span>
                 </div>
               </div>
-
             </motion.div>
+
+
+
 
           </div>
         </div>
       </div>
-
     </div>
   );
 }
