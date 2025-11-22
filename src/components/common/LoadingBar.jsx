@@ -15,7 +15,7 @@ export function LoadingBar({ file, extractedUrl }) {
 
   const [progress, setProgress] = React.useState(0);
   const [stage, setStage] = React.useState(LOADING_STAGES.FAKING);
-  const [statusMessage, setStatusMessage] = React.useState('분석 진행 중입니다...잠시만 기다려주세요.');
+  const [statusMessage, setStatusMessage] = React.useState('잠시만 기다려주세요.');
 
   const intervalRef = React.useRef(null);
   const apiCalledRef = React.useRef(false);

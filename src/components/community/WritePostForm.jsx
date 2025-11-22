@@ -24,6 +24,8 @@ const WritePostForm = ({ onPostSuccess }) => {
             reader.onloadend = () => setPreviewUrl(reader.result);
             reader.readAsDataURL(file);
         }
+        // [수정] 모바일/PC에서 동일 파일 재선택 및 이벤트 트리거 보장을 위해 초기화
+        e.target.value = ''; 
     };
 
     const handleCancelPreview = (e) => {
@@ -31,7 +33,8 @@ const WritePostForm = ({ onPostSuccess }) => {
         e.stopPropagation();
         setPhotoFile(null);
         setPreviewUrl(null);
-        document.getElementById('photo-upload').value = '';
+        const input = document.getElementById('photo-upload');
+        if (input) input.value = '';
     };
 
     const resetForm = () => {
@@ -40,7 +43,8 @@ const WritePostForm = ({ onPostSuccess }) => {
         setContext('');
         setPhotoFile(null);
         setPreviewUrl(null);
-        document.getElementById('photo-upload').value = '';
+        const input = document.getElementById('photo-upload');
+        if (input) input.value = '';
     };
 
     const handleSubmit = async (e) => {
@@ -73,13 +77,14 @@ const WritePostForm = ({ onPostSuccess }) => {
         <div className="w-full h-full flex flex-col">
 
             {/* PHOTO 영역 */}
-            <div className="flex flex-col items-center justify-center flex-none">
+            {/* [수정] relative 추가하여 내부의 absolute input이 영역 밖으로 튀지 않게 함 */}
+            <div className="flex flex-col items-center justify-center flex-none relative">
                 <label
                     htmlFor="photo-upload"
                     className="
                         relative flex flex-col items-center justify-center
                         w-48 h-44 border-2 border-dashed rounded-md cursor-pointer
-                        hover:bg-gray-50 transition
+                        hover:bg-gray-50 transition z-10
                     "
                 >
                     {previewUrl ? (
@@ -104,12 +109,16 @@ const WritePostForm = ({ onPostSuccess }) => {
                     )}
                 </label>
 
+                {/* [수정] hidden 클래스 제거 
+                    대신 absolute, opacity-0, w-0, h-0을 사용하여 
+                    '보이지 않지만 존재하는' 상태로 만듦 (모바일 버그 해결 핵심)
+                */}
                 <input
                     id="photo-upload"
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="hidden"
+                    className="absolute opacity-0 w-0 h-0 overflow-hidden"
                 />
 
                 {previewUrl && photoFile && (
@@ -134,7 +143,7 @@ const WritePostForm = ({ onPostSuccess }) => {
                     className="text-sm"
                 />
 
-                {/*  스크롤 가능 Textarea (높이 고정 + 내용 많으면 스크롤) */}
+                {/* 스크롤 가능 Textarea (높이 고정 + 내용 많으면 스크롤) */}
                 <Textarea
                     placeholder="Context"
                     value={context}

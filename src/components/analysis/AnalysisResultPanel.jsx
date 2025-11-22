@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { updateAnalysisTitleApi } from '@/api/analysis';
-import { CheckCircle, XCircle, AlertTriangle, Loader2, RotateCcw } from 'lucide-react';
+import { ShieldCheck, ShieldBan, ShieldAlert, Loader2, ScanQrCode} from 'lucide-react';
 import { toast } from "sonner";
 
 export default function AnalysisResultPanel({ result, onTitleUpdated, onReset }) {
@@ -53,13 +53,13 @@ export default function AnalysisResultPanel({ result, onTitleUpdated, onReset })
     const getStatusProps = (riskLevel) => {
         switch (riskLevel) {
             case 'SAFE':
-                return { color: 'text-green-600', bg: 'bg-green-50', icon: CheckCircle, label: '안전' };
+                return { color: 'text-green-600', bg: 'bg-green-50', icon: ShieldCheck, label: '안전' };
             case 'WARNING':
-                return { color: 'text-yellow-600', bg: 'bg-yellow-50', icon: AlertTriangle, label: '주의' };
+                return { color: 'text-yellow-600', bg: 'bg-yellow-50', icon: ShieldAlert, label: '주의' };
             case 'DANGER':
-                return { color: 'text-red-600', bg: 'bg-red-50', icon: XCircle, label: '위험' };
+                return { color: 'text-red-600', bg: 'bg-red-50', icon: ShieldBan, label: '위험' };
             default:
-                return { color: 'text-yellow-600', bg: 'bg-yellow-50', icon: AlertTriangle, label: '주의' };
+                return { color: 'text-yellow-600', bg: 'bg-yellow-50', icon: ShieldAlert, label: '주의' };
         }
     };
 
@@ -91,7 +91,7 @@ export default function AnalysisResultPanel({ result, onTitleUpdated, onReset })
                     "
                     title="New Analysis"
                 >
-                    <RotateCcw className="w-5 h-5" />
+                    <ScanQrCode className="w-5 h-5" />
                 </button>
             </div>
 

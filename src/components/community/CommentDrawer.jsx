@@ -94,7 +94,7 @@ export const CommentDrawer = ({
       <DrawerContent className={`h-[70vh] flex flex-col rounded-t-xl ${className}`}>
         
         <DrawerHeader className="flex-none">
-          <DrawerTitle>COMMENT</DrawerTitle>
+          <DrawerTitle className="font-light">COMMENT</DrawerTitle>
           <DrawerDescription className="sr-only">
             Comments section for the post
           </DrawerDescription>
@@ -114,7 +114,7 @@ export const CommentDrawer = ({
                   comment?.writerId ??
                   comment?.writer?.id;
 
-                const authorName = comment?.userName ?? authorId; // ⭐ 이름 우선 표시
+                const authorName = comment?.userName ?? authorId; 
 
                 const currentUserId = user?.id ?? user?.userId;
 
@@ -129,8 +129,8 @@ export const CommentDrawer = ({
                     
                     <div className="relative flex-1 w-0"> 
                         <div className="pr-8">
-                          <p className="text-sm font-semibold text-[#81BF59] mb-0.5">
-                            {authorName} {/* ⭐ 수정 완료 */}
+                          <p className="text-sm font-medium text-[#81BF59] mb-0.5">
+                            {authorName} 
                           </p>
 
                           <p 
