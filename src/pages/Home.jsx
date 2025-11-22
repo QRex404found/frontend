@@ -235,7 +235,7 @@ export function Home() {
                 <Users size={44} className="text-lime-600 mx-auto mb-4" />
                 <h4 className="text-xl font-medium mb-2">보안 경험 공유</h4>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  QR 관련 정보와 사례를 함께 나눌 수 있습니다.
+                  QR 관련 정보와 사례를 함께 나눌 수 있습니다.<br/>의견을 공유하세요!
                 </p>
               </div>
 
