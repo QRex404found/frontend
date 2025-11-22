@@ -217,7 +217,7 @@ export function Analysis() {
                 w-[0.5px] bg-transparent rounded-none relative cursor-col-resize
                 after:content-[''] after:absolute
                 after:top-[24px] after:bottom-[24px]
-                after:left-[calc(50%-1px)] after:-translate-x-1/2 after:w-[1px]
+                after:left-[0px] after:w-[1px]
                 after:bg-[#E5E5E5] after:rounded-full
                 hover:bg-transparent hover:after:bg-[#E5E5E5]
               "
