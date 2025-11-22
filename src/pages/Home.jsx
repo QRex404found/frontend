@@ -64,7 +64,7 @@ export function Home() {
         className="
           relative w-[calc(100%+2rem)] md:w-[calc(100%+4rem)]
           -ml-4 -mr-4 -mt-4 md:-ml-8 md:-mr-8 md:-mt-8
-          h-[calc(100vh-80px)] overflow-hidden
+          h-[100dvh] md:h-[calc(100vh-80px)] overflow-hidden
         "
       >
         <video
