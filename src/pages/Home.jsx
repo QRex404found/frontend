@@ -197,6 +197,7 @@ export function Home() {
                     {/* CTA SECTION */}
                     <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-14 my-24 overflow-hidden">
 
+                        {/* 배경 애니메이션 (원본 유지) */}
                         <div className="absolute inset-0 pointer-events-none opacity-[0.12]">
                             <motion.svg width="100%" height="100%" viewBox="0 0 800 200">
                                 <motion.path
@@ -212,11 +213,13 @@ export function Home() {
                             </motion.svg>
                         </div>
 
-                        <h3 className="text-3xl font-medium text-center mb-8 relative z-10">
+                        {/* 제목: mb-8 -> mb-14로 변경 (컨테이너 패딩 p-14와 간격 맞춤) */}
+                        <h3 className="text-3xl font-medium text-center mb-14 relative z-10">
                             QRex는 당신의 안전한 QR 사용을 돕습니다
                         </h3>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-4 relative z-10">
+                        {/* 그리드 박스: mb-4 제거 (하단은 이미 부모의 p-14가 담당함) */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
 
                             <div className="text-center p-6">
                                 <QrCode size={44} className="text-lime-600 mx-auto mb-4" />
