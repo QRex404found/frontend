@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { lockScroll, unlockScroll } from '@/utils/scrollLock';
+// lockScroll 임포트 제거됨
 import {
   Drawer,
   DrawerContent,
@@ -43,11 +43,7 @@ export const CommentDrawer = ({
     }
   }, [isOpen, initialComments]);
 
-  useEffect(() => {
-    if (isOpen) lockScroll();
-    else unlockScroll();
-    return () => unlockScroll();
-  }, [isOpen]);
+  // ❌ lockScroll 관련 useEffect 삭제됨 (여기가 문제의 원인)
 
   const handleSubmitComment = async (e) => {
     e.preventDefault();
@@ -105,11 +101,9 @@ export const CommentDrawer = ({
       open={isOpen}
       onOpenChange={onOpenChange}
       direction="bottom"
-      // ✅ [핵심 1] 라이브러리가 강제로 위치를 조정하지 못하게 막습니다. (iOS 붕 뜸 해결)
-      repositionInputs={false}
-      // disablePreventScroll // 이건 지우거나 주석 처리 유지
+      repositionInputs={false} // ✅ 필수 유지
     >
-      {/* ✅ [핵심 2] h-[70dvh] -> h-[70vh] 변경 (키보드 올라올 때 Drawer 높이 찌그러짐 방지) */}
+      {/* ✅ h-[70vh] 사용 (dvh 아님) */}
       <DrawerContent className={`h-[70vh] flex flex-col rounded-t-xl ${className}`}>
         
         <DrawerHeader className="flex-none">
@@ -134,9 +128,7 @@ export const CommentDrawer = ({
                   comment?.writer?.id;
 
                 const authorName = comment?.userName ?? authorId; 
-
                 const currentUserId = user?.id ?? user?.userId;
-
                 const isMyComment =
                   authorId != null &&
                   currentUserId != null &&
@@ -151,7 +143,6 @@ export const CommentDrawer = ({
                           <p className="text-sm font-medium text-[#81BF59] mb-0.5">
                             {authorName} 
                           </p>
-
                           <p 
                             className="text-sm text-gray-700 whitespace-pre-wrap break-all w-full [overflow-wrap:anywhere]"
                             style={{ wordBreak: 'break-all' }}
@@ -159,7 +150,6 @@ export const CommentDrawer = ({
                             {comment.contents}
                           </p>
                         </div>
-
                         <div className="absolute top-0 right-0">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -194,7 +184,6 @@ export const CommentDrawer = ({
           </div>
         </ScrollArea>
 
-        {/* 하단 safe-area 처리는 그대로 둡니다. */}
         <form
           onSubmit={handleSubmitComment}
           className="flex-none flex items-end gap-2 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t bg-white"
