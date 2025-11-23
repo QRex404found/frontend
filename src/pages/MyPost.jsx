@@ -100,14 +100,20 @@ export function MyPost() {
     setShowDetail(true);
   };
 
-  // ✅ 삭제 완료 핸들러 (수정됨: 스크롤 잠금 강제 해제 추가)
+  //  삭제 완료 핸들러
   const handleDeleteComplete = () => {
     // 1. 모달 닫기 (State 초기화)
     setShowDetail(false);
     setSelectedBoardId(null);
 
-    // 2. [핵심] 스크롤 잠금 강제 해제 (화면 먹통 해결)
+    // 2. 스크롤 잠금 강제 해제 (화면 먹통 해결)
     document.body.style.overflow = 'unset';
+
+    //  아래 코드를 추가하세요! (화면 클릭 먹통 해결) 
+    document.body.style.pointerEvents = 'auto';
+
+    // (혹시 모르니 Radix UI 등이 남기는 스타일 속성 제거)
+    document.body.style.removeProperty('pointer-events');
 
     // 3. 화면 리스트에서 즉시 제거 (Optimistic Update)
     setMyPosts((prev) => prev.filter((post) => post.id !== selectedBoardId));
