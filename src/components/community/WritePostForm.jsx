@@ -106,7 +106,6 @@ const WritePostForm = ({ onPostSuccess }) => {
                             />
                             <button
                                 onClick={handleCancelPreview}
-                                // 수정됨: z-20 클래스 추가 (투명 input보다 위로 올림)
                                 className="absolute top-1 right-1 p-0.5 bg-gray-900 bg-opacity-50 text-white rounded-full hover:bg-opacity-75 z-20"
                             >
                                 <X size={14} />
@@ -144,14 +143,14 @@ const WritePostForm = ({ onPostSuccess }) => {
                     placeholder="Title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="text-sm"
+                    className="text-base md:text-sm"
                 />
 
                 <Input
                     placeholder="URL (선택)"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
-                    className="text-sm"
+                    className="text-base md:text-sm"
                 />
 
                 <Textarea
@@ -163,7 +162,7 @@ const WritePostForm = ({ onPostSuccess }) => {
                         min-h-[200px]
                         max-h-[200px]
                         overflow-y-auto
-                        text-sm
+                        text-base md:text-sm
                     "
                 />
             </div>
