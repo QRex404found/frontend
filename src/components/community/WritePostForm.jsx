@@ -7,7 +7,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { CameraIcon, X } from 'lucide-react';
 import { toast } from "sonner";
 import { createPostApi } from '@/api/community';
-// ✅ [추가됨] HEIC 변환을 위한 라이브러리 import
 import heic2any from 'heic2any'; 
 
 const WritePostForm = ({ onPostSuccess }) => {
@@ -18,20 +17,18 @@ const WritePostForm = ({ onPostSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [previewUrl, setPreviewUrl] = useState(null);
 
-    // ✅ [수정됨] async 키워드 추가 및 HEIC 변환 로직 적용
     const handleFileChange = async (e) => {
         let file = e.target.files && e.target.files[0];
 
         if (!file) return;
 
-        // 1. HEIC 파일인지 확인 (MIME 타입 또는 확장자 확인)
+        // 1. HEIC 파일인지 확인
         const isHeic = 
             file.type === "image/heic" || 
             file.type === "image/heif" || 
             file.name.toLowerCase().endsWith('.heic');
 
         if (isHeic) {
-            // 변환 중임을 알리는 토스트 (선택 사항)
             const convertingToast = toast.loading("이미지 포맷 변환 중...");
 
             try {
@@ -39,13 +36,12 @@ const WritePostForm = ({ onPostSuccess }) => {
                 const convertedBlob = await heic2any({
                     blob: file,
                     toType: "image/jpeg",
-                    quality: 0.8, // 화질 설정 (0 ~ 1)
+                    quality: 0.8,
                 });
 
-                // heic2any가 배열을 반환하는 경우 대비 (단일 이미지 처리)
                 const finalBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
 
-                // 3. 변환된 Blob을 다시 File 객체로 생성 (확장자 .jpg로 변경)
+                // 3. 변환된 Blob을 다시 File 객체로 생성
                 file = new File(
                     [finalBlob], 
                     file.name.replace(/\.(heic|heif)$/i, ".jpg"), 
@@ -63,7 +59,7 @@ const WritePostForm = ({ onPostSuccess }) => {
             }
         }
 
-        // 4. (변환된 혹은 원래의) 파일을 state에 저장
+        // 4. 파일을 state에 저장
         setPhotoFile(file);
 
         const reader = new FileReader();
@@ -72,7 +68,6 @@ const WritePostForm = ({ onPostSuccess }) => {
         };
         reader.readAsDataURL(file);
 
-        // 동일 파일 다시 선택해도 onChange가 다시 호출되도록 초기화
         e.target.value = '';
     };
 
@@ -163,7 +158,6 @@ const WritePostForm = ({ onPostSuccess }) => {
                         </>
                     )}
 
-                    {/* input을 label 안으로 넣고, 전체를 투명하게 덮게 함 */}
                     <input
                         id="photo-upload"
                         type="file"
@@ -186,26 +180,29 @@ const WritePostForm = ({ onPostSuccess }) => {
                     placeholder="Title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="text-base md:text-sm"
+                    // ✅ [수정됨] 모바일에서 text-[16px] 적용하여 아이폰 확대 방지
+                    className="text-[16px] md:text-sm"
                 />
 
                 <Input
                     placeholder="URL (선택)"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
-                    className="text-base md:text-sm"
+                    // ✅ [수정됨] 모바일에서 text-[16px] 적용하여 아이폰 확대 방지
+                    className="text-[16px] md:text-sm"
                 />
 
                 <Textarea
                     placeholder="Context"
                     value={context}
                     onChange={(e) => setContext(e.target.value)}
+                    // ✅ [수정됨] 모바일에서 text-[16px] 적용하여 아이폰 확대 방지
                     className="
                         resize-none 
                         min-h-[200px]
                         max-h-[200px]
                         overflow-y-auto
-                        text-base md:text-sm
+                        text-[16px] md:text-sm
                     "
                 />
             </div>
