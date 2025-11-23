@@ -87,14 +87,29 @@ export function PostDetailModal({
     currentUserId != null &&
     String(authorId) === String(currentUserId);
 
-  // 신고
+  // ✅ [수정됨] 신고 핸들러
+  // 신고 누적으로 게시글이 삭제되었을 때(401, 403, 404) 모달을 닫고 목록을 갱신합니다.
   const handleReportPost = async () => {
     if (!postDetail) return;
     try {
       await reportPostApi(postDetail.boardId);
       toast.success("게시글이 신고되었습니다.");
-    } catch {
-      toast.error("신고 중 오류가 발생했습니다.");
+    } catch (error) {
+      const status = error.response?.status;
+      
+      // 🚨 핵심 수정: 이미 삭제된 게시글(401, 403, 404)일 경우 처리
+      if (status === 401 || status === 403 || status === 404) {
+        toast.info("신고 누적으로 인해 게시글이 삭제되었습니다.");
+        
+        // 1. 목록 갱신 (부모에게 알림)
+        if (onDeleteSuccess) onDeleteSuccess();
+        
+        // 2. 모달 닫기
+        onOpenChange(false);
+      } else {
+        // 그 외 진짜 에러
+        toast.error("신고 중 오류가 발생했습니다.");
+      }
     }
   };
 
