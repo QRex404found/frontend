@@ -4,15 +4,15 @@ import useAuth from "@/hooks/useAuth";
 import { updateProfileApi } from "@/api/auth";
 import { toast } from "sonner";
 
-export default function EditProfileTab({ onClose }) {
+// [수정] { onClose } 제거 (쓰지 않는 변수라 에러 발생)
+export default function EditProfileTab() { 
   const { user, setUser } = useAuth();
 
   const [name, setName] = useState(user?.username ?? "");
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
 
-  // ⭐️ [추가] Global user 상태가 업데이트되면(저장 성공 후), 
-  // 현재 탭의 input 값도 확실하게 최신값으로 유지하도록 동기화
+  // Global user 상태가 업데이트되면 현재 탭의 input 값도 동기화
   useEffect(() => {
     if (user?.username) {
       setName(user.username);
@@ -42,28 +42,25 @@ export default function EditProfileTab({ onClose }) {
       const newToken = res?.data?.token || res?.token;
 
       if (newToken) {
-        // 1. 토큰 저장
         localStorage.setItem("accessToken", newToken);
 
         try {
+          // 토큰 디코딩 (atob는 브라우저 환경에서 정상 작동)
           const payload = JSON.parse(atob(newToken.split(".")[1]));
 
-          // ⭐️ [수정] 토큰 내용보다 '현재 입력한 name'을 우선시하여 업데이트
           setUser({
-            ...user,             // 기존 프로필 이미지나 이메일 등 유지
-            userId: payload.sub, // ID는 토큰에서 가져옴
-            username: name,      // <-- payload.username 대신 입력한 'name' 사용 (즉시 반영 핵심)
+            ...user,            
+            userId: payload.sub, 
+            username: name,      
           });
           
           toast.success("회원정보가 수정되었습니다.");
         } catch (e) {
           console.error("토큰 디코딩 실패:", e);
-          // 토큰 디코딩 실패 시에도 UI 업데이트 시도
           setUser({ ...user, username: name });
           toast.success("수정 완료 (새로고침 권장)");
         }
       } else {
-        // 토큰이 갱신되지 않는 API 응답일 경우에도 UI는 업데이트
         setUser({ ...user, username: name });
         toast.success("회원정보가 수정되었습니다.");
       }
@@ -72,7 +69,7 @@ export default function EditProfileTab({ onClose }) {
       setVerifyPassword("");
 
     } catch (error) {
-      console.error("Profile Update Error:", error);
+      console.error("Profile Update Update Error:", error);
       toast.error("회원정보 수정에 실패했습니다.");
     }
   };
