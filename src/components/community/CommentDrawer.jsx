@@ -67,9 +67,6 @@ export const CommentDrawer = ({
   const handleReportComment = async (commentId) => {
     try {
       const response = await reportCommentApi(commentId);
-      
-      // 👇 콘솔을 확인해보세요. 서버가 뭘 주는지 눈으로 봐야 확실합니다.
-      console.log("DEBUG: 신고 API 응답 원본:", response);
 
       // 1. 데이터 껍질 벗기기 (Axios 객체면 .data, 아니면 그대로)
       const realData = response?.data || response;
@@ -77,7 +74,6 @@ export const CommentDrawer = ({
       // 2. 메시지 꺼내기 (JSON 객체면 .message, 문자열이면 그대로)
       const message = realData?.message || realData;
 
-      console.log("DEBUG: 추출된 메시지:", message);
 
       // 3. 메시지를 문자열로 변환해서 "삭제"가 있는지 검사
       if (String(message).includes("삭제")) {

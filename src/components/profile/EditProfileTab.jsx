@@ -1,16 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
 import { updateProfileApi } from "@/api/auth";
 import { toast } from "sonner";
 
 export default function EditProfileTab({ onClose }) {
-  // 1. setUser를 가져옵니다 (이름 변경 시 즉시 반영하기 위해)
   const { user, setUser } = useAuth();
 
   const [name, setName] = useState(user?.username ?? "");
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
+
+  // ⭐️ [추가] Global user 상태가 업데이트되면(저장 성공 후), 
+  // 현재 탭의 input 값도 확실하게 최신값으로 유지하도록 동기화
+  useEffect(() => {
+    if (user?.username) {
+      setName(user.username);
+    }
+  }, [user?.username]);
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -24,45 +31,40 @@ export default function EditProfileTab({ onClose }) {
     }
 
     try {
-      // 서버에서 새 JWT 토큰을 반환함
       const res = await updateProfileApi({
         newName: name,
         newPassword: password || null,
         verifyPassword: verifyPassword || null,
       });
 
-      console.log("Update Profile Response:", res); // 디버깅용 로그
+      console.log("Update Profile Response:", res);
 
-      // ⭐️ [핵심 수정] 오류 해결 부분
-      // API 클라이언트(Axios 등) 설정에 따라
-      // 1. res.data에 실제 데이터가 있거나 (res.data.token)
-      // 2. res 자체가 데이터인 경우 (res.token)
-      // 두 경우를 모두 안전하게 체크합니다.
       const newToken = res?.data?.token || res?.token;
 
       if (newToken) {
-        // 토큰 저장
+        // 1. 토큰 저장
         localStorage.setItem("accessToken", newToken);
 
-        // 새 토큰에서 username 추출 및 에러 방지 처리
         try {
-            const payload = JSON.parse(atob(newToken.split(".")[1]));
+          const payload = JSON.parse(atob(newToken.split(".")[1]));
 
-            // username 변경을 즉시 UI 반영
-            setUser({
-              userId: payload.sub,
-              username: payload.username,
-            });
-            
-            toast.success("회원정보가 수정되었습니다.");
+          // ⭐️ [수정] 토큰 내용보다 '현재 입력한 name'을 우선시하여 업데이트
+          setUser({
+            ...user,             // 기존 프로필 이미지나 이메일 등 유지
+            userId: payload.sub, // ID는 토큰에서 가져옴
+            username: name,      // <-- payload.username 대신 입력한 'name' 사용 (즉시 반영 핵심)
+          });
+          
+          toast.success("회원정보가 수정되었습니다.");
         } catch (e) {
-            console.error("토큰 디코딩 실패:", e);
-            toast.success("수정 완료. 변경 확인을 위해 새로고침해주세요.");
+          console.error("토큰 디코딩 실패:", e);
+          // 토큰 디코딩 실패 시에도 UI 업데이트 시도
+          setUser({ ...user, username: name });
+          toast.success("수정 완료 (새로고침 권장)");
         }
       } else {
-        // 토큰이 없는 경우 (하지만 에러는 안 난 경우)
-        console.warn("Token not found in response");
-        // 백엔드에서 200 OK를 줬다면 수정은 성공한 것이므로 성공 처리
+        // 토큰이 갱신되지 않는 API 응답일 경우에도 UI는 업데이트
+        setUser({ ...user, username: name });
         toast.success("회원정보가 수정되었습니다.");
       }
 
