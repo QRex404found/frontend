@@ -63,33 +63,24 @@ export const CommentDrawer = ({
     }
   };
 
-  // ✅ [여기가 핵심입니다] 어떤 형태로 데이터가 와도 다 처리하는 만능 로직
   const handleReportComment = async (commentId) => {
     try {
       const response = await reportCommentApi(commentId);
-
-      // 1. 데이터 껍질 벗기기 (Axios 객체면 .data, 아니면 그대로)
       const realData = response?.data || response;
-      
-      // 2. 메시지 꺼내기 (JSON 객체면 .message, 문자열이면 그대로)
       const message = realData?.message || realData;
 
-
-      // 3. 메시지를 문자열로 변환해서 "삭제"가 있는지 검사
       if (String(message).includes("삭제")) {
         toast.info("신고 누적으로 댓글이 삭제되었습니다.");
       } else {
         toast.success("댓글이 신고되었습니다.");
       }
 
-      // 4. 목록 갱신 (삭제된 거 안 보이게)
       if (onCommentUpdate) onCommentUpdate();
 
     } catch (error) {
       console.log("DEBUG: 신고 에러 발생", error);
       const status = error.response?.status;
 
-      // 이미 삭제된 댓글을 또 신고했을 때 (404, 403, 401)
       if (status === 404 || status === 403 || status === 401) {
         toast.info("신고 누적으로 댓글이 삭제되었습니다.");
         if (onCommentUpdate) onCommentUpdate(); 
@@ -114,10 +105,12 @@ export const CommentDrawer = ({
       open={isOpen}
       onOpenChange={onOpenChange}
       direction="bottom"
-      //disablePreventScroll
+      // ✅ [핵심 1] 라이브러리가 강제로 위치를 조정하지 못하게 막습니다. (iOS 붕 뜸 해결)
+      repositionInputs={false}
+      // disablePreventScroll // 이건 지우거나 주석 처리 유지
     >
-      {/*  h-[70vh] -> h-[70dvh] (iOS 키보드 이슈 해결) */}
-      <DrawerContent className={`h-[70dvh] flex flex-col rounded-t-xl ${className}`}>
+      {/* ✅ [핵심 2] h-[70dvh] -> h-[70vh] 변경 (키보드 올라올 때 Drawer 높이 찌그러짐 방지) */}
+      <DrawerContent className={`h-[70vh] flex flex-col rounded-t-xl ${className}`}>
         
         <DrawerHeader className="flex-none">
           <DrawerTitle className="font-light">COMMENT</DrawerTitle>
@@ -201,7 +194,7 @@ export const CommentDrawer = ({
           </div>
         </ScrollArea>
 
-        {/* 수정됨: pb-[calc(1rem+env(safe-area-inset-bottom))] 추가 (iOS 하단바 대응) */}
+        {/* 하단 safe-area 처리는 그대로 둡니다. */}
         <form
           onSubmit={handleSubmitComment}
           className="flex-none flex items-end gap-2 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t bg-white"
