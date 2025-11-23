@@ -156,6 +156,8 @@ export function Home() {
                                 URL 위험 요소 탐지뿐 아니라,<br />
                                 사용자 경험 기반 보안 인사이트 공유, 분석 기록의 지속 관리를 지원하여<br />
                                 일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.
+
+                                <br/><br/>더 안전한 일상을 위한 첫 걸음, QRex와 함께하세요!
                             </p>
 
                             <button
@@ -233,7 +235,7 @@ export function Home() {
                                 <Users size={44} className="text-lime-600 mx-auto mb-4" />
                                 <h4 className="text-xl font-medium mb-2">보안 경험 공유</h4>
                                 <p className="text-slate-500 text-sm leading-relaxed">
-                                    QR 관련 정보와 사례를 함께 나눌 수 있습니다.
+                                    QR 관련 정보와 사례를 함께 나눌 수 있습니다.<br/>다른 사용자들과 의견을 공유해보세요!
                                 </p>
                             </div>
 
