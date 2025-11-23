@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-// lockScroll 임포트 제거됨
+// lockScroll 임포트 제거됨 (잘하셨습니다)
 import {
   Drawer,
   DrawerContent,
@@ -35,6 +35,10 @@ export const CommentDrawer = ({
 }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  
+  // 1️⃣ [Plan B 추가] 화면 높이를 저장할 상태 변수 (기본값 70vh)
+  const [drawerHeight, setDrawerHeight] = useState('70vh');
+
   const { user } = useAuth();
 
   useEffect(() => {
@@ -43,7 +47,33 @@ export const CommentDrawer = ({
     }
   }, [isOpen, initialComments]);
 
-  // ❌ lockScroll 관련 useEffect 삭제됨 (여기가 문제의 원인)
+  // 2️⃣ [Plan B 추가] iOS VisualViewport 리스너 (키보드 대응용)
+  useEffect(() => {
+    // VisualViewport API 지원 여부 확인 (최신 브라우저는 대부분 지원)
+    if (!window.visualViewport) return;
+
+    const handleResize = () => {
+      // 현재 눈에 보이는 실제 화면 높이 (키보드 제외한 공간)
+      const currentVisualHeight = window.visualViewport.height;
+      
+      // 키보드가 올라오든 말든, "현재 보이는 공간"의 70%를 Drawer 높이로 강제 설정
+      // 계산된 픽셀(px) 값으로 변환하여 주입
+      setDrawerHeight(`${currentVisualHeight * 0.7}px`);
+    };
+
+    // 이벤트 등록 (리사이즈 및 스크롤 시 재계산)
+    window.visualViewport.addEventListener('resize', handleResize);
+    window.visualViewport.addEventListener('scroll', handleResize);
+
+    // 초기 실행
+    handleResize();
+
+    return () => {
+      window.visualViewport.removeEventListener('resize', handleResize);
+      window.visualViewport.removeEventListener('scroll', handleResize);
+    };
+  }, []); // 빈 배열: 마운트 될 때 한 번만 실행 (이벤트 리스너 등록)
+
 
   const handleSubmitComment = async (e) => {
     e.preventDefault();
@@ -101,10 +131,14 @@ export const CommentDrawer = ({
       open={isOpen}
       onOpenChange={onOpenChange}
       direction="bottom"
-      repositionInputs={false} // ✅ 필수 유지
+      repositionInputs={false} // ✅ 유지 (라이브러리 자동 이동 방지)
     >
-      {/* ✅ h-[70vh] 사용 (dvh 아님) */}
-      <DrawerContent className={`h-[70vh] flex flex-col rounded-t-xl ${className}`}>
+      {/* 3️⃣ [Plan B 수정] style 속성에 계산된 높이(drawerHeight) 직접 주입 */}
+      {/* className에서 h-[70vh]를 빼도 되지만, 안전을 위해 남겨두고 style이 덮어쓰게 합니다 */}
+      <DrawerContent 
+        className={`flex flex-col rounded-t-xl ${className}`}
+        style={{ height: drawerHeight, maxHeight: '85vh' }}
+      >
         
         <DrawerHeader className="flex-none">
           <DrawerTitle className="font-light">COMMENT</DrawerTitle>
