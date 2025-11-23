@@ -101,7 +101,7 @@ export function SignUp() {
                 value={form.name}
                 onChange={handleChange}
                 required
-                placeholder="hong-gil-dong"
+                placeholder="활동 시 사용자에게 노출됩니다."
               />
             </div>
 
@@ -115,7 +115,7 @@ export function SignUp() {
                   value={form.id}
                   onChange={handleChange}
                   required
-                  placeholder="ID는 댓글 작성시"
+                  placeholder="ID"
                 />
                 <Button
                   type="button"

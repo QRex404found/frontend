@@ -79,7 +79,7 @@ export default function AnalysisResultPanel({ result, onTitleUpdated, onReset })
     return (
         <div className="w-full h-full flex flex-col space-y-6">
             <div className="flex items-center justify-between border-b pb-2 mb-4">
-                <h2 className="!text-3xl font-light">QR Analysis Result</h2>
+                <h2 className="text-xl md:text-3xl font-light">QR Analysis Result</h2>
 
                 <button
                     onClick={onReset}
