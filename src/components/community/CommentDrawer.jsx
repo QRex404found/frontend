@@ -114,7 +114,7 @@ export const CommentDrawer = ({
       open={isOpen}
       onOpenChange={onOpenChange}
       direction="bottom"
-      disablePreventScroll
+      //disablePreventScroll
     >
       {/* 수정됨: h-[70vh] -> h-[70dvh] (iOS 키보드 이슈 해결) */}
       <DrawerContent className={`h-[70dvh] flex flex-col rounded-t-xl ${className}`}>
