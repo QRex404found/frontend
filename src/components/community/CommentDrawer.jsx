@@ -116,7 +116,8 @@ export const CommentDrawer = ({
       direction="bottom"
       disablePreventScroll
     >
-      <DrawerContent className={`h-[70vh] flex flex-col rounded-t-xl ${className}`}>
+      {/* 수정됨: h-[70vh] -> h-[70dvh] (iOS 키보드 이슈 해결) */}
+      <DrawerContent className={`h-[70dvh] flex flex-col rounded-t-xl ${className}`}>
         
         <DrawerHeader className="flex-none">
           <DrawerTitle className="font-light">COMMENT</DrawerTitle>
@@ -200,9 +201,10 @@ export const CommentDrawer = ({
           </div>
         </ScrollArea>
 
+        {/* 수정됨: pb-[calc(1rem+env(safe-area-inset-bottom))] 추가 (iOS 하단바 대응) */}
         <form
           onSubmit={handleSubmitComment}
-          className="flex-none flex items-end gap-2 p-4 border-t bg-white"
+          className="flex-none flex items-end gap-2 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t bg-white"
         >
           <Textarea
             placeholder="Add a comment..."

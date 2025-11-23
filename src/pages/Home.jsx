@@ -11,7 +11,7 @@ export default function EditProfileTab({ onClose }) {
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
 
-  // ⭐️ [추가] Global user 상태가 업데이트되면(저장 성공 후), 
+  //  [추가] Global user 상태가 업데이트되면(저장 성공 후), 
   // 현재 탭의 input 값도 확실하게 최신값으로 유지하도록 동기화
   useEffect(() => {
     if (user?.username) {
