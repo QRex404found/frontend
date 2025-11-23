@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { CameraIcon, X } from 'lucide-react';
 import { toast } from "sonner";
 import { createPostApi } from '@/api/community';
+// ✅ [추가됨] HEIC 변환을 위한 라이브러리 import
+import heic2any from 'heic2any'; 
 
 const WritePostForm = ({ onPostSuccess }) => {
     const [title, setTitle] = useState('');
@@ -16,18 +18,59 @@ const WritePostForm = ({ onPostSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [previewUrl, setPreviewUrl] = useState(null);
 
-    const handleFileChange = (e) => {
-        const file = e.target.files && e.target.files[0];
+    // ✅ [수정됨] async 키워드 추가 및 HEIC 변환 로직 적용
+    const handleFileChange = async (e) => {
+        let file = e.target.files && e.target.files[0];
 
-        if (file) {
-            setPhotoFile(file);
+        if (!file) return;
 
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewUrl(reader.result);
-            };
-            reader.readAsDataURL(file);
+        // 1. HEIC 파일인지 확인 (MIME 타입 또는 확장자 확인)
+        const isHeic = 
+            file.type === "image/heic" || 
+            file.type === "image/heif" || 
+            file.name.toLowerCase().endsWith('.heic');
+
+        if (isHeic) {
+            // 변환 중임을 알리는 토스트 (선택 사항)
+            const convertingToast = toast.loading("이미지 포맷 변환 중...");
+
+            try {
+                // 2. heic2any를 사용하여 JPG로 변환
+                const convertedBlob = await heic2any({
+                    blob: file,
+                    toType: "image/jpeg",
+                    quality: 0.8, // 화질 설정 (0 ~ 1)
+                });
+
+                // heic2any가 배열을 반환하는 경우 대비 (단일 이미지 처리)
+                const finalBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+
+                // 3. 변환된 Blob을 다시 File 객체로 생성 (확장자 .jpg로 변경)
+                file = new File(
+                    [finalBlob], 
+                    file.name.replace(/\.(heic|heif)$/i, ".jpg"), 
+                    { type: "image/jpeg", lastModified: new Date().getTime() }
+                );
+
+                toast.dismiss(convertingToast);
+                toast.success("이미지 변환 완료!");
+
+            } catch (error) {
+                console.error("HEIC 변환 실패:", error);
+                toast.dismiss(convertingToast);
+                toast.error("이미지 변환에 실패했습니다. 다른 이미지를 사용해주세요.");
+                return;
+            }
         }
+
+        // 4. (변환된 혹은 원래의) 파일을 state에 저장
+        setPhotoFile(file);
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setPreviewUrl(reader.result);
+        };
+        reader.readAsDataURL(file);
 
         // 동일 파일 다시 선택해도 onChange가 다시 호출되도록 초기화
         e.target.value = '';
