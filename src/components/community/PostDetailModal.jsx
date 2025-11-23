@@ -203,7 +203,7 @@ export function PostDetailModal({
           )}
 
           {/* BODY */}
-          {/* ✅ [수정됨] 로딩 중이어도 데이터가 있으면 내용을 보여줍니다 (배경 유지) */}
+          {/* [수정됨] 로딩 중이어도 데이터가 있으면 내용을 보여줍니다 (배경 유지) */}
           {(isLoading && !postDetail) ? (
             <div className="flex items-center justify-center flex-1 min-h-0">
               <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
