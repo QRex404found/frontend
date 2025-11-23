@@ -2,7 +2,6 @@ import axios from 'axios';
 
 // 🚀 API 기본 URL
 const API_BASE_URL = 'https://api.qrex.kro.kr/api';
-// const API_BASE_URL = 'https://192.168.0.15:8080/api';
 
 // ✅ Axios 인스턴스 생성
 const apiClient = axios.create({
@@ -16,12 +15,9 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('jwtToken');
-
-    // 토큰이 있으면 자동으로 Authorization 헤더 추가
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
   },
   (error) => Promise.reject(error)
@@ -32,18 +28,21 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
+    const requestUrl = error?.config?.url; // 👈 요청한 URL 확인
 
-    // 🚨 [수정됨] 403(권한없음)은 제외하고, 401(토큰만료)일 때만 로그아웃 이벤트 발생
-    // 이렇게 해야 게시글 삭제 등으로 인한 403 에러 시 로그아웃되지 않습니다.
-    if (status === 401) {
+    // 🚨 중요: 로그인 요청('/auth/login')이 "아닐 때만" 401 체크
+    // 로그인 할 때 비번 틀린 건 그냥 SignIn.jsx의 catch 문으로 넘겨야 함
+    const isLoginRequest = requestUrl && requestUrl.includes('/auth/login');
+
+    if (status === 401 && !isLoginRequest) {
       console.warn('⚠️ 인증 오류: 토큰이 없거나 만료됨');
 
-      // 🔹 여기서는 "이벤트만" 쏜다. (다른 의존성 전혀 없음)
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('qrex-token-expired'));
       }
     }
 
+    // 403, 404, 그리고 로그인 실패(401) 등은 컴포넌트로 에러를 넘김
     return Promise.reject(error);
   }
 );
