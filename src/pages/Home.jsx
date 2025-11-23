@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import videoBg from '@/assets/background.mp4';
 
 // 이미지 import
-import holdingQR from '@/assets/holding_QR.jpg';
+import holdingQR from '@/assets/holding_QR.png';
 import analysisImg from '@/assets/Analysis.jpg';
 import heartImg from '@/assets/Heart.png';
 import mypostImg from '@/assets/mypost.png';
