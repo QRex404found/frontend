@@ -1,6 +1,7 @@
-// src/contexts/AuthContext.jsx (이 코드로 덮어쓰세요)
-
+// src/contexts/AuthContext.jsx
 import React, { createContext, useState, useEffect, useCallback } from 'react';
+// 👇 경로가 맞는지 꼭 확인하세요! (components 폴더 위치)
+import { AuthPopup } from '@/components/common/AuthPopup'; 
 
 // 1. JWT 토큰을 해독(decode)하는 헬퍼 함수
 const parseJwt = (token) => {
@@ -33,12 +34,8 @@ const getInitialUser = () => {
     return { id: null, username: null };
   }
 
-  // 0일 수도 있는 ID를 확인. (?? = nullish coalescing 연산자)
-  // decoded.sub도 없고, decoded.id도 없으면 null이 됨.
-  // 만약 다른 키(예: userId)라면 decoded.userId ?? null 처럼 수정ㄱ.
   const userId = decoded.sub ?? decoded.id;
 
-  // userId가 0일 경우를 대비해 null/undefined만 체크.
   if (userId == null) { 
     localStorage.removeItem('jwtToken');
     return { id: null, username: null };
@@ -47,11 +44,11 @@ const getInitialUser = () => {
   return { id: userId, username: decoded.username || null };
 };
 
-// 3. Context 생성 (기본값)
+// 3. Context 생성
 export const AuthContext = createContext({
   isLoggedIn: false,
-  user: { id: null, username: null }, // user.id 사용
-  login: (token, userInfo) => {}, // userInfo 인자 받도록 수정
+  user: { id: null, username: null },
+  login: (token, userInfo) => {},
   logout: () => {},
   setUser: (userInfo) => {},
   isChecked: false,
@@ -60,38 +57,48 @@ export const AuthContext = createContext({
 export const AuthProvider = ({ children }) => {
   const initialUser = getInitialUser();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(!!initialUser.id || initialUser.id === 0); // 0도 true로
+  const [isLoggedIn, setIsLoggedIn] = useState(!!initialUser.id || initialUser.id === 0);
   const [user, setUser] = useState(initialUser);
   const [isChecked, setIsChecked] = useState(false);
+  
+  // ✅ 팝업 상태 관리 추가 (좀비 팝업 해결의 핵심)
+  const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
 
   useEffect(() => {
     setIsChecked(true);
-  }, []);
+
+    // ✅ 이벤트 리스너 등록: api/index.js에서 보낸 신호를 받음
+    const handleTokenExpired = () => {
+      logout(); // 로그아웃 처리
+      setIsAuthPopupOpen(true); // 팝업 열기
+    };
+
+    window.addEventListener('qrex-token-expired', handleTokenExpired);
+
+    return () => {
+      window.removeEventListener('qrex-token-expired', handleTokenExpired);
+    };
+  }, []); // 의존성 배열 비움 (마운트 시 1회 실행)
 
   const login = useCallback((token, userInfo) => {
     localStorage.setItem('jwtToken', token);
     setIsLoggedIn(true);
+    // ✅ 로그인 성공 시 팝업이 떠있다면 닫기 (로그인 시 팝업 뜨는 오류 방지)
+    setIsAuthPopupOpen(false);
 
     if (userInfo) {
-      // (Case 1) 일반 로그인
       setUser(userInfo);
     } else {
-      // (Case 2) 소셜 로그인
       const decoded = parseJwt(token);
-      
-      // 브라우저 콘솔에서 이 로그를 확인하세요!
       console.log('AuthContext: 해독된 토큰 페이로드:', decoded); 
 
-      // 0일 수도 있는 ID를 확인.
-      // 만약 다른 키(예: userId)라면 decoded.userId ?? null 처럼 수정.
       const userId = decoded?.sub ?? decoded?.id;
       
-      // 0을 false로 취급하지 않도록 검사 방식을 변경.
-      if (userId != null) { // (userId !== null && userId !== undefined)와 동일
+      if (userId != null) {
         console.log('AuthContext: 사용자 ID 설정:', userId);
         setUser({ id: userId, username: decoded.username || null });
       } else {
-        console.error('AuthContext: 토큰에서 사용자 ID("sub" 또는 "id")를 찾을 수 없습니다.');
+        console.error('AuthContext: 토큰에서 사용자 ID를 찾을 수 없습니다.');
       }
     }
   }, []); 
@@ -116,7 +123,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>
+      {children}
+      
+      {/* ✅ 여기서 AuthPopup을 중앙 제어합니다 */}
+      {/* onClose가 있어야 좀비 팝업이 되지 않고 닫힙니다 */}
+      <AuthPopup 
+        show={isAuthPopupOpen} 
+        isMandatory={true} 
+        onClose={() => setIsAuthPopupOpen(false)} 
+      />
+    </AuthContext.Provider>
   );
 };
 

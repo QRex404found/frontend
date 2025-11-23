@@ -14,7 +14,7 @@ import { OAuthCallback } from './pages/OAuthCallback.jsx';
 import QrexChatWidget from '@/components/chat/QrexChatWidget.jsx';
 import { Toaster } from "sonner";
 
-import { AuthPopup } from '@/components/common/AuthPopup';
+//import { AuthPopup } from '@/components/common/AuthPopup';
 import useAuth from '@/hooks/useAuth';
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
   useEffect(() => {
     const handler = () => {
       // 1) 강제 팝업
-      setForceAuthPopup(true);
+      // setForceAuthPopup(true);
 
       // 2) 로그인 상태 해제
       logout?.();
@@ -46,10 +46,10 @@ function App() {
     <div className="flex flex-col min-h-screen">
       <Header />
 
-      {/* 🔥 강제 로그인 팝업 */}
+      {/* 🔥 강제 로그인 팝업
       {forceAuthPopup && (
         <AuthPopup show={true} isMandatory={true} />
-      )}
+      )} */}
 
       <main className="flex-grow p-4 md:p-8">
         <Routes>
