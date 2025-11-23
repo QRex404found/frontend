@@ -1,5 +1,3 @@
-// src/components/community/CommentDrawer.jsx
-
 import React, { useState, useEffect } from 'react';
 import { lockScroll, unlockScroll } from '@/utils/scrollLock';
 import {
@@ -65,30 +63,39 @@ export const CommentDrawer = ({
     }
   };
 
-  // ✅ [수정됨] 댓글 신고 핸들러
+  // ✅ [최종 수정] 댓글 신고 핸들러
+  // 백엔드가 JSON ({ "message": "..." }) 형태로 보내주므로 이를 확실하게 처리합니다.
   const handleReportComment = async (commentId) => {
     try {
-      await reportCommentApi(commentId);
+      const response = await reportCommentApi(commentId);
       
-      // 1. 신고 성공 메시지
-      toast.success("댓글이 신고되었습니다.");
+      // 1. 백엔드에서 보낸 JSON 데이터 확인
+      // 이제는 response.data가 무조건 { message: "..." } 형태의 객체입니다.
+      const responseData = response?.data;
+      const message = responseData?.message || "";
 
-      // 2. 중요: 신고 후 댓글 상태가 변했을 수 있으므로(삭제 등) 목록을 반드시 갱신합니다.
-      // 이렇게 해야 50번째 신고 직후 화면에서 댓글이 사라집니다.
+      // 2. 메시지에 "삭제"가 포함되어 있으면 삭제 알림을 띄웁니다.
+      if (message && message.includes("삭제")) {
+        toast.info("신고 누적으로 댓글이 삭제되었습니다.");
+      } else {
+        toast.success("댓글이 신고되었습니다.");
+      }
+
+      // 3. 목록 갱신 (삭제된 댓글은 화면에서 사라짐)
       if (onCommentUpdate) onCommentUpdate();
 
     } catch (error) {
       const status = error.response?.status;
 
-      // 3. 만약 신고 시도 중 404(찾을 수 없음)나 403/401(권한 없음)이 뜨면
-      // 이는 신고 누적으로 이미 삭제된 댓글로 간주합니다.
+      // 4. 이미 삭제된 댓글을 신고해서 에러(404, 403, 401)가 난 경우
       if (status === 404 || status === 403 || status === 401) {
         toast.info("신고 누적으로 댓글이 삭제되었습니다.");
         
-        // 목록을 갱신하여 삭제된 댓글을 화면에서 치워버립니다.
+        // 목록 갱신해서 치워버리기
         if (onCommentUpdate) onCommentUpdate(); 
       } else {
         // 그 외 진짜 에러
+        console.error("신고 에러:", error);
         toast.error("댓글 신고에 실패했습니다.");
       }
     }

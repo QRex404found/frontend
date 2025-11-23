@@ -1,5 +1,3 @@
-// src/components/community/PostDetailModal.jsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { lockScroll, unlockScroll } from '@/utils/scrollLock';
@@ -37,20 +35,31 @@ export function PostDetailModal({
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
   const [refetchCounter, setRefetchCounter] = useState(0);
 
-  // 데이터 로딩중
+  // 데이터 로딩
   useEffect(() => {
     if (isOpen && boardId) {
-      setIsLoading(true);
+      // ✅ [수정됨] 깜빡임 방지 핵심 로직
+      // 이미 화면에 데이터(postDetail)가 있다면 로딩 스피너를 띄우지 않습니다.
+      // 이렇게 하면 댓글 갱신 시 뒷배경이 유지됩니다.
+      if (!postDetail) {
+        setIsLoading(true);
+      }
+
       getPostDetailApi(boardId)
         .then(setPostDetail)
         .catch(() => setError('게시글을 불러오는 데 실패했습니다.'))
-        .finally(() => setIsLoading(false));
+        .finally(() => {
+          // 데이터가 없을 때만 로딩을 켰으므로, 끌 때도 조건부로 끕니다.
+          if (!postDetail) setIsLoading(false);
+        });
     } else {
+      // 모달이 닫힐 때는 초기화
       setPostDetail(null);
       setError(null);
       setIsCommentDrawerOpen(false);
       setTitleOpen(false);
       setRefetchCounter(0);
+      setIsLoading(false);
     }
   }, [isOpen, boardId, refetchCounter]);
 
@@ -73,7 +82,7 @@ export function PostDetailModal({
     return () => window.removeEventListener('resize', checkTruncation);
   }, [postDetail?.title, isOpen, titleOpen]);
 
-  // ✅ 작성자 판별 로직 (안전)
+  // 작성자 판별 로직
   const authorId =
     postDetail?.userId ??
     postDetail?.user?.id ??
@@ -87,8 +96,7 @@ export function PostDetailModal({
     currentUserId != null &&
     String(authorId) === String(currentUserId);
 
-  // ✅ [수정됨] 신고 핸들러
-  // 신고 누적으로 게시글이 삭제되었을 때(401, 403, 404) 모달을 닫고 목록을 갱신합니다.
+  // 신고 핸들러 (기존 로직 유지)
   const handleReportPost = async () => {
     if (!postDetail) return;
     try {
@@ -97,37 +105,25 @@ export function PostDetailModal({
     } catch (error) {
       const status = error.response?.status;
       
-      // 🚨 핵심 수정: 이미 삭제된 게시글(401, 403, 404)일 경우 처리
       if (status === 401 || status === 403 || status === 404) {
         toast.info("신고 누적으로 인해 게시글이 삭제되었습니다.");
-        
-        // 1. 목록 갱신 (부모에게 알림)
         if (onDeleteSuccess) onDeleteSuccess();
-        
-        // 2. 모달 닫기
         onOpenChange(false);
       } else {
-        // 그 외 진짜 에러
         toast.error("신고 중 오류가 발생했습니다.");
       }
     }
   };
 
-  // ✅ 삭제 (자동 새로고침 반영)
+  // 삭제 핸들러 (기존 로직 유지)
   const handleDeletePost = async () => {
     if (!postDetail || isDeleting) return;
 
     setIsDeleting(true);
     try {
       await deletePostApi(postDetail.boardId);
-
-      // ✅ 1) 먼저 부모 상태 push (리스트 갱신)
       if (onDeleteSuccess) onDeleteSuccess();
-
-      // ✅ 2) 알림
       toast.success("게시글이 삭제되었습니다.");
-
-      // ✅ 3) 그 다음 모달 닫기
       onOpenChange(false);
 
     } catch {
@@ -207,7 +203,8 @@ export function PostDetailModal({
           )}
 
           {/* BODY */}
-          {isLoading ? (
+          {/* ✅ [수정됨] 로딩 중이어도 데이터가 있으면 내용을 보여줍니다 (배경 유지) */}
+          {(isLoading && !postDetail) ? (
             <div className="flex items-center justify-center flex-1 min-h-0">
               <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
             </div>
