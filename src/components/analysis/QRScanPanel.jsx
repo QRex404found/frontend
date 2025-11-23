@@ -1,10 +1,9 @@
 import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
-// Dropdown 관련 컴포넌트는 사용하지 않더라도 모바일 로직 등 확장을 위해 유지
 import { Camera } from 'lucide-react';
 import jsQR from 'jsqr';
 
-/* ---------------- QR 이미지에서 URL 추출 ---------------- */
+/* ---------------- QR 이미지에서 URL 추출 (기존 로직 유지) ---------------- */
 const scanFileForQrUrl = async (file) => {
   let imageBitmap;
   try {
@@ -61,7 +60,6 @@ const scanFileForQrUrl = async (file) => {
   throw new Error("이미지에서 QR 코드를 찾을 수 없습니다.");
 };
 
-
 /* ---------------- QRScanPanel ---------------- */
 export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
   const fileInputRef = useRef(null);
@@ -69,7 +67,6 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
     typeof navigator !== "undefined" &&
     /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
-  /* 분석 시작 */
   const startAnalysis = async (file) => {
     if (!file) return;
     try {
@@ -86,7 +83,6 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
     e.target.value = null;
   };
 
-  /* ---------------- 데스크탑 전용: 카메라 버튼 = 파일 탐색기 ---------------- */
   const handleDesktopClick = () => {
     if (!fileInputRef.current) return;
     fileInputRef.current.accept = "image/*"; 
@@ -94,8 +90,6 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
     fileInputRef.current.click();
   };
 
-  /* ---------------- 모바일 전용: 버튼 핸들러 ---------------- */
-  // (현재 UI에서는 모바일 버튼 하나만 사용 중이나 로직 유지)
   const handleSelectFile = () => {
     if (!fileInputRef.current) return;
     fileInputRef.current.accept = "*/*";
@@ -104,8 +98,11 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
   };
 
   return (
-    // [수정] min-h 대신 h-full을 사용하여 부모(Card) 높이를 꽉 채우고 중앙 정렬 유지
-    <div className="flex flex-col items-center justify-center h-full">
+    // [수정됨]
+    // 1. w-full: 가로 공간 확보
+    // 2. flex-1: 부모(Card 등)가 flex 컨테이너일 경우 남은 공간을 모두 차지하도록 함
+    // 3. min-h-[300px]: 모바일에서 부모 높이가 잡히지 않을 경우를 대비해 최소 높이 강제 지정 (필요에 따라 조절)
+    <div className="flex flex-col items-center justify-center w-full h-full flex-1 min-h-[300px]">
       <div className="flex flex-col items-center justify-center p-6 space-y-6">
         <p className="mb-4 text-2xl font-medium text-gray-700">Scan your QR</p>
         <input
@@ -115,7 +112,6 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
           onChange={handleFileSelect}
         />
 
-        {/* 데스크탑: 바로 파일 탐색기 */}
         {!isMobile && (
           <Button
             className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"
@@ -126,7 +122,6 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
           </Button>
         )}
 
-        {/* 모바일: 카메라 아이콘 클릭 시 */}
         {isMobile && (
           <Button
             className="w-24 h-24 rounded-full shadow-xl text-white bg-lime-500 hover:bg-lime-600"
@@ -136,7 +131,6 @@ export function QRScanPanel({ onAnalysisStart, onAnalysisResult }) {
             <Camera className="!w-10 !h-10" />
           </Button>
         )}
-
       </div>
     </div>
   );
