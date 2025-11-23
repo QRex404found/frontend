@@ -115,7 +115,7 @@ export function SignUp() {
                   value={form.id}
                   onChange={handleChange}
                   required
-                  placeholder="댓글에 표시될 이름"
+                  placeholder="ID는 댓글 작성시"
                 />
                 <Button
                   type="button"

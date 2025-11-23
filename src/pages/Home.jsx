@@ -1,419 +1,126 @@
-// src/pages/Home.jsx
-
-import React, { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-
-import videoBg from '@/assets/background.mp4';
-
-// 이미지 import
-import holdingQR from '@/assets/holding_QR.png';
-import analysisImg from '@/assets/Analysis.png';
-import heartImg from '@/assets/Heart.png';
-import mypostImg from '@/assets/mypost.png';
-import {
-  ChevronDown,
-  QrCode,
-  Users,
-  FileText,
-  ShieldCheck,
-  Globe,
-  AlertTriangle,
-  MessageSquare,
-  Lightbulb,
-  Flag,
-  Save,
-  Edit3,
-  Search,
-} from 'lucide-react';
-
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { updateProfileApi } from "@/api/auth";
+import { toast } from "sonner";
 
-export function Home() {
-  const infoSectionRef = useRef(null);
+export default function EditProfileTab({ onClose }) {
+  const { user, setUser } = useAuth();
 
-  const { isLoggedIn } = useAuth();
-  const navigate = useNavigate();
+  const [name, setName] = useState(user?.username ?? "");
+  const [password, setPassword] = useState("");
+  const [verifyPassword, setVerifyPassword] = useState("");
 
-  const scrollToInfo = () => {
-    infoSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleStart = () => {
-    if (!isLoggedIn) {
-      navigate("/login");
-    } else {
-      navigate("/analysis");
-    }
-  };
-
+  // ⭐️ [추가] Global user 상태가 업데이트되면(저장 성공 후), 
+  // 현재 탭의 input 값도 확실하게 최신값으로 유지하도록 동기화
   useEffect(() => {
-    // viewport 메타 태그 찾기
-    const meta = document.querySelector("meta[name='viewport']");
-    const originalContent = meta ? meta.getAttribute("content") : "";
+    if (user?.username) {
+      setName(user.username);
+    }
+  }, [user?.username]);
 
-    if (meta) {
-      // 확대/축소 금지 설정 적용 (user-scalable=no, scale 고정)
-      meta.setAttribute(
-        "content",
-        "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
-      );
+  const handleSave = async () => {
+    if (!name.trim()) {
+      toast.error("이름을 입력해주세요.");
+      return;
     }
 
-    // 이 페이지를 벗어날 때(Cleanup) 원래 설정으로 복구
-    return () => {
-      if (meta) {
-        meta.setAttribute("content", originalContent);
-      }
-    };
-  }, []);
+    if (password && password !== verifyPassword) {
+      toast.error("비밀번호가 일치하지 않습니다.");
+      return;
+    }
 
+    try {
+      const res = await updateProfileApi({
+        newName: name,
+        newPassword: password || null,
+        verifyPassword: verifyPassword || null,
+      });
+
+      console.log("Update Profile Response:", res);
+
+      const newToken = res?.data?.token || res?.token;
+
+      if (newToken) {
+        // 1. 토큰 저장
+        localStorage.setItem("accessToken", newToken);
+
+        try {
+          const payload = JSON.parse(atob(newToken.split(".")[1]));
+
+          // ⭐️ [수정] 토큰 내용보다 '현재 입력한 name'을 우선시하여 업데이트
+          setUser({
+            ...user,             // 기존 프로필 이미지나 이메일 등 유지
+            userId: payload.sub, // ID는 토큰에서 가져옴
+            username: name,      // <-- payload.username 대신 입력한 'name' 사용 (즉시 반영 핵심)
+          });
+          
+          toast.success("회원정보가 수정되었습니다.");
+        } catch (e) {
+          console.error("토큰 디코딩 실패:", e);
+          // 토큰 디코딩 실패 시에도 UI 업데이트 시도
+          setUser({ ...user, username: name });
+          toast.success("수정 완료 (새로고침 권장)");
+        }
+      } else {
+        // 토큰이 갱신되지 않는 API 응답일 경우에도 UI는 업데이트
+        setUser({ ...user, username: name });
+        toast.success("회원정보가 수정되었습니다.");
+      }
+
+      setPassword("");
+      setVerifyPassword("");
+
+    } catch (error) {
+      console.error("Profile Update Error:", error);
+      toast.error("회원정보 수정에 실패했습니다.");
+    }
+  };
+
+  const getPasswordStateClass = () => {
+    if (!password && !verifyPassword) return "";
+    return password === verifyPassword ? "border-green-500" : "border-red-500";
+  };
 
   return (
-    <div className="w-full overflow-x-hidden">
-
-      {/* ====================================================== */}
-      {/* 1) HERO SECTION */}
-      {/* ====================================================== */}
-      <div
-        className="
-          relative w-[calc(100%+2rem)] md:w-[calc(100%+4rem)]
-          -ml-4 -mr-4 -mt-4 md:-ml-8 md:-mr-8 md:-mt-8
-          h-[calc(100vh-80px)] overflow-hidden
-        "
-      >
-        <video
-          src={videoBg}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute top-0 left-0 w-full h-full object-obtain"
+    <div className="p-3 space-y-4 text-sm bg-white border rounded-md">
+      <div className="flex flex-col gap-1">
+        <label className="font-medium">Name</label>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          /* 수정됨: 모바일 확대 방지 (text-base md:text-sm 추가) */
+          className="px-3 py-2 border rounded-md outline-none focus:ring-2 focus:ring-primary text-base md:text-sm"
         />
-
-        {/* Scroll Arrow */}
-        <div className="absolute z-10 -translate-x-1/2 bottom-20 md:bottom-10 left-1/2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={scrollToInfo}
-                  className="p-2 text-white transition opacity-90 hover:opacity-100"
-                >
-                  <ChevronDown
-                    size={42}
-                    strokeWidth={1.5}
-                    className="filter drop-shadow-[0_3px_3px_rgba(0,0,0,0.6)]"
-                  />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent
-                side="top"
-                className="text-white bg-black/80 border-white/10 backdrop-blur-md"
-              >
-                Learn More
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
       </div>
 
-
-
-      {/* ====================================================== */}
-      {/* 2) ABOUT HEADER */}
-      {/* ====================================================== */}
-      <div ref={infoSectionRef} className="px-6 bg-white text-slate-900 py-28">
-        <div className="max-w-6xl mx-auto">
-
-          <motion.div
-            initial={{ opacity: 0, y: 35 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            viewport={{ once: true }}
-            className="text-center mb-14"
-          >
-            <h2 className="mb-6 text-5xl font-medium tracking-tight">
-              QR 보안을 <span className="text-lime-600">더 스마트하게.</span>
-            </h2>
-
-            <p className="max-w-3xl mx-auto text-xl leading-relaxed text-slate-500">
-              QRex는 QR 분석, 위험 탐지, 커뮤니티, 이력 관리까지<br />
-              한 번에 제공하는 지능형 QR 보안 플랫폼입니다.
-            </p>
-          </motion.div>
-
-
-
-          {/* ====================================================== */}
-          {/* 3) WHAT IS QREX */}
-          {/* ====================================================== */}
-          <div className="flex flex-col items-center justify-between gap-20 mb-16 md:flex-row">
-
-            {/* LEFT: Text */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7 }}
-              viewport={{ once: true }}
-              className="flex-1" // 남은 공간을 모두 차지하여 이미지를 오른쪽 끝으로 밈
-            >
-              <h3 className="mb-6 text-3xl font-medium">QRex란?</h3>
-              <p className="mb-10 text-lg leading-relaxed text-slate-600">
-                QRex는 URL 구조 분석, 도메인 신뢰도 판단, AI 기반 위험 해석을 결합해<br />
-                QR 링크의 안전성을 종합적으로 평가하는 지능형 보안 플랫폼입니다.<br /><br />
-
-                URL 위험 요소 탐지뿐 아니라,<br />
-                사용자 경험 기반 보안 인사이트 공유, 분석 기록의 지속 관리를 지원하여<br />
-                일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.
-              </p>
-
-              <button
-                onClick={handleStart}
-                className="px-8 py-4 font-medium text-white transition bg-lime-500 rounded-xl hover:bg-lime-600"
-              >
-                Explore QRex
-              </button>
-            </motion.div>
-
-            {/* RIGHT IMAGE BOX — 옵션 A */}
-{/* RIGHT IMAGE BOX — 옵션 A */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              viewport={{ once: true }}
-              className="
-                shrink-0 
-                bg-white border border-slate-200 rounded-3xl 
-                flex items-center justify-center
-                
-                
-                w-full max-w-[320px]   /* 화면이 좁으면 줄어들고, 넓으면 320px까지 커짐 */
-                aspect-square          /* 가로 사이즈에 맞춰 높이도 1:1 비율 자동 유지 (h-[320px] 제거) */
-                
-
-                mx-auto md:ml-auto
-                overflow-hidden
-              "
-            >
-              <img
-                src={holdingQR}
-                alt="QRex Illustration"
-                className="object-contain w-full h-full mix-blend-multiply"
-              />
-            </motion.div>
-          </div>
-
-
-          {/* CTA SECTION */}
-          {/* p-14를 -> px-14 pt-14 pb-8 로 변경 (아래쪽 여백만 14에서 8로 줄임) */}
-          <div className="relative pb-8 my-24 overflow-hidden border bg-slate-50 border-slate-200 rounded-3xl px-14 pt-14">
-
-            {/* 배경 애니메이션 유지 */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.12]">
-              <motion.svg width="100%" height="100%" viewBox="0 0 800 200">
-                <motion.path
-                  d="M0 120 C 150 20, 300 180, 450 60 C 600 -20, 750 150, 800 80"
-                  stroke="#7CCF00"
-                  strokeWidth="45"
-                  strokeLinecap="round"
-                  fill="none"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.8, ease: "easeInOut" }}
-                />
-              </motion.svg>
-            </div>
-
-            {/* 제목 (유지) */}
-            <h3 className="relative z-10 text-3xl font-medium text-center mb-14">
-              QRex는 당신의 안전한 QR 사용을 돕습니다
-            </h3>
-
-            {/* 그리드 (유지) */}
-            <div className="relative z-10 grid grid-cols-1 gap-10 md:grid-cols-3">
-
-              <div className="p-6 text-center">
-                <QrCode size={44} className="mx-auto mb-4 text-lime-600" />
-                <h4 className="mb-2 text-xl font-medium">정확한 URL 분석</h4>
-                <p className="text-sm leading-relaxed text-slate-500">
-                  URL 구조, IP, 도메인 신뢰도를 기반으로 <br />위험도를 판단합니다.
-                </p>
-              </div>
-
-              <div className="p-6 text-center">
-                <Users size={44} className="mx-auto mb-4 text-lime-600" />
-                <h4 className="mb-2 text-xl font-medium">보안 경험 공유</h4>
-                <p className="text-sm leading-relaxed text-slate-500">
-                  QR 관련 정보와 사례를 함께 나눌 수 있습니다.
-                </p>
-              </div>
-
-              <div className="p-6 text-center">
-                <FileText size={44} className="mx-auto mb-4 text-lime-600" />
-                <h4 className="mb-2 text-xl font-medium">분석 이력 관리</h4>
-                <p className="text-sm leading-relaxed text-slate-500">
-                  스캔한 QR 분석 결과를 한곳에서 <br />쉽게 관리하세요.
-                </p>
-              </div>
-
-            </div>
-          </div>
-
-
-
-
-          {/* ====================================================== */}
-          {/* 5) FEATURE 3-COLUMN */}
-          {/* ====================================================== */}
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
-
-
-            {/* =============================== */}
-            {/* Analysis */}
-            {/* =============================== */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-              viewport={{ once: true }}
-              className="flex flex-col items-center p-10 text-center transition border shadow-sm rounded-3xl hover:shadow-md"
-            >
-              <div className="inline-block w-32 h-32 mb-6 overflow-hidden rounded-xl">
-                <img
-                  src={analysisImg}
-                  alt="Analysis"
-                  className="object-contain w-full h-full mix-blend-multiply"
-                />
-              </div>
-
-              <h4 className="mb-3 text-2xl font-medium">Analysis</h4>
-
-              <p className="flex-grow mb-6 leading-relaxed text-slate-600">
-                URL 위험도·도메인 신뢰도·URL 패턴을 종합 분석해
-                보안 위협 여부를 판단합니다.
-              </p>
-
-              <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
-                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                  <ShieldCheck className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-sm font-medium text-slate-700">URL 위험도 분석</span>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                  <Globe className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-sm font-medium text-slate-700">도메인 신뢰도 검증</span>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                  <AlertTriangle className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-sm font-medium text-slate-700">URL 리스크 설명 제공</span>
-                </div>
-              </div>
-            </motion.div>
-
-
-
-
-            {/* =============================== */}
-            {/* Community */}
-            {/* =============================== */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              viewport={{ once: true }}
-              className="flex flex-col items-center p-10 text-center transition border shadow-sm rounded-3xl hover:shadow-md"
-            >
-              <div className="inline-block w-32 h-32 mb-6 overflow-hidden rounded-xl">
-                <img
-                  src={heartImg}
-                  alt="Community"
-                  className="object-contain w-full h-full mix-blend-multiply"
-                />
-              </div>
-
-              <h4 className="mb-3 text-2xl font-medium">Community</h4>
-
-              <p className="flex-grow mb-6 leading-relaxed text-slate-600">
-                사용자 경험 기반 사례로
-                실질적인 보안 인사이트를 제공합니다.
-              </p>
-
-              <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
-                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                  <MessageSquare className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-sm font-medium text-slate-700">사용자 사례 공유</span>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                  <Lightbulb className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-sm font-medium text-slate-700">보안 인사이트 교류</span>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                  <Flag className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-sm font-medium text-slate-700">신고 & 위험 URL 제보</span>
-                </div>
-              </div>
-            </motion.div>
-
-
-
-
-            {/* =============================== */}
-            {/* MyPost */}
-            {/* =============================== */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="flex flex-col items-center p-10 text-center transition border shadow-sm rounded-3xl hover:shadow-md"
-            >
-              <div className="inline-block w-32 h-32 mb-6 overflow-hidden rounded-xl">
-                <img
-                  src={mypostImg}
-                  alt="MyPost"
-                  className="object-contain w-full h-full mix-blend-multiply"
-                />
-              </div>
-
-              <h4 className="mb-3 text-2xl font-medium">My post</h4>
-
-              <p className="flex-grow mb-6 leading-relaxed text-slate-600">
-                분석한 QR 기록을 저장하고
-                언제든 빠르게 다시 확인할 수 있습니다.
-              </p>
-
-              <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
-                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                  <Save className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-sm font-medium text-slate-700">분석 기록 자동 저장</span>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                  <Edit3 className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-sm font-medium text-slate-700">제목 & 내용 관리</span>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                  <Search className="w-5 h-5 text-lime-600/80" />
-                  <span className="text-sm font-medium text-slate-700">상세 분석 보기</span>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
+      <div className="flex flex-col gap-1">
+        <label className="font-medium">New Password</label>
+        <input
+          type="password"
+          placeholder="변경할 경우에만 입력"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          /* 수정됨: 모바일 확대 방지 (text-base md:text-sm 추가) */
+          className={`border rounded-md px-3 py-2 text-base md:text-sm ${getPasswordStateClass()}`}
+        />
       </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="font-medium">Verify Password</label>
+        <input
+          type="password"
+          placeholder="비밀번호 확인"
+          value={verifyPassword}
+          onChange={(e) => setVerifyPassword(e.target.value)}
+           /* 수정됨: 모바일 확대 방지 (text-base md:text-sm 추가) */
+          className={`border rounded-md px-3 py-2 text-base md:text-sm ${getPasswordStateClass()}`}
+        />
+      </div>
+
+      <Button onClick={handleSave} className="w-full font-medium text-white bg-lime-500 hover:bg-lime-600">
+        Save changes
+      </Button>
     </div>
   );
 }
