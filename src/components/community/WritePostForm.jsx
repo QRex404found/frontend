@@ -180,7 +180,7 @@ const WritePostForm = ({ onPostSuccess }) => {
                     placeholder="Title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    // ✅ [수정됨] 모바일에서 text-[16px] 적용하여 아이폰 확대 방지
+                    //  [수정됨] 모바일에서 text-[16px] 적용하여 아이폰 확대 방지
                     className="text-[16px] md:text-sm"
                 />
 
@@ -188,7 +188,7 @@ const WritePostForm = ({ onPostSuccess }) => {
                     placeholder="URL (선택)"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
-                    // ✅ [수정됨] 모바일에서 text-[16px] 적용하여 아이폰 확대 방지
+                    //모바일에서 text-[16px] 적용하여 아이폰 확대 방지
                     className="text-[16px] md:text-sm"
                 />
 
@@ -196,7 +196,7 @@ const WritePostForm = ({ onPostSuccess }) => {
                     placeholder="Context"
                     value={context}
                     onChange={(e) => setContext(e.target.value)}
-                    // ✅ [수정됨] 모바일에서 text-[16px] 적용하여 아이폰 확대 방지
+                    //모바일에서 text-[16px] 적용하여 아이폰 확대 방지
                     className="
                         resize-none 
                         min-h-[200px]

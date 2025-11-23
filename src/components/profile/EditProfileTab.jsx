@@ -11,7 +11,7 @@ export default function EditProfileTab({ onClose }) {
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
 
-  // ⭐️ [추가] Global user 상태가 업데이트되면(저장 성공 후), 
+  //  Global user 상태가 업데이트되면(저장 성공 후), 
   // 현재 탭의 input 값도 확실하게 최신값으로 유지하도록 동기화
   useEffect(() => {
     if (user?.username) {
@@ -48,9 +48,9 @@ export default function EditProfileTab({ onClose }) {
         try {
           const payload = JSON.parse(atob(newToken.split(".")[1]));
 
-          // ⭐️ [수정] 토큰 내용보다 '현재 입력한 name'을 우선시하여 업데이트
+          // 토큰 내용보다 '현재 입력한 name'을 우선시하여 업데이트
           setUser({
-            ...user,             // 기존 프로필 이미지나 이메일 등 유지
+            ...user,            // 기존 프로필 이미지나 이메일 등 유지
             userId: payload.sub, // ID는 토큰에서 가져옴
             username: name,      // <-- payload.username 대신 입력한 'name' 사용 (즉시 반영 핵심)
           });
@@ -89,8 +89,8 @@ export default function EditProfileTab({ onClose }) {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          /* 수정됨: 모바일 확대 방지 (text-base md:text-sm 추가) */
-          className="px-3 py-2 border rounded-md outline-none focus:ring-2 focus:ring-primary text-base md:text-sm"
+          /* text-base -> text-[16px]로 변경하여 아이폰 확대 방지 */
+          className="px-3 py-2 border rounded-md outline-none focus:ring-2 focus:ring-primary text-[16px] md:text-sm"
         />
       </div>
 
@@ -101,8 +101,8 @@ export default function EditProfileTab({ onClose }) {
           placeholder="변경할 경우에만 입력"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          /* 수정됨: 모바일 확대 방지 (text-base md:text-sm 추가) */
-          className={`border rounded-md px-3 py-2 text-base md:text-sm ${getPasswordStateClass()}`}
+          /* text-base -> text-[16px]로 변경하여 아이폰 확대 방지 */
+          className={`border rounded-md px-3 py-2 text-[16px] md:text-sm ${getPasswordStateClass()}`}
         />
       </div>
 
@@ -113,8 +113,8 @@ export default function EditProfileTab({ onClose }) {
           placeholder="비밀번호 확인"
           value={verifyPassword}
           onChange={(e) => setVerifyPassword(e.target.value)}
-           /* 수정됨: 모바일 확대 방지 (text-base md:text-sm 추가) */
-          className={`border rounded-md px-3 py-2 text-base md:text-sm ${getPasswordStateClass()}`}
+           /*  text-base -> text-[16px]로 변경하여 아이폰 확대 방지 */
+          className={`border rounded-md px-3 py-2 text-[16px] md:text-sm ${getPasswordStateClass()}`}
         />
       </div>
 
