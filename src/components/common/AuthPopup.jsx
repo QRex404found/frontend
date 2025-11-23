@@ -9,35 +9,39 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
-export function AuthPopup({ show, isMandatory }) {
+// onClose props를 추가로 받습니다.
+export function AuthPopup({ show, isMandatory, onClose }) {
   const navigate = useNavigate();
 
-  /**  로그인 버튼 → 로그인 화면으로 이동 */
+  /** 로그인 버튼 → 팝업 닫고 로그인 화면으로 이동 */
   const handleLoginClick = () => {
-    // 팝업 닫히는 처리 이후 네비게이션 실행
-    setTimeout(() => {
-      navigate('/login');
-    }, 10);
+    // 1. 부모에게 닫기 요청
+    if (onClose) onClose(false);
+    
+    // 2. 네비게이션 실행
+    navigate('/login');
   };
 
-  /**  팝업 닫기 → Home 이동 */
+  /** 팝업 닫기(X버튼/배경클릭) → 팝업 닫고 Home 이동 */
   const handlePopupClose = (isOpen) => {
     if (!isOpen) {
-      setTimeout(() => {
-        navigate('/');
-      }, 10);
+      // 1. 부모에게 닫기 요청 (필수)
+      if (onClose) onClose(false);
+      
+      // 2. 홈으로 이동
+      navigate('/');
     }
   };
 
   return (
     <Dialog
       open={show}
-      onOpenChange={handlePopupClose}
-      modal={true} // Android 포커스 이슈 해결
+      onOpenChange={handlePopupClose} // Shadcn Dialog가 닫힐 때 호출
+      modal={true}
     >
       <DialogContent
         className="sm:max-w-[425px]"
-        // 바깥 클릭으로 닫기 방지 (불필요 끄기 가능)
+        // isMandatory일 때 배경 클릭 막기
         onInteractOutside={(e) => isMandatory && e.preventDefault()}
       >
         <DialogHeader>
