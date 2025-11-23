@@ -11,7 +11,7 @@ const apiClient = axios.create({
   },
 });
 
-// ✅ 요청 인터셉터 (Request Interceptor)
+// ✅ 요청 인터셉터
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('jwtToken');
@@ -23,32 +23,28 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ 응답 인터셉터 (Response Interceptor)
+// ✅ 응답 인터셉터
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
     const requestUrl = error?.config?.url || '';
 
-    // 🚨 [여기가 핵심입니다]
-    // 1. 로그인 (/auth/login)
-    // 2. 신고 (/report)
-    // 3. 게시글 관련 모든 조회/삭제 (/community/posts) <- 이걸 추가해야 조회 시 401 에러로 튕기지 않습니다!
-    const isIgnoredRequest = 
-      requestUrl.includes('/auth/login') || 
-      requestUrl.includes('/report') ||
-      requestUrl.includes('/community/posts'); // ✅ 게시글 관련 모든 URL 예외 처리
+    // 🚨 [수정됨] 게시글 조회(/community/posts)는 무시하면 안 됩니다!
+    // 여기서 예외로 두면, 커뮤니티 이용 중 토큰 만료 시 로그아웃이 안 됩니다.
+    // 로그인(/auth/login) 요청만 예외로 둡니다.
+    const isIgnoredRequest = requestUrl.includes('/auth/login');
 
-    // 예외 URL이 "아닐 때만" 401 체크하여 로그아웃
+    // 401(인증 만료)이고, 로그인 요청이 아닐 때 -> 로그아웃 트리거
     if (status === 401 && !isIgnoredRequest) {
       console.warn('⚠️ 인증 오류: 토큰이 없거나 만료됨 (로그아웃 실행)');
 
       if (typeof window !== 'undefined') {
+        // AuthContext와 ChatWidget이 이 이벤트를 듣습니다.
         window.dispatchEvent(new Event('qrex-token-expired'));
       }
     }
 
-    // 그 외 모든 에러는 컴포넌트로 넘겨서 토스트 띄우게 함
     return Promise.reject(error);
   }
 );

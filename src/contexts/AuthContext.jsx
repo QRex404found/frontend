@@ -1,9 +1,7 @@
-// src/contexts/AuthContext.jsx
 import React, { createContext, useState, useEffect, useCallback } from 'react';
-// 👇 경로가 맞는지 꼭 확인하세요! (components 폴더 위치)
 import { AuthPopup } from '@/components/common/AuthPopup'; 
 
-// 1. JWT 토큰을 해독(decode)하는 헬퍼 함수
+// 1. JWT 토큰 해독 함수
 const parseJwt = (token) => {
   try {
     const base64Url = token.split('.')[1];
@@ -16,26 +14,22 @@ const parseJwt = (token) => {
     );
     return JSON.parse(jsonPayload);
   } catch (e) {
-    return null; // 유효하지 않은 토큰은 null 반환
+    return null; 
   }
 };
 
-// 2. localStorage에서 토큰을 읽어 초기 유저 상태를 설정하는 함수
+// 2. 초기 유저 상태 설정
 const getInitialUser = () => {
   const token = localStorage.getItem('jwtToken');
-  if (!token) {
-    return { id: null, username: null };
-  }
+  if (!token) return { id: null, username: null };
 
   const decoded = parseJwt(token);
-
   if (!decoded || decoded.exp * 1000 < Date.now()) {
     localStorage.removeItem('jwtToken');
     return { id: null, username: null };
   }
 
   const userId = decoded.sub ?? decoded.id;
-
   if (userId == null) { 
     localStorage.removeItem('jwtToken');
     return { id: null, username: null };
@@ -44,7 +38,6 @@ const getInitialUser = () => {
   return { id: userId, username: decoded.username || null };
 };
 
-// 3. Context 생성
 export const AuthContext = createContext({
   isLoggedIn: false,
   user: { id: null, username: null },
@@ -60,54 +53,51 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!initialUser.id || initialUser.id === 0);
   const [user, setUser] = useState(initialUser);
   const [isChecked, setIsChecked] = useState(false);
-  
-  // ✅ 팝업 상태 관리 추가 (좀비 팝업 해결의 핵심)
   const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
+
+  const logout = useCallback(() => {
+    localStorage.removeItem('jwtToken');
+    setIsLoggedIn(false);
+    setUser({ id: null, username: null });
+    
+    // [추가] 로그아웃 시 명시적으로 채팅 초기화 이벤트 발송
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('qrex-chat-reset'));
+    }
+  }, []);
 
   useEffect(() => {
     setIsChecked(true);
 
-    // ✅ 이벤트 리스너 등록: api/index.js에서 보낸 신호를 받음
+    // 토큰 만료 이벤트 리스너
     const handleTokenExpired = () => {
-      logout(); // 로그아웃 처리
-      setIsAuthPopupOpen(true); // 팝업 열기
+      console.log("AuthContext: 토큰 만료 감지 -> 로그아웃 및 팝업 오픈");
+      logout(); 
+      setIsAuthPopupOpen(true); // 만료 시 팝업 띄움
     };
 
     window.addEventListener('qrex-token-expired', handleTokenExpired);
-
     return () => {
       window.removeEventListener('qrex-token-expired', handleTokenExpired);
     };
-  }, []); // 의존성 배열 비움 (마운트 시 1회 실행)
+  }, [logout]);
 
   const login = useCallback((token, userInfo) => {
     localStorage.setItem('jwtToken', token);
     setIsLoggedIn(true);
-    // ✅ 로그인 성공 시 팝업이 떠있다면 닫기 (로그인 시 팝업 뜨는 오류 방지)
-    setIsAuthPopupOpen(false);
+    setIsAuthPopupOpen(false); // 로그인 성공 시 팝업 닫기
 
     if (userInfo) {
       setUser(userInfo);
     } else {
       const decoded = parseJwt(token);
-      console.log('AuthContext: 해독된 토큰 페이로드:', decoded); 
-
       const userId = decoded?.sub ?? decoded?.id;
       
       if (userId != null) {
-        console.log('AuthContext: 사용자 ID 설정:', userId);
         setUser({ id: userId, username: decoded.username || null });
-      } else {
-        console.error('AuthContext: 토큰에서 사용자 ID를 찾을 수 없습니다.');
       }
     }
   }, []); 
-
-  const logout = useCallback(() => {
-    localStorage.removeItem('jwtToken');
-    setIsLoggedIn(false);
-    setUser({ id: null, username: null }); 
-  }, []);
 
   const updateProfile = useCallback((newUserInfo) => {
     setUser(newUserInfo);
@@ -126,8 +116,6 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={contextValue}>
       {children}
       
-      {/* ✅ 여기서 AuthPopup을 중앙 제어합니다 */}
-      {/* onClose가 있어야 좀비 팝업이 되지 않고 닫힙니다 */}
       <AuthPopup 
         show={isAuthPopupOpen} 
         isMandatory={true} 
