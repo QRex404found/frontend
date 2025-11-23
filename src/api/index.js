@@ -33,8 +33,9 @@ apiClient.interceptors.response.use(
   (error) => {
     const status = error?.response?.status;
 
-    // 401 또는 403 에러 발생 시
-    if (status === 401 || status === 403) {
+    // 🚨 [수정됨] 403(권한없음)은 제외하고, 401(토큰만료)일 때만 로그아웃 이벤트 발생
+    // 이렇게 해야 게시글 삭제 등으로 인한 403 에러 시 로그아웃되지 않습니다.
+    if (status === 401) {
       console.warn('⚠️ 인증 오류: 토큰이 없거나 만료됨');
 
       // 🔹 여기서는 "이벤트만" 쏜다. (다른 의존성 전혀 없음)
