@@ -65,12 +65,32 @@ export const CommentDrawer = ({
     }
   };
 
+  // ✅ [수정됨] 댓글 신고 핸들러
   const handleReportComment = async (commentId) => {
     try {
       await reportCommentApi(commentId);
+      
+      // 1. 신고 성공 메시지
       toast.success("댓글이 신고되었습니다.");
-    } catch {
-      toast.error("댓글 신고에 실패했습니다.");
+
+      // 2. 중요: 신고 후 댓글 상태가 변했을 수 있으므로(삭제 등) 목록을 반드시 갱신합니다.
+      // 이렇게 해야 50번째 신고 직후 화면에서 댓글이 사라집니다.
+      if (onCommentUpdate) onCommentUpdate();
+
+    } catch (error) {
+      const status = error.response?.status;
+
+      // 3. 만약 신고 시도 중 404(찾을 수 없음)나 403/401(권한 없음)이 뜨면
+      // 이는 신고 누적으로 이미 삭제된 댓글로 간주합니다.
+      if (status === 404 || status === 403 || status === 401) {
+        toast.info("신고 누적으로 댓글이 삭제되었습니다.");
+        
+        // 목록을 갱신하여 삭제된 댓글을 화면에서 치워버립니다.
+        if (onCommentUpdate) onCommentUpdate(); 
+      } else {
+        // 그 외 진짜 에러
+        toast.error("댓글 신고에 실패했습니다.");
+      }
     }
   };
 
