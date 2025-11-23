@@ -63,39 +63,41 @@ export const CommentDrawer = ({
     }
   };
 
-  // ✅ [최종 수정] 댓글 신고 핸들러
-  // 백엔드가 JSON ({ "message": "..." }) 형태로 보내주므로 이를 확실하게 처리합니다.
+  // ✅ [여기가 핵심입니다] 어떤 형태로 데이터가 와도 다 처리하는 만능 로직
   const handleReportComment = async (commentId) => {
     try {
       const response = await reportCommentApi(commentId);
       
-      // 1. 백엔드에서 보낸 JSON 데이터 확인
-      // 이제는 response.data가 무조건 { message: "..." } 형태의 객체입니다.
-      const responseData = response?.data;
-      const message = responseData?.message || "";
+      // 👇 콘솔을 확인해보세요. 서버가 뭘 주는지 눈으로 봐야 확실합니다.
+      console.log("DEBUG: 신고 API 응답 원본:", response);
 
-      // 2. 메시지에 "삭제"가 포함되어 있으면 삭제 알림을 띄웁니다.
-      if (message && message.includes("삭제")) {
+      // 1. 데이터 껍질 벗기기 (Axios 객체면 .data, 아니면 그대로)
+      const realData = response?.data || response;
+      
+      // 2. 메시지 꺼내기 (JSON 객체면 .message, 문자열이면 그대로)
+      const message = realData?.message || realData;
+
+      console.log("DEBUG: 추출된 메시지:", message);
+
+      // 3. 메시지를 문자열로 변환해서 "삭제"가 있는지 검사
+      if (String(message).includes("삭제")) {
         toast.info("신고 누적으로 댓글이 삭제되었습니다.");
       } else {
         toast.success("댓글이 신고되었습니다.");
       }
 
-      // 3. 목록 갱신 (삭제된 댓글은 화면에서 사라짐)
+      // 4. 목록 갱신 (삭제된 거 안 보이게)
       if (onCommentUpdate) onCommentUpdate();
 
     } catch (error) {
+      console.log("DEBUG: 신고 에러 발생", error);
       const status = error.response?.status;
 
-      // 4. 이미 삭제된 댓글을 신고해서 에러(404, 403, 401)가 난 경우
+      // 이미 삭제된 댓글을 또 신고했을 때 (404, 403, 401)
       if (status === 404 || status === 403 || status === 401) {
         toast.info("신고 누적으로 댓글이 삭제되었습니다.");
-        
-        // 목록 갱신해서 치워버리기
         if (onCommentUpdate) onCommentUpdate(); 
       } else {
-        // 그 외 진짜 에러
-        console.error("신고 에러:", error);
         toast.error("댓글 신고에 실패했습니다.");
       }
     }
