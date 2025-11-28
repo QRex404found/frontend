@@ -1,16 +1,5 @@
 # 💻 QRex Frontend Client
 
-<div align="center">
-  <img src="src/assets/qrex_logo.png" alt="QRex Logo" width="200" />
-  <h3>🛡️ AI 기반 지능형 QR/URL 피싱 탐지 플랫폼</h3>
-  <p>
-    QRex는 사용자가 QR코드를 스캔하거나 URL을 입력했을 때,<br/>
-    AI 에이전트와 RAG(검색 증강 생성) 기술을 통해 피싱 위협을 분석하고 안전한 인터넷 환경을 제공하는 웹 서비스입니다.
-  </p>
-</div>
-
----
-
 ## 🚀 Key Features
 
 ### 1. 🔍 QR Code & URL Analysis (Core)
@@ -92,12 +81,4 @@ src
 - **Scroll Lock:** 모바일 환경에서의 매끄러운 사용자 경험을 위해 브라우저 확대/축소 방지 및 스크롤 제어 로직(`scrollLock.js`)을 직접 구현했습니다.
 
 ### 2. Split View Dashboard
-- **Resizable Panel:** PC 환경에서는 **Analysis**와 **Community** 페이지에서 좌우 패널 크기를 마우스로 자유롭게 조절할 수 있는 Split View를 제공하여 생산성을 높였습니다.
-
----
-
-### 👨‍💻 Developer
-
-- **Frontend Engineer:** 김여민
-- **Contact:** [이메일 주소를 입력하세요]
-- **Team:** 404 FOUND (Chungbuk National Univ.)
+- **Resizable Panel:** PC 환경에서는 **Analysis**와 **Community** 페이지에서 좌우 패널 크기를 마우스로 자유롭게 조절할 수 있는 Split View를 제공하여 생산성을 높였습니다
