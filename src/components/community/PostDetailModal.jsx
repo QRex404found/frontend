@@ -95,22 +95,26 @@ export function PostDetailModal({
 
   // 신고 핸들러
   const handleReportPost = async () => {
-    if (!postDetail) return;
-    try {
-      await reportPostApi(postDetail.boardId);
-      toast.success("게시글이 신고되었습니다.");
-    } catch (error) {
-      const status = error.response?.status;
-      
-      if (status === 401 || status === 403 || status === 404) {
-        toast.info("신고 누적으로 인해 게시글이 삭제되었습니다.");
-        if (onDeleteSuccess) onDeleteSuccess();
-        onOpenChange(false);
-      } else {
-        toast.error("신고 중 오류가 발생했습니다.");
-      }
+  if (!postDetail) return;
+
+  try {
+    await reportPostApi(postDetail.boardId);
+    toast.success("게시글이 신고되었습니다.");
+  } catch (error) {
+    const status = error?.response?.status;
+
+    // ✅ 신고 누적 → 게시글 삭제된 경우
+    if (status === 400) {
+      toast.info("신고 누적으로 게시글이 삭제되었습니다.");
+      if (onDeleteSuccess) onDeleteSuccess(); // 목록 새로고침
+      onOpenChange(false);                    // 모달 닫기
+      return;
     }
-  };
+
+    // ✅ 그 외 진짜 오류만 에러 토스트
+    toast.error("게시글 신고 중 오류가 발생했습니다.");
+  }
+};
 
   // 삭제 핸들러
   const handleDeletePost = async () => {
