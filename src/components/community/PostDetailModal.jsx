@@ -139,7 +139,7 @@ export function PostDetailModal({
     // 1. http 또는 https 프로토콜 확인
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       e.preventDefault(); // 이동 막기
-      toast.error("유효하지 않은 URL입니다. (http:// 또는 https:// 포함 필요)");
+      toast.error("유효하지 않은 URL입니다.");
       return;
     }
 
