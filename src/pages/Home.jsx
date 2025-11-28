@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 import videoBg from '@/assets/background.mp4';
 
-// 이미지 import
+// 이미지 import. 이미지 배경 제거.
 import holdingQR from '@/assets/holding_QR.png';
 import analysisImg from '@/assets/Analysis.png';
 import heartImg from '@/assets/Heart.png';
