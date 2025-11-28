@@ -80,7 +80,7 @@ export function SignUp() {
   };
 
   return (
-    <div className="flex items-center justify-center p-4 min-h-[calc(100vh-64px)]">
+    <div className="flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader>
           <CardTitle className="text-3xl font-bold">Sign up</CardTitle>
