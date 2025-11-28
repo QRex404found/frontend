@@ -23,7 +23,6 @@ export function PostDetailModal({
   onDeleteSuccess,
 }) {
   const { user } = useAuth();
-  
   const [postDetail, setPostDetail] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -34,75 +33,53 @@ export function PostDetailModal({
   const titleRef = useRef(null);
 
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
-  
-  // 댓글 작성/삭제 시 메인 데이터를 다시 불러오기 위한 트리거
   const [refetchCounter, setRefetchCounter] = useState(0);
 
-  // ----------------------------------------------------------------
-  // 1. 데이터 로딩 (깜빡임 방지 로직 적용)
-  // ----------------------------------------------------------------
+  // 데이터 로딩
   useEffect(() => {
     if (isOpen && boardId) {
-      // ✅ [핵심] 이미 데이터가 있으면 로딩 스피너를 보여주지 않음 (Background Fetching)
-      // 이렇게 해야 댓글만 업데이트될 때 게시글 화면이 하얗게 변하지 않음
+      // 기존 데이터가 없으면 로딩 표시 (깜빡임 방지)
       if (!postDetail) {
         setIsLoading(true);
       }
 
       getPostDetailApi(boardId)
-        .then((data) => {
-          setPostDetail(data);
-          setError(null);
-        })
-        .catch(() => {
-          setError('게시글을 불러오는 데 실패했습니다.');
-        })
+        .then(setPostDetail)
+        .catch(() => setError('게시글을 불러오는 데 실패했습니다.'))
         .finally(() => {
-          setIsLoading(false);
+          if (!postDetail) setIsLoading(false);
         });
     } else {
-      // 모달이 닫힐 때만 상태 초기화
-      if (!isOpen) {
-        setPostDetail(null);
-        setError(null);
-        setIsCommentDrawerOpen(false);
-        setTitleOpen(false);
-        setRefetchCounter(0);
-        setIsLoading(false);
-      }
+      // 모달 닫힐 때 초기화
+      setPostDetail(null);
+      setError(null);
+      setIsCommentDrawerOpen(false);
+      setTitleOpen(false);
+      setRefetchCounter(0);
+      setIsLoading(false);
     }
   }, [isOpen, boardId, refetchCounter]);
 
-  // ----------------------------------------------------------------
-  // 2. 스크롤 잠금 관리
-  // ----------------------------------------------------------------
+  // 스크롤 잠금
   useEffect(() => {
     if (isOpen || isCommentDrawerOpen) lockScroll();
     else unlockScroll();
     return () => unlockScroll();
   }, [isOpen, isCommentDrawerOpen]);
 
-  // ----------------------------------------------------------------
-  // 3. 제목 말줄임 감지
-  // ----------------------------------------------------------------
+  // 제목 말줄임 감지
   useEffect(() => {
     const checkTruncation = () => {
       if (!titleRef.current) return;
       const el = titleRef.current;
       setIsTruncated(el.scrollWidth > el.clientWidth);
     };
-    // 모달이 열리거나 제목이 변경될 때 체크
-    if (isOpen) {
-      // 약간의 지연을 두어 렌더링 후 계산 정확도 향상
-      setTimeout(checkTruncation, 0);
-    }
+    checkTruncation();
     window.addEventListener('resize', checkTruncation);
     return () => window.removeEventListener('resize', checkTruncation);
   }, [postDetail?.title, isOpen, titleOpen]);
 
-  // ----------------------------------------------------------------
-  // 4. 권한 및 핸들러
-  // ----------------------------------------------------------------
+  // 작성자 판별
   const authorId =
     postDetail?.userId ??
     postDetail?.user?.id ??
@@ -116,7 +93,7 @@ export function PostDetailModal({
     currentUserId != null &&
     String(authorId) === String(currentUserId);
 
-  // 신고
+  // 신고 핸들러
   const handleReportPost = async () => {
     if (!postDetail) return;
     try {
@@ -124,6 +101,7 @@ export function PostDetailModal({
       toast.success("게시글이 신고되었습니다.");
     } catch (error) {
       const status = error.response?.status;
+      
       if (status === 401 || status === 403 || status === 404) {
         toast.info("신고 누적으로 인해 게시글이 삭제되었습니다.");
         if (onDeleteSuccess) onDeleteSuccess();
@@ -134,22 +112,43 @@ export function PostDetailModal({
     }
   };
 
-  // 삭제
+  // 삭제 핸들러
   const handleDeletePost = async () => {
     if (!postDetail || isDeleting) return;
-
-    if (!window.confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
 
     setIsDeleting(true);
     try {
       await deletePostApi(postDetail.boardId);
-      toast.success("게시글이 삭제되었습니다.");
       if (onDeleteSuccess) onDeleteSuccess();
+      toast.success("게시글이 삭제되었습니다.");
       onOpenChange(false);
+
     } catch {
       toast.error("삭제 중 오류가 발생했습니다.");
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  // 🌟 [추가] URL 클릭 시 유효성 검사 핸들러
+  const handleUrlClick = (e) => {
+    const url = postDetail?.url;
+
+    if (!url) return;
+
+    // 1. http 또는 https 프로토콜 확인
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      e.preventDefault(); // 이동 막기
+      toast.error("유효하지 않은 URL입니다. (http:// 또는 https:// 포함 필요)");
+      return;
+    }
+
+    // 2. URL 형식 검사
+    try {
+      new URL(url); // 여기서 에러 나면 catch로 이동
+    } catch (_) {
+      e.preventDefault(); // 이동 막기
+      toast.error("접속할 수 없는 잘못된 URL 형식입니다.");
     }
   };
 
@@ -160,38 +159,24 @@ export function PostDetailModal({
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent
           className="hide-default-close w-full max-w-[90vw] sm:max-w-[800px] 
-          max-h-[90vh] h-auto flex flex-col bg-white p-0 overflow-hidden rounded-xl outline-none"
+          max-h-[90vh] h-auto flex flex-col bg-white p-0 overflow-hidden rounded-xl"
           autoFocus={false}
         >
-          {/* --- Header --- */}
+          {/* HEADER */}
           <div className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 border-b shrink-0">
             <div className="flex items-center flex-1 min-w-0 gap-2">
-              <span 
-                ref={titleRef} 
-                className={`text-lg font-semibold ${titleOpen ? '' : 'truncate'}`}
-                title={postDetail?.title}
-              >
+              <span ref={titleRef} className="text-lg font-semibold truncate" title={postDetail?.title}>
                 {postDetail?.title}
               </span>
-              {isTruncated && !titleOpen && (
+              {isTruncated && (
                 <Button
                   variant="ghost"
                   size="icon"
                   className="w-6 h-6 text-gray-500 rounded-full shrink-0"
-                  onClick={() => setTitleOpen(true)}
+                  onClick={() => setTitleOpen((prev) => !prev)}
                 >
-                  <ChevronDown size={16} />
+                  {titleOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </Button>
-              )}
-              {titleOpen && (
-                 <Button
-                 variant="ghost"
-                 size="icon"
-                 className="w-6 h-6 text-gray-500 rounded-full shrink-0"
-                 onClick={() => setTitleOpen(false)}
-               >
-                 <ChevronUp size={16} />
-               </Button>
               )}
             </div>
 
@@ -203,21 +188,21 @@ export function PostDetailModal({
                   </Button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="bg-white">
+                <DropdownMenuContent align="end">
                   {isMyPost ? (
                     <DropdownMenuItem
                       onClick={handleDeletePost}
                       disabled={isDeleting}
-                      className="text-red-600 cursor-pointer focus:text-red-600 focus:bg-red-50"
+                      className="text-red-600 focus:text-red-600 focus:bg-red-50"
                     >
-                      {isDeleting ? "삭제 중..." : "게시글 삭제"}
+                      {isDeleting ? "Deleting..." : "Delete Post"}
                     </DropdownMenuItem>
                   ) : (
                     <DropdownMenuItem
                       onClick={handleReportPost}
-                      className="text-[#CA8A04] cursor-pointer focus:text-[#CA8A04] focus:bg-yellow-50"
+                      className="text-[#CA8A04] focus:text-[#CA8A04]"
                     >
-                      게시글 신고
+                      Report Post
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuContent>
@@ -229,92 +214,76 @@ export function PostDetailModal({
             </div>
           </div>
 
-          {/* --- Body --- */}
-          {/* ✅ 로딩 중이어도 기존 데이터(postDetail)가 있으면 내용을 유지함 */}
+          {/* 펼쳐진 제목 */}
+          {titleOpen && (
+            <div className="px-6 py-2 text-sm text-gray-700 whitespace-pre-wrap border-b shrink-0">
+              {postDetail?.title}
+            </div>
+          )}
+
+          {/* BODY */}
           {(isLoading && !postDetail) ? (
-            <div className="flex items-center justify-center flex-1 min-h-[300px]">
+            <div className="flex items-center justify-center flex-1 min-h-0">
               <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
             </div>
           ) : error ? (
-            <div className="flex items-center justify-center flex-1 min-h-[200px]">
-              <p className="text-red-500">{error}</p>
-            </div>
+            <p className="px-6 py-4 text-red-500">{error}</p>
           ) : !postDetail ? (
-            <div className="flex items-center justify-center flex-1 min-h-[200px]">
-              <p className="text-gray-500">데이터를 표시할 수 없습니다.</p>
-            </div>
+            <p className="px-6 py-4">데이터를 표시할 수 없습니다.</p>
           ) : (
             <>
-              <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
-                {/* 이미지 영역 */}
-                {postDetail.imagePath && (
-                  <div className="px-6 pt-4">
-                    <div className="flex justify-center overflow-hidden border border-gray-100 rounded-lg bg-gray-50">
-                      <img 
-                        src={postDetail.imagePath} 
-                        alt="첨부 이미지" 
-                        className="max-w-full max-h-[400px] object-contain" 
-                      />
-                    </div>
+              {postDetail.imagePath && (
+                <div className="px-6 pt-4 shrink-0">
+                  <div className="flex justify-center">
+                    <img src={postDetail.imagePath} alt="첨부 이미지" className="max-w-full max-h-[250px] rounded-lg" />
                   </div>
-                )}
-
-                {/* URL 영역 */}
-                {postDetail.url && (
-                  <div className="px-6 pt-4">
-                    <div className="p-3 break-all border border-blue-100 rounded-md bg-blue-50/50">
-                      <span className="mr-2 font-semibold text-blue-800">URL:</span>
-                      <a 
-                        href={postDetail.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="text-sm text-blue-600 underline hover:text-blue-700"
-                      >
-                        {postDetail.url}
-                      </a>
-                    </div>
-                  </div>
-                )}
-
-                {/* 본문 영역 */}
-                <div className="px-6 py-4">
-                  <div className="leading-relaxed text-gray-800 break-all whitespace-pre-wrap min-h-[100px]">
-                    {postDetail.contents}
-                  </div>
-                </div>
-              </div>
-
-              {/* --- Footer (댓글 미리보기) --- */}
-              {showComments && (
-                <div 
-                  className="px-6 py-3 transition-colors border-t cursor-pointer bg-gray-50/50 hover:bg-gray-100 shrink-0" 
-                  onClick={() => setIsCommentDrawerOpen(true)}
-                >
-                  <LatestCommentPreview comments={postDetail?.comments} />
                 </div>
               )}
+
+              {/* 🌟 URL 표시 영역 (수정됨: onClick 핸들러 추가) */}
+              {postDetail.url && (
+                <div className="px-6 pt-4 shrink-0">
+                  <div className="p-3 break-all border rounded-md">
+                    <span className="font-semibold">URL: </span>
+                    <a 
+                      href={postDetail.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-blue-600 underline hover:text-blue-700"
+                      onClick={handleUrlClick} // 👈 클릭 시 유효성 검사 실행
+                    >
+                      {postDetail.url}
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex-1 min-h-0 px-6 py-4 overflow-y-auto">
+                <div className="leading-relaxed text-gray-800 break-all whitespace-pre-wrap">
+                  {postDetail.contents}
+                </div>
+              </div>
             </>
           )}
 
-          {/* 댓글 Drawer */}
+          {showComments && (
+            <div className="px-6 py-3 cursor-pointer shrink-0" onClick={() => setIsCommentDrawerOpen(true)}>
+              <LatestCommentPreview comments={postDetail?.comments} />
+            </div>
+          )}
+
           <CommentDrawer
             isOpen={isCommentDrawerOpen}
             onOpenChange={setIsCommentDrawerOpen}
             boardId={boardId}
             initialComments={postDetail?.comments || []}
             className="w-full max-w-[90vw] sm:max-w-[800px] mx-auto"
-            // 댓글이 작성/삭제되면 refetchCounter를 올려서 메인 데이터를 조용히 갱신함
-            onCommentUpdate={() => setRefetchCounter((prev) => prev + 1)}
+            onCommentUpdate={() => setRefetchCounter((count) => count + 1)}
           />
         </DialogContent>
       </Dialog>
 
-      <style>{`
-        .hide-default-close button[aria-label="Close"] { display: none !important; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #e2e8f0; border-radius: 3px; }
-      `}</style>
+      <style>{`.hide-default-close button.absolute.right-4.top-4 { display: none !important; }`}</style>
     </>
   );
 }
