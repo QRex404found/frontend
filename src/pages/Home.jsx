@@ -42,7 +42,7 @@ export function Home() {
     const { isLoggedIn } = useAuth();
     const navigate = useNavigate();
 
-    // 🧲 홈 화면에서만 확대/축소 완전 차단 + 나가면 복구
+    //  홈 화면에서만 확대/축소 완전 차단 + 나가면 복구
     useEffect(() => {
         const meta = document.querySelector('meta[name=viewport]');
         if (meta) {
@@ -157,7 +157,7 @@ export function Home() {
                                 사용자 경험 기반 보안 인사이트 공유, 분석 기록의 지속 관리를 지원하여<br />
                                 일상 속 QR 사용을 더 안전하고 스마트하게 만들어줍니다.
 
-                                <br/><br/>더 안전한 일상을 위한 첫 걸음, QRex와 함께하세요!
+                                <br /><br />더 안전한 일상을 위한 첫 걸음, QRex와 함께하세요!
                             </p>
 
                             <button
@@ -215,181 +215,188 @@ export function Home() {
                             </motion.svg>
                         </div>
 
-                        {/* 제목: mb-8 -> mb-14로 변경 (컨테이너 패딩 p-14와 간격 맞춤) */}
-                        <h3 className="relative z-10 text-3xl font-medium text-center mb-14">
-                            QRex는 당신의 안전한 QR 사용을 돕습니다
-                        </h3>
+                        
 
-                        {/* 그리드 박스: mb-4 제거 (하단은 이미 부모의 p-14가 담당함) */}
-                        <div className="relative z-10 grid grid-cols-1 gap-10 md:grid-cols-3">
+                            <h3 className="relative z-10 text-3xl font-medium text-center mb-14">
+                                QRex는 이렇게 피싱 여부를 판단합니다
+                            </h3>
 
-                            <div className="p-6 text-center">
-                                <QrCode size={44} className="mx-auto mb-4 text-lime-600" />
-                                <h4 className="mb-2 text-xl font-medium">정확한 URL 분석</h4>
-                                <p className="text-sm leading-relaxed text-slate-500">
-                                    URL 구조, IP, 도메인 신뢰도를 기반으로 <br />위험도를 판단합니다.
-                                </p>
+                            <div className="relative z-10 grid grid-cols-1 gap-10 md:grid-cols-3">
+
+                                {/* google safe browsing */}
+                                <div className="p-6 text-center">
+                                    <ShieldCheck size={44} className="mx-auto mb-4 text-lime-600" />
+                                    <h4 className="mb-2 text-xl font-medium">안전성 DB 조회</h4>
+                                    <p className="text-sm leading-relaxed text-slate-500">
+                                        Google Safe Browsing과 악성 도메인 DB를 기반으로<br />
+                                        알려진 피싱 사이트 여부를 우선 확인합니다.
+                                    </p>
+                                </div>
+
+                                {/* 블랙리스트 + 규칙 기반 */}
+                                <div className="p-6 text-center">
+                                    <Globe size={44} className="mx-auto mb-4 text-lime-600" />
+                                    <h4 className="mb-2 text-xl font-medium">도메인 위험 패턴 분석</h4>
+                                    <p className="text-sm leading-relaxed text-slate-500">
+                                        타이포스쿼팅, 서브도메인 패턴, IP 기반 URL 등<br />
+                                        의심 사례 규칙을 적용해 위험도를 진단합니다.
+                                    </p>
+                                </div>
+
+                                {/* RAG */}
+                                <div className="p-6 text-center">
+                                    <Lightbulb size={44} className="mx-auto mb-4 text-lime-600" />
+                                    <h4 className="mb-2 text-xl font-medium">RAG 기반 AI 분석</h4>
+                                    <p className="text-sm leading-relaxed text-slate-500">
+                                        최신 피싱 사례, 보안 지식, URL 구조 정보를<br />
+                                        AI가 통합 분석하여 최종 판단을 제공합니다.
+                                    </p>
+                                </div>
+
                             </div>
+                        </div>
 
-                            <div className="p-6 text-center">
-                                <Users size={44} className="mx-auto mb-4 text-lime-600" />
-                                <h4 className="mb-2 text-xl font-medium">보안 경험 공유</h4>
-                                <p className="text-sm leading-relaxed text-slate-500">
-                                    QR 관련 정보와 사례를 함께 나눌 수 있습니다.<br/>다른 사용자들과 의견을 공유해보세요!
-                                </p>
-                            </div>
+                        {/* FEATURE 3-COLUMN */}
+                        <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
 
-                            <div className="p-6 text-center">
-                                <FileText size={44} className="mx-auto mb-4 text-lime-600" />
-                                <h4 className="mb-2 text-xl font-medium">분석 이력 관리</h4>
-                                <p className="text-sm leading-relaxed text-slate-500">
-                                    스캔한 QR 분석 결과를 한곳에서 <br />쉽게 관리하세요.
+                            {/* =============================== */}
+                            {/* Analysis */}
+                            {/* =============================== */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.7 }}
+                                viewport={{ once: true }}
+                                className="flex flex-col items-center p-10 text-center transition border shadow-sm rounded-3xl hover:shadow-md"
+                            >
+                                <div className="inline-block w-32 h-32 mb-6 overflow-hidden rounded-xl">
+                                    <img
+                                        src={analysisImg}
+                                        alt="Analysis"
+                                        className="object-contain w-full h-full mix-blend-multiply"
+                                    />
+                                </div>
+
+                                <h4 className="mb-3 text-2xl font-medium">Analysis</h4>
+
+                                <p className="flex-grow mb-6 leading-relaxed text-slate-600">
+                                    URL 위험도·도메인 신뢰도·URL 패턴을 종합 분석해
+                                    보안 위협 여부를 판단합니다.
                                 </p>
-                            </div>
+
+                                {/* 🔹 리스트 - 완전 복원 */}
+                                <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
+                                    <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
+                                        <ShieldCheck className="w-5 h-5 text-lime-600/80" />
+                                        <span className="text-sm font-medium text-slate-700">URL 위험도 분석</span>
+                                    </div>
+                                    <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
+                                        <Globe className="w-5 h-5 text-lime-600/80" />
+                                        <span className="text-sm font-medium text-slate-700">도메인 신뢰도 검증</span>
+                                    </div>
+                                    <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
+                                        <AlertTriangle className="w-5 h-5 text-lime-600/80" />
+                                        <span className="text-sm font-medium text-slate-700">URL 리스크 설명 제공</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+
+
+
+
+                            {/* =============================== */}
+                            {/* Community */}
+                            {/* =============================== */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.7, delay: 0.1 }}
+                                viewport={{ once: true }}
+                                className="flex flex-col items-center p-10 text-center transition border shadow-sm rounded-3xl hover:shadow-md"
+                            >
+                                <div className="inline-block w-32 h-32 mb-6 overflow-hidden rounded-xl">
+                                    <img
+                                        src={heartImg}
+                                        alt="Community"
+                                        className="object-contain w-full h-full mix-blend-multiply"
+                                    />
+                                </div>
+
+                                <h4 className="mb-3 text-2xl font-medium">Community</h4>
+
+                                <p className="flex-grow mb-6 leading-relaxed text-slate-600">
+                                    사용자 경험 기반 사례로
+                                    실질적인 보안 인사이트를 제공합니다.
+                                </p>
+
+                                <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
+                                    <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
+                                        <MessageSquare className="w-5 h-5 text-lime-600/80" />
+                                        <span className="text-sm font-medium text-slate-700">사용자 사례 공유</span>
+                                    </div>
+                                    <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
+                                        <Lightbulb className="w-5 h-5 text-lime-600/80" />
+                                        <span className="text-sm font-medium text-slate-700">보안 인사이트 교류</span>
+                                    </div>
+                                    <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
+                                        <Flag className="w-5 h-5 text-lime-600/80" />
+                                        <span className="text-sm font-medium text-slate-700">신고 & 위험 URL 제보</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+
+
+
+
+                            {/* =============================== */}
+                            {/* MyPost */}
+                            {/* =============================== */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.7, delay: 0.2 }}
+                                viewport={{ once: true }}
+                                className="flex flex-col items-center p-10 text-center transition border shadow-sm rounded-3xl hover:shadow-md"
+                            >
+                                <div className="inline-block w-32 h-32 mb-6 overflow-hidden rounded-xl">
+                                    <img
+                                        src={mypostImg}
+                                        alt="MyPost"
+                                        className="object-contain w-full h-full mix-blend-multiply"
+                                    />
+                                </div>
+
+                                <h4 className="mb-3 text-2xl font-medium">My post</h4>
+
+                                <p className="flex-grow mb-6 leading-relaxed text-slate-600">
+                                    분석한 QR 기록을 저장하고
+                                    언제든 빠르게 다시 확인할 수 있습니다.
+                                </p>
+
+                                {/* 🔹 리스트 - 완전 복원 */}
+                                <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
+                                    <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
+                                        <Save className="w-5 h-5 text-lime-600/80" />
+                                        <span className="text-sm font-medium text-slate-700">분석 기록 자동 저장</span>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
+                                        <Edit3 className="w-5 h-5 text-lime-600/80" />
+                                        <span className="text-sm font-medium text-slate-700">제목 & 내용 관리</span>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
+                                        <Search className="w-5 h-5 text-lime-600/80" />
+                                        <span className="text-sm font-medium text-slate-700">상세 분석 보기</span>
+                                    </div>
+                                </div>
+
+                            </motion.div>
 
                         </div>
                     </div>
-                    {/* FEATURE 3-COLUMN */}
-                    <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
-
-                        {/* =============================== */}
-                        {/* Analysis */}
-                        {/* =============================== */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.7 }}
-                            viewport={{ once: true }}
-                            className="flex flex-col items-center p-10 text-center transition border shadow-sm rounded-3xl hover:shadow-md"
-                        >
-                            <div className="inline-block w-32 h-32 mb-6 overflow-hidden rounded-xl">
-                                <img
-                                    src={analysisImg}
-                                    alt="Analysis"
-                                    className="object-contain w-full h-full mix-blend-multiply"
-                                />
-                            </div>
-
-                            <h4 className="mb-3 text-2xl font-medium">Analysis</h4>
-
-                            <p className="flex-grow mb-6 leading-relaxed text-slate-600">
-                                URL 위험도·도메인 신뢰도·URL 패턴을 종합 분석해
-                                보안 위협 여부를 판단합니다.
-                            </p>
-
-                            {/* 🔹 리스트 - 완전 복원 */}
-                            <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
-                                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                                    <ShieldCheck className="w-5 h-5 text-lime-600/80" />
-                                    <span className="text-sm font-medium text-slate-700">URL 위험도 분석</span>
-                                </div>
-                                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                                    <Globe className="w-5 h-5 text-lime-600/80" />
-                                    <span className="text-sm font-medium text-slate-700">도메인 신뢰도 검증</span>
-                                </div>
-                                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                                    <AlertTriangle className="w-5 h-5 text-lime-600/80" />
-                                    <span className="text-sm font-medium text-slate-700">URL 리스크 설명 제공</span>
-                                </div>
-                            </div>
-                        </motion.div>
-
-
-
-
-                        {/* =============================== */}
-                        {/* Community */}
-                        {/* =============================== */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.7, delay: 0.1 }}
-                            viewport={{ once: true }}
-                            className="flex flex-col items-center p-10 text-center transition border shadow-sm rounded-3xl hover:shadow-md"
-                        >
-                            <div className="inline-block w-32 h-32 mb-6 overflow-hidden rounded-xl">
-                                <img
-                                    src={heartImg}
-                                    alt="Community"
-                                    className="object-contain w-full h-full mix-blend-multiply"
-                                />
-                            </div>
-
-                            <h4 className="mb-3 text-2xl font-medium">Community</h4>
-
-                            <p className="flex-grow mb-6 leading-relaxed text-slate-600">
-                                사용자 경험 기반 사례로
-                                실질적인 보안 인사이트를 제공합니다.
-                            </p>
-
-                            <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
-                                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                                    <MessageSquare className="w-5 h-5 text-lime-600/80" />
-                                    <span className="text-sm font-medium text-slate-700">사용자 사례 공유</span>
-                                </div>
-                                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                                    <Lightbulb className="w-5 h-5 text-lime-600/80" />
-                                    <span className="text-sm font-medium text-slate-700">보안 인사이트 교류</span>
-                                </div>
-                                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                                    <Flag className="w-5 h-5 text-lime-600/80" />
-                                    <span className="text-sm font-medium text-slate-700">신고 & 위험 URL 제보</span>
-                                </div>
-                            </div>
-                        </motion.div>
-
-
-
-
-                        {/* =============================== */}
-                        {/* MyPost */}
-                        {/* =============================== */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.7, delay: 0.2 }}
-                            viewport={{ once: true }}
-                            className="flex flex-col items-center p-10 text-center transition border shadow-sm rounded-3xl hover:shadow-md"
-                        >
-                            <div className="inline-block w-32 h-32 mb-6 overflow-hidden rounded-xl">
-                                <img
-                                    src={mypostImg}
-                                    alt="MyPost"
-                                    className="object-contain w-full h-full mix-blend-multiply"
-                                />
-                            </div>
-
-                            <h4 className="mb-3 text-2xl font-medium">My post</h4>
-
-                            <p className="flex-grow mb-6 leading-relaxed text-slate-600">
-                                분석한 QR 기록을 저장하고
-                                언제든 빠르게 다시 확인할 수 있습니다.
-                            </p>
-
-                            {/* 🔹 리스트 - 완전 복원 */}
-                            <div className="grid grid-cols-1 gap-3 w-full max-w-[260px] mx-auto">
-                                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                                    <Save className="w-5 h-5 text-lime-600/80" />
-                                    <span className="text-sm font-medium text-slate-700">분석 기록 자동 저장</span>
-                                </div>
-
-                                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                                    <Edit3 className="w-5 h-5 text-lime-600/80" />
-                                    <span className="text-sm font-medium text-slate-700">제목 & 내용 관리</span>
-                                </div>
-
-                                <div className="flex items-center gap-3 p-4 transition-all border rounded-xl bg-lime-50/70 border-lime-200/40 hover:bg-lime-100/80">
-                                    <Search className="w-5 h-5 text-lime-600/80" />
-                                    <span className="text-sm font-medium text-slate-700">상세 분석 보기</span>
-                                </div>
-                            </div>
-
-                        </motion.div>
-
-                    </div>
                 </div>
-            </div>
 
-        </div>
-    );
+            </div>
+            );
 }

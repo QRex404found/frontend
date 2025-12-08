@@ -103,7 +103,7 @@ export function PostDetailModal({
   } catch (error) {
     const status = error?.response?.status;
 
-    // ✅ 신고 누적 → 게시글 삭제된 경우
+    // ✅ 신고 누적 → 게시글 삭제된 경우  
     if (status === 400) {
       toast.info("신고 누적으로 게시글이 삭제되었습니다.");
       if (onDeleteSuccess) onDeleteSuccess(); // 목록 새로고침

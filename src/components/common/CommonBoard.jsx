@@ -67,7 +67,7 @@ export const CommonBoard = ({
                     </div>
                 ) : posts.length === 0 ? (
                     <div className="text-center text-gray-500 py-10">
-                        {caption || "표시할 기록이 없습니다."}
+                        {caption || "등록된 게시글이 없습니다."}
                     </div>
                 ) : (
                     <div className="overflow-x-auto">

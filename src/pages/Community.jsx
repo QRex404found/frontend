@@ -22,14 +22,13 @@ export function Community() {
   const [error, setError] = useState(null);
   const [selectedBoardId, setSelectedBoardId] = useState(null);
 
-  // 1. 함수를 useEffect 밖으로 정의
-  const fetchPosts = async (page) => {
+  const fetchPosts = async (page = currentPage) => {
     setLoading(true);
     setError(null);
 
     try {
       const data = await getCommunityPostsApi(page - 1, PAGE_SIZE);
-      const transformedPosts = data.content.slice().map((post) => ({
+      const transformedPosts = data.content.map((post) => ({
         id: post.boardId,
         title: post.title,
         date: post.createdAt,
@@ -45,14 +44,23 @@ export function Community() {
     }
   };
 
-  // 2. useEffect에서는 호출만 함
   useEffect(() => {
     if (isLoggedIn) {
-      fetchPosts(currentPage);
+      fetchPosts();
     }
   }, [currentPage, isLoggedIn]);
 
-  /* 1. 인증 체크 로직 */
+  useEffect(() => {
+    const handler = () => {
+      // 삭제되면 자동 새로고침
+      fetchPosts();
+    };
+
+    window.addEventListener("qrex-board-deleted", handler);
+    return () => window.removeEventListener("qrex-board-deleted", handler);
+  }, [currentPage]);
+
+  /* 인증 체크 */
   if (!isChecked) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -61,7 +69,6 @@ export function Community() {
     );
   }
 
-  // 새 AuthPopup 구조 적용
   if (!isLoggedIn) {
     return (
       <AuthPopup
@@ -72,37 +79,18 @@ export function Community() {
     );
   }
 
-  /* 2. 핸들러 */
-  const handlePostClick = (item) => {
-    setSelectedBoardId(item.id);
-  };
+  /* 핸들러 */
+  const handlePostClick = (item) => setSelectedBoardId(item.id);
 
-  const handleCloseModal = () => {
-    setSelectedBoardId(null);
-  };
+  const handleCloseModal = () => setSelectedBoardId(null);
 
-  // ✅ 삭제 완료 핸들러 (Community용 강력 수정버전)
+  // 게시글 상세 모달에서 삭제할 때
   const handleDeleteComplete = () => {
-    // 1. 모달 닫기 (ID 초기화)
     setSelectedBoardId(null);
-
-    // 2. 화면 리스트에서 즉시 제거 (Optimistic Update)
-    setPosts((prev) => prev.filter((post) => post.id !== selectedBoardId));
-
-    // 3. [핵심 해결책] 약간의 지연(0ms)을 주고 강제로 스타일 복구
-    // setTimeout을 써야 리렌더링 사이클 뒤에 실행되어 확실하게 적용됩니다.
-    setTimeout(() => {
-      document.body.style.overflow = 'unset';       // 스크롤 잠금 해제
-      document.body.style.pointerEvents = 'auto';   // 클릭 방지 해제 (이게 중요)
-    }, 0);
-
-    // 4. 서버 데이터 동기화
-    setTimeout(() => {
-      fetchPosts(currentPage);
-    }, 100);
+    fetchPosts();
   };
 
-  /* 3. 에러 화면 */
+  /* 에러 */
   if (error) {
     return (
       <div className="p-8 text-center text-red-500">
@@ -111,7 +99,7 @@ export function Community() {
     );
   }
 
-  /* 4. 실제 렌더링 */
+  /* 렌더링 */
   return (
     <div className="p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
@@ -128,7 +116,6 @@ export function Community() {
         />
       </div>
 
-      {/* 게시글 상세 모달 */}
       <PostDetailModal
         isOpen={!!selectedBoardId}
         onOpenChange={handleCloseModal}
