@@ -216,7 +216,7 @@ export function Home() {
                         </div>
 
                         <h3 className="relative z-10 text-3xl font-medium text-center mb-14">
-                            QRex는 이렇게 피싱 여부를 판단합니다
+                            QRex는 어떻게 피싱 여부를 판단할까요?
                         </h3>
 
                         <div className="relative z-10 grid grid-cols-1 gap-10 md:grid-cols-3">
@@ -226,7 +226,7 @@ export function Home() {
                                 <ShieldCheck size={44} className="mx-auto mb-4 text-lime-600" />
                                 <h4 className="mb-4 text-xl font-medium">안전성 DB 조회</h4>
                                 <p className="text-sm leading-relaxed text-slate-500 mb-0">
-                                    Google Safe Browsing과 악성 도메인 DB를 기반으로<br />
+                                    Google Safe Browsing, 악성 도메인 DB를 통해<br />
                                     알려진 피싱 사이트 여부를 우선 확인합니다.
                                 </p>
                             </div>
@@ -237,7 +237,7 @@ export function Home() {
                                 <h4 className="mb-4 text-xl font-medium">도메인 위험 패턴 분석</h4>
                                 <p className="text-sm leading-relaxed text-slate-500 mb-0">
                                     의심 도메인 목록, 비정상적인 URL 구조,<br />
-                                    서브도메인 사용 방식 등을 규칙 기반으로 점검하여<br />
+                                    서브도메인 사용 방식 등을 규칙 기반으로 점검해<br />
                                     잠재 위험을 보다 정밀하게 탐지합니다.
                                 </p>
                             </div>
@@ -249,7 +249,7 @@ export function Home() {
                                 <p className="text-sm leading-relaxed text-slate-500 mb-0">
                                     최신 피싱 사례, 보안 지식, URL 구조 정보를<br />
                                     AI가 통합 분석하여 최종 판단을 제공합니다.<br />
-                                    이를 통해 보다 신뢰도 높은 결과를 제공할 수 있습니다.
+                                    이를 통해 보다 신뢰도 높은 결과를 얻습니다.
                                 </p>
                             </div>
 
