@@ -120,6 +120,13 @@ export default function ChatBody({ isOpen, user }) {
         setTimeout(() => {
           window.dispatchEvent(new Event("analysis-updated"));
         }, 500);
+
+        // ⭐⭐ NEW ONLY! 커뮤니티 새로고침도 동시에 실행
+        setTimeout(() => {
+          window.dispatchEvent(
+            new CustomEvent("qrex:communityPostDeleted")
+          );
+        }, 300);
       }
     } catch (error) {
       console.error("AI Error:", error);
@@ -164,7 +171,6 @@ export default function ChatBody({ isOpen, user }) {
                   />
                 )}
 
-                {/*  CommentDrawer 방식 그대로 적용된 말풍선 */}
                 <div
                   className={`
                     max-w-[75%]
