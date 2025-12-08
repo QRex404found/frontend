@@ -51,13 +51,15 @@ export function Community() {
   }, [currentPage, isLoggedIn]);
 
   useEffect(() => {
+
     const handler = () => {
-      // 삭제되면 자동 새로고침
       fetchPosts();
     };
 
-    window.addEventListener("qrex-board-deleted", handler);
-    return () => window.removeEventListener("qrex-board-deleted", handler);
+    // 🚨 이벤트 이름만 변경
+    window.addEventListener("analysis-updated", handler);
+
+    return () => window.removeEventListener("analysis-updated", handler);
   }, [currentPage]);
 
   /* 인증 체크 */
