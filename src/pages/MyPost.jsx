@@ -1,5 +1,4 @@
 // src/pages/MyPost.jsx
-
 import React, { useState, useEffect, useMemo } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { AuthPopup } from '@/components/common/AuthPopup';
@@ -36,6 +35,15 @@ export function MyPost() {
 
   const [mobileTab, setMobileTab] = useState("write");
 
+  // 🔥 write form state만 추가
+  const [formState, setFormState] = useState({
+    title: "",
+    url: "",
+    context: "",
+    photoFile: null,
+    previewUrl: null,
+  });
+
   useEffect(() => {
     if (isChecked && isLoggedIn && user) fetchPosts(currentPage);
   }, [currentPage, isChecked, isLoggedIn, user]);
@@ -61,12 +69,6 @@ export function MyPost() {
     }
   };
 
-  useEffect(() => {
-    const handleRefresh = () => fetchPosts(1);
-    window.addEventListener("analysis-updated", handleRefresh);
-    return () => window.removeEventListener("analysis-updated", handleRefresh);
-  }, []);
-
   const toggleDeleteMode = () => {
     if (isDeleting && selectedPosts.length > 0) {
       deleteSelected();
@@ -79,20 +81,12 @@ export function MyPost() {
   const deleteSelected = async () => {
     try {
       await Promise.all(selectedPosts.map((id) => deletePostApi(id)));
-      toast.success("게시글이 삭제되었습니다.");
+      toast.success("삭제되었습니다.");
       fetchPosts(currentPage);
-    } catch {
-      toast.error("삭제 실패");
     } finally {
       setIsDeleting(false);
       setSelectedPosts([]);
     }
-  };
-
-  const toggleSelect = (id) => {
-    setSelectedPosts((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
   };
 
   const openDetail = (item) => {
@@ -101,26 +95,16 @@ export function MyPost() {
   };
 
   const handleDeleteComplete = () => {
-    document.body.style.overflow = 'unset';
-    document.body.style.pointerEvents = 'auto';
-    document.body.style.removeProperty('pointer-events');
     setShowDetail(false);
     setSelectedBoardId(null);
-
     setMyPosts((prev) => prev.filter((p) => p.id !== selectedBoardId));
     setTimeout(() => fetchPosts(currentPage), 100);
   };
 
-  // 🔥 핵심: WritePostForm을 한 번만 생성
-  const writeForm = useMemo(
-    () => <WritePostForm onPostSuccess={() => fetchPosts(1)} />,
-    []
-  );
-
   const showEmpty = !isLoading && myPosts.length === 0;
 
   if (!isChecked)
-    return <div className="flex items-center justify-center h-screen text-gray-500">Loading...</div>;
+    return <div>Loading...</div>;
 
   if (!isLoggedIn)
     return <AuthPopup show={true} isMandatory={true} onClose={() => navigate('/')} />;
@@ -138,69 +122,45 @@ export function MyPost() {
         />
       )}
 
-      {/* PC 화면 */}
+      {/* PC */}
       <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={50} minSize={30}>
-            <div className="flex flex-col h-full">
-              <Card className="flex flex-col w-full h-full p-6">
-                {writeForm}
-              </Card>
-            </div>
+            <Card className="flex flex-col w-full h-full p-6">
+              <WritePostForm
+                formState={formState}
+                setFormState={setFormState}
+                onPostSuccess={() => fetchPosts(1)}
+              />
+            </Card>
           </ResizablePanel>
 
-          <ResizableHandle className="w-[0.5px] bg-transparent rounded-none relative cursor-col-resize
-                after:content-[''] after:absolute
-                after:top-[20px] after:bottom-[20px]
-                after:left-[calc(50%-1px)] after:-translate-x-1/2 after:w-[1px]
-                after:bg-[#E5E5E5] after:rounded-full
-                hover:bg-transparent hover:after:bg-[#E5E5E5]" />
+          <ResizableHandle />
 
           <ResizablePanel minSize={30}>
             <div className="flex flex-col h-full pl-4">
               <div className="flex flex-col w-full px-2 py-2 md:px-4">
-                <h1 className="hidden mb-4 text-3xl font-medium lg:block">My Post</h1>
-
-                <MyPostBoard
-                  isDeleting={isDeleting}
-                  toggleDeleteMode={toggleDeleteMode}
-                  myPosts={myPosts}
-                  isLoading={isLoading}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  setCurrentPage={setCurrentPage}
-                  openDetail={openDetail}
-                  selectedPosts={selectedPosts}
-                  toggleSelect={toggleSelect}
-                  showEmpty={showEmpty}
-                  rowHeightClass="h-12"
-                />
+                <MyPostBoard {...{
+                  isDeleting,
+                  toggleDeleteMode,
+                  myPosts,
+                  isLoading,
+                  currentPage,
+                  totalPages,
+                  setCurrentPage,
+                  openDetail,
+                  selectedPosts,
+                  showEmpty,
+                  rowHeightClass: "h-12",
+                }} />
               </div>
             </div>
           </ResizablePanel>
-
         </ResizablePanelGroup>
       </div>
 
       {/* Mobile */}
       <div className="w-full mt-4 lg:hidden">
-        <div className="flex justify-center mb-3">
-          <div className="inline-flex p-1 bg-gray-100 border border-gray-200 rounded-full shadow-sm">
-            <button
-              onClick={() => setMobileTab("write")}
-              className={`px-4 py-1.5 rounded-full ${mobileTab === "write" ? "bg-white shadow-sm border" : "text-gray-600"}`}
-            >
-              글 작성
-            </button>
-            <button
-              onClick={() => setMobileTab("list")}
-              className={`px-4 py-1.5 rounded-full ${mobileTab === "list" ? "bg-white shadow-sm border" : "text-gray-600"}`}
-            >
-              내가 쓴 글
-            </button>
-          </div>
-        </div>
-
         <div className="overflow-hidden bg-white border rounded-lg shadow-sm">
           <div
             className="flex w-[200%] transition-transform duration-300"
@@ -208,25 +168,28 @@ export function MyPost() {
           >
             <div className="w-1/2 p-4">
               <Card className="flex flex-col w-full h-full p-4">
-                {writeForm}
+                <WritePostForm
+                  formState={formState}
+                  setFormState={setFormState}
+                  onPostSuccess={() => fetchPosts(1)}
+                />
               </Card>
             </div>
 
             <div className="w-1/2 p-4">
-              <MyPostBoard
-                isDeleting={isDeleting}
-                toggleDeleteMode={toggleDeleteMode}
-                myPosts={myPosts}
-                isLoading={isLoading}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                setCurrentPage={setCurrentPage}
-                openDetail={openDetail}
-                selectedPosts={selectedPosts}
-                toggleSelect={toggleSelect}
-                showEmpty={showEmpty}
-                rowHeightClass="h-14"
-              />
+              <MyPostBoard {...{
+                isDeleting,
+                toggleDeleteMode,
+                myPosts,
+                isLoading,
+                currentPage,
+                totalPages,
+                setCurrentPage,
+                openDetail,
+                selectedPosts,
+                showEmpty,
+                rowHeightClass: "h-14",
+              }} />
             </div>
           </div>
         </div>
