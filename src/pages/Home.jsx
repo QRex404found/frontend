@@ -228,8 +228,8 @@ export function Home() {
                                     <ShieldCheck size={44} className="mx-auto mb-4 text-lime-600" />
                                     <h4 className="mb-2 text-xl font-medium">안전성 DB 조회</h4>
                                     <p className="text-sm leading-relaxed text-slate-500">
-                                        Google Safe Browsing과 악성 도메인 DB를 기반으로<br />
-                                        알려진 피싱 사이트 여부를 우선 확인합니다.
+                                        Google Safe Browsing과 악성 도메인 DB를<br />
+                                        기반으로 알려진 피싱 사이트 여부를<br />우선 확인합니다.
                                     </p>
                                 </div>
 
@@ -238,8 +238,8 @@ export function Home() {
                                     <Globe size={44} className="mx-auto mb-4 text-lime-600" />
                                     <h4 className="mb-2 text-xl font-medium">도메인 위험 패턴 분석</h4>
                                     <p className="text-sm leading-relaxed text-slate-500">
-                                        타이포스쿼팅, 서브도메인 패턴, IP 기반 URL 등<br />
-                                        의심 사례 규칙을 적용해 위험도를 진단합니다.
+                                        의심 도메인 목록, 비정상적인 URL 구조,<br />서브도메인 사용 여부 등을<br />
+                                        규칙 기반으로 점검하여 잠재 위험을 빠르게 탐지합니다.
                                     </p>
                                 </div>
 
@@ -249,7 +249,8 @@ export function Home() {
                                     <h4 className="mb-2 text-xl font-medium">RAG 기반 AI 분석</h4>
                                     <p className="text-sm leading-relaxed text-slate-500">
                                         최신 피싱 사례, 보안 지식, URL 구조 정보를<br />
-                                        AI가 통합 분석하여 최종 판단을 제공합니다.
+                                        AI가 통합 분석하여 최종 판단을 제공합니다.<br/>
+                                        위험 요소를 함께 제시해 더 신뢰도 있는 결과를 제공합니다.
                                     </p>
                                 </div>
 

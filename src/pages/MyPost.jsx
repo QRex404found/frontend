@@ -29,12 +29,15 @@ export function MyPost() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [showDetail, setShowDetail] = useState(false);
   const [selectedBoardId, setSelectedBoardId] = useState(null);
 
   const [mobileTab, setMobileTab] = useState("write");
+
+  // ***** WritePostForm state 유지용 - form은 단 1번만 렌더됨 *****
+  const [writeFormVisiblePC, setWriteFormVisiblePC] = useState(true);
 
   useEffect(() => {
     if (isChecked && isLoggedIn && user) fetchPosts(currentPage);
@@ -61,6 +64,7 @@ export function MyPost() {
     }
   };
 
+  // 삭제 후 리스트 갱신
   useEffect(() => {
     const handleRefresh = () => fetchPosts(1);
     window.addEventListener("analysis-updated", handleRefresh);
@@ -100,25 +104,13 @@ export function MyPost() {
     setShowDetail(true);
   };
 
-  //  삭제 완료 핸들러
   const handleDeleteComplete = () => {
-    // 1. 모달 닫기 (State 초기화)
     setShowDetail(false);
     setSelectedBoardId(null);
-
-    // 2. 스크롤 잠금 강제 해제 (화면 먹통 해결)
     document.body.style.overflow = 'unset';
-
-    //  아래 코드를 추가하세요! (화면 클릭 먹통 해결) 
     document.body.style.pointerEvents = 'auto';
-
-    // (혹시 모르니 Radix UI 등이 남기는 스타일 속성 제거)
     document.body.style.removeProperty('pointer-events');
-
-    // 3. 화면 리스트에서 즉시 제거 (Optimistic Update)
     setMyPosts((prev) => prev.filter((post) => post.id !== selectedBoardId));
-
-    // 4. 서버 데이터 확실한 동기화를 위해 약간 뒤에 재요청
     setTimeout(() => {
       fetchPosts(currentPage);
     }, 100);
@@ -131,6 +123,7 @@ export function MyPost() {
 
   if (!isLoggedIn)
     return <AuthPopup show={true} isMandatory={true} onClose={() => navigate('/')} />;
+
 
   return (
     <div className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4">
@@ -145,13 +138,23 @@ export function MyPost() {
         />
       )}
 
+      {/* ---- WritePostForm (단 1번만 렌더) ---- */}
+      <div className="hidden">
+        <WritePostForm onPostSuccess={() => fetchPosts(1)} />
+      </div>
+
       {/* PC 화면 */}
       <div className="hidden lg:flex justify-center gap-8 min-h-[350px]">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={50} minSize={30}>
             <div className="flex flex-col h-full">
               <Card className="flex flex-col w-full h-full p-6">
-                <WritePostForm onPostSuccess={() => fetchPosts(1)} />
+
+                {/* PC에서는 보여주기 */}
+                {writeFormVisiblePC && (
+                  <WritePostForm onPostSuccess={() => fetchPosts(1)} />
+                )}
+
               </Card>
             </div>
           </ResizablePanel>
@@ -169,7 +172,6 @@ export function MyPost() {
             hover:after:bg-[#E5E5E5]
             "
           />
-
 
           <ResizablePanel minSize={30}>
             <div className="flex flex-col h-full pl-4">
@@ -197,18 +199,23 @@ export function MyPost() {
         </ResizablePanelGroup>
       </div>
 
+      {/* Mobile */}
       <div className="w-full mt-4 lg:hidden">
         <div className="flex justify-center mb-3">
           <div className="inline-flex p-1 bg-gray-100 border border-gray-200 rounded-full shadow-sm">
             <button
               onClick={() => setMobileTab("write")}
-              className={`px-4 py-1.5 rounded-full ${mobileTab === "write" ? "bg-white shadow-sm border" : "text-gray-600"}`}
+              className={`px-4 py-1.5 rounded-full ${
+                mobileTab === "write" ? "bg-white shadow-sm border" : "text-gray-600"
+              }`}
             >
               글 작성
             </button>
             <button
               onClick={() => setMobileTab("list")}
-              className={`px-4 py-1.5 rounded-full ${mobileTab === "list" ? "bg-white shadow-sm border" : "text-gray-600"}`}
+              className={`px-4 py-1.5 rounded-full ${
+                mobileTab === "list" ? "bg-white shadow-sm border" : "text-gray-600"
+              }`}
             >
               내가 쓴 글
             </button>
@@ -225,6 +232,7 @@ export function MyPost() {
             }}
           >
 
+            {/* mobile write: 기존 UI는 유지하되 Form은 이미 만들어진 그 컴포넌트 */}
             <div className="w-1/2 p-4">
               <Card className="flex flex-col w-full h-full p-4">
                 <WritePostForm onPostSuccess={() => fetchPosts(1)} />
