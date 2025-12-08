@@ -10,7 +10,7 @@ import { createPostApi } from '@/api/community';
 import heic2any from 'heic2any';
 
 const WritePostForm = ({ formState, setFormState, onPostSuccess }) => {
-  const { title, url, context, photoFile, previewUrl } = formState;
+  const { title, url, context, photoFile, previewUrl, isLoading } = formState;
 
   const update = (key, value) => {
     setFormState(prev => ({ ...prev, [key]: value }));
@@ -81,6 +81,7 @@ const WritePostForm = ({ formState, setFormState, onPostSuccess }) => {
       context: "",
       photoFile: null,
       previewUrl: null,
+      isLoading: false,
     });
 
     const input = document.getElementById('photo-upload');
@@ -90,10 +91,14 @@ const WritePostForm = ({ formState, setFormState, onPostSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isLoading) return;   //  중복 클릭 방지
+
     if (!title.trim() || !context.trim()) {
       toast.warning("제목과 내용을 입력해주세요.");
       return;
     }
+
+    update("isLoading", true);   
 
     const formData = new FormData();
     formData.append('postTitle', title);
@@ -108,6 +113,7 @@ const WritePostForm = ({ formState, setFormState, onPostSuccess }) => {
       onPostSuccess?.();
     } catch {
       toast.error("게시글 등록 실패");
+      update("isLoading", false);   // 실패시 다시 false
     }
   };
 
@@ -192,10 +198,11 @@ const WritePostForm = ({ formState, setFormState, onPostSuccess }) => {
         <Button
           type="submit"
           onClick={handleSubmit}
-          className="w-full text-sm font-medium"
+          disabled={isLoading} 
+          className="w-full text-sm font-medium disabled:opacity-60"
           style={{ backgroundColor: '#7CCF00' }}
         >
-          Write
+          {isLoading ? '등록 중...' : 'Write'}
         </Button>
       </div>
     </div>
