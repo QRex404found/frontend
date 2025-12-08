@@ -45,6 +45,14 @@ export function MyPost() {
   });
 
   useEffect(() => {
+  const handler = () => fetchPosts(1);
+  window.addEventListener("analysis-updated", handler);
+
+  return () => window.removeEventListener("analysis-updated", handler);
+}, []);
+
+
+  useEffect(() => {
     if (isChecked && isLoggedIn && user) fetchPosts(currentPage);
   }, [currentPage, isChecked, isLoggedIn, user]);
 
@@ -69,7 +77,7 @@ export function MyPost() {
     }
   };
 
-  // ⭐ 여기에 다시 추가
+
   const toggleSelect = (id) => {
     setSelectedPosts((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
