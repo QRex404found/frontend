@@ -1,5 +1,5 @@
 // src/pages/MyPost.jsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { AuthPopup } from '@/components/common/AuthPopup';
 import WritePostForm from '@/components/community/WritePostForm';
@@ -67,6 +67,13 @@ export function MyPost() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // ⭐ 여기에 다시 추가
+  const toggleSelect = (id) => {
+    setSelectedPosts((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
   };
 
   const toggleDeleteMode = () => {
@@ -140,20 +147,22 @@ export function MyPost() {
           <ResizablePanel minSize={30}>
             <div className="flex flex-col h-full pl-4">
               <div className="flex flex-col w-full px-2 py-2 md:px-4">
-                <MyPostBoard {...{
-                  isDeleting,
-                  toggleDeleteMode,
-                  myPosts,
-                  isLoading,
-                  currentPage,
-                  totalPages,
-                  setCurrentPage,
-                  openDetail,
-                  selectedPosts,
-                  toggleSelect,
-                  showEmpty,
-                  rowHeightClass: "h-12",
-                }} />
+                <MyPostBoard
+                  {...{
+                    isDeleting,
+                    toggleDeleteMode,
+                    toggleSelect,
+                    myPosts,
+                    isLoading,
+                    currentPage,
+                    totalPages,
+                    setCurrentPage,
+                    openDetail,
+                    selectedPosts,
+                    showEmpty,
+                    rowHeightClass: "h-12",
+                  }}
+                />
               </div>
             </div>
           </ResizablePanel>
@@ -178,24 +187,27 @@ export function MyPost() {
             </div>
 
             <div className="w-1/2 p-4">
-              <MyPostBoard {...{
-                isDeleting,
-                toggleDeleteMode,
-                myPosts,
-                isLoading,
-                currentPage,
-                totalPages,
-                setCurrentPage,
-                openDetail,
-                selectedPosts,
-                toggleSelect,
-                showEmpty,
-                rowHeightClass: "h-14",
-              }} />
+              <MyPostBoard
+                {...{
+                  isDeleting,
+                  toggleDeleteMode,
+                  toggleSelect,
+                  myPosts,
+                  isLoading,
+                  currentPage,
+                  totalPages,
+                  setCurrentPage,
+                  openDetail,
+                  selectedPosts,
+                  showEmpty,
+                  rowHeightClass: "h-14",
+                }}
+              />
             </div>
           </div>
         </div>
       </div>
+
     </div>
   );
 }
