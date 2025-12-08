@@ -150,6 +150,7 @@ export function MyPost() {
                   setCurrentPage,
                   openDetail,
                   selectedPosts,
+                  toggleSelect,
                   showEmpty,
                   rowHeightClass: "h-12",
                 }} />
@@ -187,6 +188,7 @@ export function MyPost() {
                 setCurrentPage,
                 openDetail,
                 selectedPosts,
+                toggleSelect,
                 showEmpty,
                 rowHeightClass: "h-14",
               }} />
