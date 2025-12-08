@@ -197,7 +197,7 @@ export function Home() {
 
 
                     {/* CTA SECTION */}
-                    <div className="relative my-24 overflow-hidden border bg-slate-50 border-slate-200 rounded-3xl p-14">
+                    <div className="relative my-24 overflow-hidden border bg-slate-50 border-slate-200 rounded-3xl px-14 pt-14 pb-8">
 
                         {/* 배경 애니메이션 (원본 유지) */}
                         <div className="absolute inset-0 pointer-events-none opacity-[0.12]">
@@ -222,7 +222,7 @@ export function Home() {
                         <div className="relative z-10 grid grid-cols-1 gap-10 md:grid-cols-3">
 
                             {/* google safe browsing */}
-                            <div className="pt-6 pb-6 px-6 text-center">
+                            <div className="pt-6 pb-4 px-6 text-center">
                                 <ShieldCheck size={44} className="mx-auto mb-4 text-lime-600" />
                                 <h4 className="mb-4 text-xl font-medium">안전성 DB 조회</h4>
                                 <p className="text-sm leading-relaxed text-slate-500 mb-0">
