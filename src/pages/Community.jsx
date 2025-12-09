@@ -118,12 +118,15 @@ export function Community() {
         />
       </div>
 
-      <PostDetailModal
-        isOpen={!!selectedBoardId}
-        onOpenChange={handleCloseModal}
-        boardId={selectedBoardId}
-        onDeleteSuccess={handleDeleteComplete}
-      />
+      {selectedBoardId && (
+        <PostDetailModal
+          isOpen={!!selectedBoardId}
+          onOpenChange={handleCloseModal}
+          boardId={selectedBoardId}
+          onDeleteSuccess={handleDeleteComplete}
+        />
+      )}
+
     </div>
   );
 }

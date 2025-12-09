@@ -35,7 +35,6 @@ export function MyPost() {
 
   const [mobileTab, setMobileTab] = useState("write");
 
-  // 🔥 write form state
   const [formState, setFormState] = useState({
     title: "",
     url: "",
@@ -43,13 +42,6 @@ export function MyPost() {
     photoFile: null,
     previewUrl: null,
   });
-
-  useEffect(() => {
-    const handler = () => fetchPosts(1);
-    window.addEventListener("analysis-updated", handler);
-
-    return () => window.removeEventListener("analysis-updated", handler);
-  }, []);
 
   useEffect(() => {
     if (isChecked && isLoggedIn && user) fetchPosts(currentPage);
@@ -107,29 +99,22 @@ export function MyPost() {
     setShowDetail(true);
   };
 
-  const restoreBody = () => {
-    const body = document.body;
-    body.style.overflow = 'unset';
-    body.style.pointerEvents = 'auto';
-    body.style.position = '';
-    body.style.top = '';
-    body.style.width = '';
-    body.style.removeProperty('padding-right');
-    document.querySelectorAll('[data-radix-portal]').forEach((el) => el.remove());
-  };
-
   const handleDeleteComplete = () => {
-    restoreBody();
     setShowDetail(false);
     setSelectedBoardId(null);
+
     setMyPosts((prev) => prev.filter((p) => p.id !== selectedBoardId));
+
     setTimeout(() => fetchPosts(currentPage), 100);
   };
 
   const showEmpty = !isLoading && myPosts.length === 0;
 
-  if (!isChecked) return <div>Loading...</div>;
-  if (!isLoggedIn) return <AuthPopup show={true} isMandatory={true} onClose={() => navigate('/')} />;
+  if (!isChecked)
+    return <div>Loading...</div>;
+
+  if (!isLoggedIn)
+    return <AuthPopup show={true} isMandatory={true} onClose={() => navigate('/')} />;
 
   return (
     <div className="px-4 md:px-8 max-w-[1300px] mx-auto pb-4">
@@ -137,10 +122,7 @@ export function MyPost() {
       {showDetail && (
         <PostDetailModal
           isOpen={showDetail}
-          onOpenChange={(open) => {
-            setShowDetail(open);
-            if (!open) restoreBody();
-          }}
+          onOpenChange={() => setShowDetail(false)}
           boardId={selectedBoardId}
           showComments={true}
           onDeleteSuccess={handleDeleteComplete}
@@ -189,13 +171,38 @@ export function MyPost() {
 
       {/* Mobile */}
       <div className="w-full mt-4 lg:hidden">
+
+        {/* ⭐ 복원된 탭 UI */}
+        <div className="lg:hidden flex mb-3">
+          <button
+            onClick={() => setMobileTab("write")}
+            className={`flex-1 py-2 text-center text-sm font-medium ${
+              mobileTab === "write"
+                ? "border-b-2 border-green-500 text-green-600"
+                : "text-gray-500"
+            }`}
+          >
+            Write
+          </button>
+
+          <button
+            onClick={() => setMobileTab("posts")}
+            className={`flex-1 py-2 text-center text-sm font-medium ${
+              mobileTab === "posts"
+                ? "border-b-2 border-green-500 text-green-600"
+                : "text-gray-500"
+            }`}
+          >
+            Posts
+          </button>
+        </div>
+
         <div className="overflow-hidden bg-white border rounded-lg shadow-sm">
           <div
             className="flex w-[200%] transition-transform duration-300"
-            style={{
-              transform: mobileTab === "write" ? "translateX(0)" : "translateX(-50%)"
-            }}
+            style={{ transform: mobileTab === "write" ? "translateX(0)" : "translateX(-50%)" }}
           >
+
             <div className="w-1/2 p-4">
               <Card className="flex flex-col w-full h-full p-4">
                 <WritePostForm
