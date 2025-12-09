@@ -94,7 +94,7 @@ export function MyPost() {
   const deleteSelected = async () => {
     try {
       await Promise.all(selectedPosts.map((id) => deletePostApi(id)));
-      toast.success("삭제되었습니다.");
+      toast.success("r게시글이 삭제되었습니다.");
       fetchPosts(currentPage);
     } finally {
       setIsDeleting(false);
@@ -107,7 +107,7 @@ export function MyPost() {
     setShowDetail(true);
   };
 
-  // 🔥 여기만 수정: 모달 삭제 후 body 스타일 확실히 복구 + 목록 sync
+
   const handleDeleteComplete = () => {
     // 1) 모달 닫기 & 선택 초기화
     setShowDetail(false);

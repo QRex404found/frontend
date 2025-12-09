@@ -56,7 +56,7 @@ export function Community() {
       fetchPosts();
     };
 
-    // 🚨 이벤트 이름만 변경
+    //  이벤트 이름만 변경
     window.addEventListener("analysis-updated", handler);
 
     return () => window.removeEventListener("analysis-updated", handler);
@@ -86,7 +86,6 @@ export function Community() {
 
   const handleCloseModal = () => setSelectedBoardId(null);
 
-  // 게시글 상세 모달에서 삭제할 때
   const handleDeleteComplete = () => {
     setSelectedBoardId(null);
     fetchPosts();
