@@ -44,7 +44,7 @@ export function MyPost() {
     previewUrl: null,
   });
 
-  // reload when chat-analysis registered a new post
+  // 챗봇(analysis)에서 글 작성 시 목록 새로고침
   useEffect(() => {
     const handler = () => fetchPosts(1);
     window.addEventListener("analysis-updated", handler);
@@ -107,10 +107,22 @@ export function MyPost() {
     setShowDetail(true);
   };
 
+  // 🔥 여기만 수정: 모달 삭제 후 body 스타일 확실히 복구 + 목록 sync
   const handleDeleteComplete = () => {
+    // 1) 모달 닫기 & 선택 초기화
     setShowDetail(false);
     setSelectedBoardId(null);
+
+    // 2) body에 걸려 있을 수 있는 스타일 강제 복원
+    document.body.style.overflow = 'unset';
+    document.body.style.pointerEvents = 'auto';
+    // 혹시 pointer-events가 인라인으로 남아 있으면 제거
+    document.body.style.removeProperty('pointer-events');
+
+    // 3) 로컬 리스트에서 즉시 제거
     setMyPosts((prev) => prev.filter((p) => p.id !== selectedBoardId));
+
+    // 4) 서버와 동기화용 재조회
     setTimeout(() => fetchPosts(currentPage), 100);
   };
 
@@ -177,7 +189,7 @@ export function MyPost() {
         </ResizablePanelGroup>
       </div>
 
-      {/* Mobile (여기만 추가됨 / 디자인은 Analysis와 동일) */}
+      {/* Mobile (Analysis 탭 UI와 동일 스타일) */}
       <div className="w-full mt-4 lg:hidden">
 
         <div className="flex items-center justify-center mb-3">
