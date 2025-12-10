@@ -94,7 +94,7 @@ export function MyPost() {
   const deleteSelected = async () => {
     try {
       await Promise.all(selectedPosts.map((id) => deletePostApi(id)));
-      toast.success("r게시글이 삭제되었습니다.");
+      toast.success("게시글이 삭제되었습니다.");
       fetchPosts(currentPage);
     } finally {
       setIsDeleting(false);

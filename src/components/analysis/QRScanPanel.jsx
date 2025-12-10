@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Camera } from 'lucide-react';
 import jsQR from 'jsqr';
 
-/* ---------------- QR 이미지에서 URL 추출 (기존 로직 유지) ---------------- */
+/* ---------------- QR 이미지에서 URL 추출  ---------------- */
 const scanFileForQrUrl = async (file) => {
   let imageBitmap;
   try {
@@ -13,50 +13,36 @@ const scanFileForQrUrl = async (file) => {
     throw new Error("이미지 파일을 처리할 수 없습니다.");
   }
 
+  const MAX_SIZE = 1000;
+  let width = imageBitmap.width;
+  let height = imageBitmap.height;
+
+  if (width > MAX_SIZE || height > MAX_SIZE) {
+    const scale = MAX_SIZE / Math.max(width, height);
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
+  }
+
   const canvas = document.createElement("canvas");
-  canvas.width = imageBitmap.width;
-  canvas.height = imageBitmap.height;
+  canvas.width = width;
+  canvas.height = height;
 
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  ctx.drawImage(imageBitmap, 0, 0);
+  
+  // 이미지 선명하게 그리기 (부드러운 스케일링)
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(imageBitmap, 0, 0, width, height);
 
-  let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const data = imageData.data;
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-  // 1차 시도: 밝기 조절 후 이진화
-  let total = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    total += (data[i] + data[i + 1] + data[i + 2]) / 3;
-  }
-  const avgBrightness = total / (data.length / 4);
-  const threshold = avgBrightness * 0.9;
-
-  for (let i = 0; i < data.length; i += 4) {
-    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-    const bw = avg > threshold ? 255 : 0;
-    data[i] = data[i + 1] = data[i + 2] = bw;
-  }
-  ctx.putImageData(imageData, 0, 0);
-
-  let code = jsQR(imageData.data, imageData.width, imageData.height, {
-    inversionAttempts: "dontInvert",
+  const code = jsQR(imageData.data, imageData.width, imageData.height, {
+    inversionAttempts: "attemptBoth",
   });
 
-  // 2차 시도: 실패 시 색상 반전 후 재시도
-  if (!code) {
-    for (let i = 0; i < data.length; i += 4) {
-      data[i] = 255 - data[i];
-      data[i + 1] = 255 - data[i + 1];
-      data[i + 2] = 255 - data[i + 2];
-    }
-    ctx.putImageData(imageData, 0, 0);
-    imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    code = jsQR(imageData.data, imageData.width, imageData.height, {
-      inversionAttempts: "dontInvert",
-    });
-  }
-
   if (code && code.data) return code.data;
+  
+  // 인식 실패
   throw new Error("이미지에서 QR 코드를 찾을 수 없습니다.");
 };
 
